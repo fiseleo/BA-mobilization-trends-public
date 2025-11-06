@@ -1,4 +1,4 @@
 export const COOKIE_NAME = 'NEXT_LOCALE';
-export const defaultLocale = 'en';
+export const DEFAULT_LOCALE = 'en';
 export type Locale = 'en' | 'ko' | 'ja';
-export const suportedLocales = ['en', 'ko', 'ja']
+export const SUPORTED_LOCALES: Locale[] = ['en', 'ko', 'ja']

@@ -1,27 +1,25 @@
-// ./app/components/ChartControls.tsx
-
 import { useState, memo, useCallback } from 'react';
-import { RaidInfo, Student } from '../../types/data';
 import StudentSearchDropdown from '../StudentSearchDropdown';
 import { StarRating } from '../StarRatingProps';
 import { useChartControlsStore } from '../../store/chartControlsStore'
 import { useShallow } from 'zustand/react/shallow';
 import TooltipSlider from '../HandleTooltip';
 import 'rc-slider/assets/index.css';
-import { raidToString } from '../../utils/raidToString';
-import { debounce } from 'lodash';
+import { raidToString, raidToStringTsx } from '../raidToString';
+import lodash from 'lodash';
+const { debounce } = lodash
 
 
 import React from 'react';
-import { useTranslations } from 'next-intl';
 import { ToggleButtonGroup } from '../ToggleButtonGroupProps';
-import { difficultyInfo, DifficultySelect } from '../Difficulty';
+import type { Student } from '~/types/data';
+import { useTranslation } from 'react-i18next';
+import { difficultyInfo, type DifficultySelect } from '../Difficulty';
+import type { Locale } from '~/utils/i18n/config';
 
 
 interface ChartControlsProps {
   students: Record<number, Student>;
-  xLabels: RaidInfo[];
-  // availableZValues: number[];
 }
 
 const SliderComponent = ({ fullXRange, labelMap, xRange, setXRange }: {
@@ -56,19 +54,14 @@ const SliderComponent = ({ fullXRange, labelMap, xRange, setXRange }: {
 
 const ChartControls = ({
   students,
-  xLabels,
-  //   availableZValues
 }: ChartControlsProps) => {
-  // console.log('ChartControls is rendering...');
-
-  const t = useTranslations('charts.heatmap.control')
-  const t_raids = useTranslations('raidInfo')
+  const { t, i18n } = useTranslation("charts", { keyPrefix: 'heatmap.control' });
+  const { t: t_raids } = useTranslation("raidInfo");
+  const locale = i18n.language as Locale
 
   const {
     selectedStudentId,
     setSelectedStudentId,
-    // tempRankWidth,
-    // setTempRankWidth,
     rankwidth,
     setRankWidth,
     selectedZValues,
@@ -83,14 +76,13 @@ const ChartControls = ({
     xRange,
     setXRange,
     fullXRange,
-    availableZValues,
-    diffculty,
-    setDiffculty,
+    availableZValueCounter,
+    difficulty,
+    setDifficulty,
+    getFilteredRaidInfoByDifficulty,
   } = useChartControlsStore(useShallow(state => ({
     selectedStudentId: state.selectedStudentId,
     setSelectedStudentId: state.setSelectedStudentId,
-    // tempRankWidth: state.tempRankWidth,
-    // setTempRankWidth: state.setTempRankWidth,
     setRankWidth: state.setRankWidth,
     rankwidth: state.rankWidth,
     selectedZValues: state.selectedZValues,
@@ -105,20 +97,22 @@ const ChartControls = ({
     xRange: state.xRange,
     setXRange: state.setXRange,
     fullXRange: state.fullXRange,
-    availableZValues: state.availableZValues,
-    diffculty: state.diffculty,
-    setDiffculty: state.setDiffculty,
+    availableZValueCounter: state.availableZValueCounter,
+    difficulty: state.difficulty,
+    setDifficulty: state.setDifficulty,
+    getFilteredRaidInfoByDifficulty: state.getFilteredRaidInfoByDifficulty
   })));
 
   const [tempRankWidth, setTempRankWidth] = useState<number>(rankwidth);
+  const xLabels = getFilteredRaidInfoByDifficulty()
 
   const labelMap: Record<number, React.ReactNode> = xLabels.reduce((map, raid, index) => {
-    map[index] = raidToString(raid, true);
+    map[index] = raidToString(raid, locale, true);
     return map;
   }, {} as Record<number, React.ReactNode>);
 
   const handleSelectAllZValues = () => {
-    setSelectedZValues(Array.from(availableZValues));
+    setSelectedZValues(Array.from(availableZValueCounter.keys()));
   };
 
 
@@ -126,15 +120,10 @@ const ChartControls = ({
     setSelectedZValues([]);
   };
 
-  const toggleOptions = [
-    { value: 'percent', label: '%' },
-    { value: 'absolute', label: 'Abs.' },
-  ];
-
 
   return (
     <>
-      <hr className="border-gray-300 dark:border-gray-700 my-3 transition-colors duration-300" />
+      <hr className="border-neutral-300 dark:border-neutral-700 my-3 transition-colors duration-300" />
       {/* Student Search - Full Width */}
       <div className="mb-2">
         <StudentSearchDropdown
@@ -143,57 +132,63 @@ const ChartControls = ({
           setSelectedStudentId={setSelectedStudentId}
         />
       </div>
-      <hr className="border-gray-300 dark:border-gray-700 my-3 transition-colors duration-300" />
+      <hr className="border-neutral-300 dark:border-neutral-700 my-3 transition-colors duration-300" />
 
       {/* Main Controls Grid */}
       <div>
         <div>
           {/* Section 1: Display Options */}
-          <h3 className="font-semibold text-gray-800 dark:text-white text-sm transition-colors duration-300">{t('displayOptions.title')}</h3>
+          <h3 className="font-semibold text-neutral-800 dark:text-white transition-colors duration-300">{t('displayOptions.title')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             <ToggleButtonGroup
               label={t('displayOptions.heatmap')}
-              options={toggleOptions}
+              options={[
+                { value: 'percent', label: t('heatmap_option_percent') },
+                { value: 'absolute', label: t('heatmap_option_absolute') },
+              ]}
               selectedValue={heatmapMode}
               onSelect={(val) => setHeatmapMode(val as 'percent' | 'absolute')}
             />
             <ToggleButtonGroup
               label={t('displayOptions.histograms')}
-              options={toggleOptions}
+              options={[
+                { value: 'percent', label: t('histogram_option_percent') },
+                { value: 'absolute', label: t('histogram_option_absolute') },
+              ]}
               selectedValue={histogramMode}
               onSelect={(val) => setHistogramMode(val as 'percent' | 'absolute')}
             />
             <div className="flex justify-between items-center">
-              <label className="text-sm font-medium text-gray-600 dark:text-gray-400 transition-colors duration-300">{t('displayOptions.rankWidth')}</label>
+              <label className="text-sm font-medium text-neutral-600 dark:text-neutral-400 transition-colors duration-300">{t('displayOptions.rankWidth')}</label>
               <div className="flex items-center">
                 <input
                   type="number"
                   min={1}
                   value={tempRankWidth}
                   onChange={e => Number(e.target.value) && setTempRankWidth(Number(e.target.value))}
-                  className="w-16 p-1 text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white border rounded-l-md focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 transition-colors duration-300"
+                  className="w-16 px-1 py-0.5 text-sm border-neutral-300 dark:border-neutral-600 dark:bg-neutral-700 dark:text-white border rounded-l-md focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 transition-colors duration-300"
                 />
                 <button
                   onClick={() => setRankWidth(tempRankWidth)}
-                  className="px-3 py-1 bg-bluearchive-botton-blue dark:bg-sky-600 hover:bg-sky-400 dark:hover:bg-sky-500 transition-colors dark:text-white w-full shadow-bluearchive text-black rounded-r-md text-sm font-semibold"
+                  className="px-3 py-1 bg-bluearchive-botton-blue  hover:bg-sky-400  transition-colors  w-full shadow-bluearchive text-black rounded-r-md text-xs font-semibold" // dark:hover:bg-sky-500 dark:text-white dark:bg-sky-600
                 >
                   {(t('setButton'))}
                 </button>
               </div>
             </div>
             <div className="flex justify-between items-center">
-              <label className="text-sm font-medium text-gray-600 dark:text-gray-400 transition-colors duration-300">{t('displayOptions.X-Threshold')}</label>
+              <label className="text-sm font-medium text-neutral-600 dark:text-neutral-400 transition-colors duration-300">{t('displayOptions.X-Threshold')}</label>
               <div className="flex items-center">
                 <input
                   type="number"
                   min={1}
                   value={hideXThreshold}
                   onChange={e => setHideXThreshold(Number(e.target.value))}
-                  className="w-16 p-1.5 text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white border rounded-l-md focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 transition-colors duration-300"
+                  className="w-16  px-1 py-0.5 text-sm border-neutral-300 dark:border-neutral-600 dark:bg-neutral-700 dark:text-white border rounded-l-md focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 transition-colors duration-300"
                 />
                 <button
                   onClick={() => setHideXThreshold(hideXThreshold)}
-                  className="px-3 py-1.5 bg-bluearchive-botton-blue dark:bg-sky-600 hover:bg-sky-400 dark:hover:bg-sky-500 transition-colors dark:text-white w-full shadow-bluearchive text-black rounded-r-md text-sm font-semibold"
+                  className="px-3 py-1.5 bg-bluearchive-botton-blue  hover:bg-sky-400  transition-colors  w-full shadow-bluearchive text-black rounded-r-md text-xs font-semibold" // dark:bg-sky-600 dark:hover:bg-sky-500 dark:text-white
                 >
                   {(t('setButton'))}
                 </button>
@@ -201,12 +196,12 @@ const ChartControls = ({
             </div>
             <div className="flex justify-between items-center">
 
-              <label htmlFor="squad-type-select" className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">{t('diffculty')}</label>
+              <label htmlFor="squad-type-select" className="text-sm font-medium text-neutral-700 dark:text-neutral-300 whitespace-nowrap">{t('difficulty')}</label>
               <select
                 id="squad-type-select"
-                value={diffculty}
-                onChange={(e) => setDiffculty(e.target.value as DifficultySelect)}
-                className="p-1 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                value={difficulty}
+                onChange={(e) => setDifficulty(e.target.value as DifficultySelect)}
+                className="p-1 border border-neutral-300 dark:border-neutral-600 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-neutral-700 dark:text-white"
               >
                 <option value="All">{t_raids('All')}</option>
                 {difficultyInfo.map(({ name }) => <option value={name} key={name}>{t_raids(name)}</option>)}
@@ -217,24 +212,24 @@ const ChartControls = ({
         </div>
 
         <div>
-          <hr className="border-gray-300 dark:border-gray-700 my-2 transition-colors duration-300" />
-          <h3 className="font-semibold text-gray-800 dark:text-white text-sm mb-1 transition-colors duration-300">{t('filterByStars.title')}</h3>
+          <hr className="border-neutral-300 dark:border-neutral-700 my-2 transition-colors duration-300" />
+          <h3 className="font-semibold text-neutral-800 dark:text-white mb-1 transition-colors duration-300">{t('filterByStars.title')}</h3>
           <div className="flex gap-1 mb-2">
             <button
               onClick={handleSelectAllZValues}
-              className="px-3 py-1 text-xs font-medium text-black bg-bluearchive-botton-blue dark:bg-sky-600 dark:text-white rounded-md hover:bg-sky-400 dark:hover:bg-sky-500 transition-colors w-full shadow-bluearchive"
+              className="px-3 py-1 text-xs font-medium text-black bg-bluearchive-botton-blue  rounded-md hover:bg-sky-400 dark:hover:bg-sky-500 transition-colors w-full shadow-bluearchive" // dark:bg-sky-600 dark:text-white
             >
               {t('filterByStars.all')}
             </button>
             <button
               onClick={handleDeselectAllZValues}
-              className="px-3 py-1 text-xs font-medium text-gray-700 dark:text-gray-300 bg-bluearchive-botton-gray dark:bg-gray-600 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors w-full shadow-bluearchive"
+              className="px-3 py-1 text-xs font-medium text-neutral-700 dark:text-neutral-300 bg-bluearchive-botton-gray dark:bg-neutral-600 rounded-md hover:bg-neutral-300 dark:hover:bg-neutral-500 transition-colors w-full shadow-bluearchive"
             >
               {t('filterByStars.none')}
             </button>
           </div>
           <div className="flex flex-wrap gap-1.5">
-            {Array.from(availableZValues)
+            {Array.from(availableZValueCounter.keys())
               .sort((a, b) => a - b)
               .sort((a, b) => {
                 const f = (x: number) => x >= 0 ? x : 10000 + -x
@@ -246,31 +241,31 @@ const ChartControls = ({
                   <button
                     key={z}
                     onClick={() => handleZSelectionChange(z)}
-                    className={`inline-grid place-items-center rounded-md w-7.5 h-6 border transition-all duration-200 
+                    className={`flex place-items-center rounded-md h-6 border transition-all duration-200 px-0.5
                     ${isSelected
-                        ? 'bg-white border-gray-600 shadow-inner dark:bg-gray-700 dark:border-gray-400 dark:shadow-none'
-                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700'
+                        ? 'bg-white border-neutral-600 shadow-inner dark:bg-neutral-700 dark:border-neutral-400 dark:shadow-none'
+                        : 'bg-white text-neutral-700 border-neutral-300 hover:bg-neutral-100 dark:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-600 dark:hover:bg-neutral-700'
                       }`}
                   >
-                    <StarRating n={z} />
+                    <StarRating n={z} /> <span className='flex items-center relative pl-1 text-xs text-neutral-600 dark:text-neutral-400'> {availableZValueCounter.get(z)?.toLocaleString()}{t('filterByStars.count')}</span>
                   </button>
                 );
               })}
           </div>
-          <hr className="border-gray-300 dark:border-gray-700 my-2 transition-colors duration-300" />
+          <hr className="border-neutral-300 dark:border-neutral-700 my-2 transition-colors duration-300" />
         </div>
 
         <div>
-          <h3 className="font-semibold text-gray-800 dark:text-white text-sm mb-2 transition-colors duration-300">{t('raidRange.title')}</h3>
-          <div className="w-full text-center text-sm text-gray-700 dark:text-gray-400 mb-2 transition-colors duration-300 flex flex-col sm:flex-row justify-center">
+          <h3 className="font-semibold text-neutral-800 dark:text-white mb-2 transition-colors duration-300">{t('raidRange.title')}</h3>
+          <div className="w-full text-center text-sm text-neutral-700 dark:text-neutral-400 mb-2 transition-colors duration-300 flex flex-col sm:flex-row justify-center">
             <span><span className="font-semibold text-blue-600 dark:text-blue-400 transition-colors duration-300">
               {xLabels[Math.max(fullXRange[0], xRange[0])]?.Id}
             </span>
-              <span className="text-xs text-gray-500 dark:text-gray-400 ml-1 transition-colors duration-300">
+              <span className="text-xs text-neutral-500 dark:text-neutral-400 ml-1 transition-colors duration-300">
                 {/* <RaidNoWrapFormatter
                   raid={xLabels[Math.max(fullXRange[0], xRange[0])]}
                 /> */}
-                {raidToString(xLabels[Math.max(fullXRange[0], xRange[0])], true)}
+                {raidToStringTsx(xLabels[Math.max(fullXRange[0], xRange[0])], locale, true)}
               </span>
             </span>
             <span className="mx-2 font-medium">—</span>
@@ -278,11 +273,8 @@ const ChartControls = ({
               <span className="font-semibold text-blue-600 dark:text-blue-400 transition-colors duration-300">
                 {xLabels[Math.min(fullXRange[1], xRange[1])]?.Id}
               </span>
-              <span className="text-xs text-gray-500 dark:text-gray-400 ml-1 transition-colors duration-300">
-                {/* <RaidNoWrapFormatter
-                  raid={xLabels[Math.min(fullXRange[1], xRange[1])]}
-                /> */}
-                {raidToString(xLabels[Math.min(fullXRange[1], xRange[1])], true)}
+              <span className="text-xs text-neutral-500 dark:text-neutral-400 ml-1 transition-colors duration-300">
+                {raidToStringTsx(xLabels[Math.min(fullXRange[1], xRange[1])], locale, true)}
               </span>
             </span>
           </div>
@@ -292,7 +284,7 @@ const ChartControls = ({
             xRange={xRange}
             setXRange={setXRange}
           />
-          <hr className="border-gray-300 dark:border-gray-700 my-3 transition-colors duration-300" />
+          <hr className="border-neutral-300 dark:border-neutral-700 my-3 transition-colors duration-300" />
         </div>
       </div>
     </>

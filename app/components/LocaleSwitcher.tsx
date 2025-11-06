@@ -1,9 +1,10 @@
-import {useLocale, useTranslations} from 'next-intl';
+import { useTranslation } from 'react-i18next';
 import LocaleSwitcherSelect from './LocaleSwitcherSelect';
 
 export default function LocaleSwitcher() {
-  const t = useTranslations('LocaleSwitcher');
-  const locale = useLocale();
+  // const {t, i18n} = useTranslation('LocaleSwitcher');
+  const { t, i18n } = useTranslation("LocaleSwitcher");
+  const locale = i18n.language
 
   return (
     <LocaleSwitcherSelect

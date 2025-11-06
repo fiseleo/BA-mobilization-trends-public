@@ -1,0 +1,106 @@
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { ItemIcon } from '../common/Icon';
+import { StudentGrowthPlanCard } from './StudentGrowthPlanCard';
+import { calculatedGrowthNeeds } from '~/utils/calculatedGrowthNeeds';
+import type { EventData, IconData, Student, StudentData, StudentPortraitData } from '~/types/plannerData';
+import { useGlobalStore } from '~/store/planner/useGlobalStore';
+import { useTranslation } from 'react-i18next';
+import { ChevronIcon } from '../../Icon';
+
+interface StudentGrowthPlannerProps {
+  eventId: number;
+  eventData: EventData;
+  iconData: IconData;
+  allStudents: StudentData;
+  studentPortraits: StudentPortraitData;
+  onCalculate: (needs: Record<string, number>) => void;
+}
+
+export const StudentGrowthPlanner = ({ eventId, eventData, iconData, allStudents, studentPortraits, onCalculate }: StudentGrowthPlannerProps) => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const { growthPlans, addPlan } = useGlobalStore();
+
+  const { t } = useTranslation("planner");
+
+
+
+  const plansForThisEvent = useMemo(() =>
+    growthPlans.filter(p => p.includedInEvents.includes(eventId)),
+    [growthPlans, eventId]);
+
+  const calculatedNeeds = useMemo(() => {
+    return calculatedGrowthNeeds(plansForThisEvent, allStudents)
+  }, [plansForThisEvent, allStudents]);
+
+  useEffect(() => { onCalculate(calculatedNeeds); }, [calculatedNeeds, onCalculate]);
+
+  const studentOptions = useMemo(() => {
+    if (!eventData.bonus || Object.keys(allStudents).length === 0) {
+      return Object.entries(allStudents).sort(([, a], [, b]) => a.Name.localeCompare(b.Name));
+    }
+    const bonusStudentIds = Object.keys(eventData.bonus);
+    const studentOptionsTop = bonusStudentIds
+      .sort((a, b) => -eventData.bonus[a].BonusPercentage.reduce((acc, val) => acc + val, 0) + eventData.bonus[b].BonusPercentage.reduce((acc, val) => acc + val, 0))
+      .map(v => ([v, allStudents[Number(v)]] as [string, Student]))
+      .filter(([, student]) => student);
+
+    const bonusIdSet = new Set(bonusStudentIds);
+    const studentOptionsAll = Object.entries(allStudents)
+      .filter(([id]) => !bonusIdSet.has(id))
+      .sort(([, a], [, b]) => a.Name.localeCompare(b.Name));
+
+    return [...studentOptionsTop, ...studentOptionsAll];
+  }, [allStudents, eventData.bonus]);
+
+  return (
+    <>
+      <div className="flex justify-between items-center cursor-pointer group" onClick={() => setIsCollapsed(!isCollapsed)}>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{t('page.studentGrowthPlanner')}</h2>
+        <span className="text-2xl transition-transform duration-300 group-hover:scale-110"><ChevronIcon className={isCollapsed ? "rotate-180" : ""} /></span>
+      </div>
+      {!isCollapsed && (
+        <div className="mt-4 space-y-4">
+          <div className="text-right">
+            <a href="/students" target="_blank" rel="noopener noreferrer" className="text-sm text-blue-500 hover:underline dark:text-blue-400">
+              {t('ui.goToFullPage')}
+            </a>
+          </div>
+          <div className="space-y-4">
+            {plansForThisEvent.length > 0 ? (
+              plansForThisEvent.map((plan) => (
+                <StudentGrowthPlanCard
+                  key={plan.uuid}
+                  plan={plan}
+                  allStudents={allStudents}
+                  studentPortraits={studentPortraits}
+                  studentOptions={studentOptions}
+                  eventData={eventData}
+                  iconData={iconData}
+                  onClose={function (): void {
+                    throw new Error('Function not implemented.');
+                  }} />
+              ))
+            ) : (
+              <div className="text-center text-gray-400 dark:text-gray-500 p-4">{t('ui.noStudentPlanInEvent')}</div>
+            )}
+          </div>
+          <button onClick={() => addPlan(eventId)} className="w-full bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-2 rounded-lg mt-2">
+            {t('ui.addNewPlan')}
+          </button>
+          {Object.keys(calculatedNeeds).length > 0 && (
+            <div className="mt-4">
+              <h3 className="font-bold dark:text-gray-200">{t('label.materialsForCurrentEvent')}</h3>
+              <div className="flex flex-wrap gap-2 mt-2 p-3 bg-gray-100 dark:bg-neutral-800/50 rounded-lg">
+                {Object.entries(calculatedNeeds).map(([key, amount]) => {
+                  if (amount <= 0) return null;
+                  const [type, id] = key.split('_');
+                  return <ItemIcon key={key} type={type} itemId={id} amount={amount} size={12} eventData={eventData} iconData={iconData} />;
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </>
+  );
+};

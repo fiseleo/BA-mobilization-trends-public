@@ -1,0 +1,116 @@
+[
+    {
+        "date": "2025-11-07",
+        "changes": {
+            "en": [
+                "Event page UI improvement",
+                "Live Dashboard Total Assault S83 (BETA) ended",
+                "Added JP Total Assault S83 Yesod top-ranking team data (from Plana Stats)",
+                "GitHub code synchronization"
+            ],
+            "ko": [
+                "이벤트 페이지 UI 개선",
+                "라이브 대시보드 총력전 S83 (BETA) 종료",
+                "JP 총력전 S83 예소드 상위권 편성 데이터 교체 (from Plana Stats)",
+                "Github 코드 동기화"
+            ],
+            "ja": [
+                "イベントページUIの改善",
+                "JP 総力戦S83 イェソド 上位編成データをの追加 (from Plana Stats)",
+                "リアルタイムダッシュボード 総力戦S83 (BETA) 終了",
+                "GitHubコードの同期"
+            ]
+        }
+    },
+    {
+        "date": "2025-11-05",
+        "changes": {
+            "en": [
+                "Added Calendar page",
+                "Rerun Event 'Radiant Moon, Raucous Dream' Update"
+            ],
+            "ko": [
+                "캘린더 페이지 추가",
+                "월화몽소 [복각] 이벤트 업데이트"
+            ],
+            "ja": [
+                "カレンダーページを追加",
+                "「月華夢騒」 [復刻] イベントアップデート"
+            ]
+        }
+    },
+    {
+        "date": "2025-11-01",
+        "changes": {
+            "en": [
+                "Separate page paths by language"
+            ],
+            "ko": [
+                "언어별로 페이지 경로 분리"
+            ],
+            "ja": [
+                "言語別にページパスを分離"
+            ]
+        }
+    },
+    {
+        "date": "2025-10-29",
+        "changes": {
+            "en": [
+                "Live Dashboard Total Assault S83 (BETA) started"
+            ],
+            "ko": [
+                "라이브 대시보드 총력전 S83 (BETA) 시작"
+            ],
+            "ja": [
+                "リアルタイムダッシュボード 総力戦S83 (BETA) 開始"
+            ]
+        }
+    },
+    {
+        "date": "2025-10-25",
+        "changes": {
+            "en": [
+                "Added Favor Rank Status",
+                "Added JP Grand Assault S27 Shiro&Kuro overall score data"
+            ],
+            "ko": [
+                "인연 칭호 보유 현황 추가",
+                "JP 대결전 S27 시로&쿠로 전체 분포 데이터 추가"
+            ],
+            "ja": [
+                "絆ランク称号の状況追加",
+                "JP 大決戦S27 シロ＆クロ 全体スコア分布データをの追加"
+            ]
+        }
+    },
+    {
+        "date": "2025-10-24",
+        "changes": {
+            "en": [
+                "Added update details",
+                "Added JP Grand Assault S27 Shiro&Kuro top-ranking team data (from Plana Stats)",
+                "Replaced JP Grand Assault S26 Chesed top-ranking team data (from Plana Stats)",
+                "Updated student information (from Schale DB)",
+                "Live Dashboard Grand Assault S27 (BETA) ended",
+                "Improved display for probability-based items"
+            ],
+            "ko": [
+                "업데이트 내역 추가",
+                "JP 대결전 S27 시로&쿠로 상위권 편성 데이터 추가 (from Plana Stats)",
+                "JP 대결전 S26 헤세드 상위권 편성 데이터 교체 (from Plana Stats)",
+                "학생 정보 최신화 (from Schale DB)",
+                "라이브 대시보드 대걸전 S27 (BETA) 종료",
+                "확률형 아이템 표시 개선"
+            ],
+            "ja": [
+                "アップデート履歴追加",
+                "JP 大決戦S27 シロ＆クロ 上位編成データをの追加 (from Plana Stats)",
+                "JP 大決戦S26 ケセド 上位編成データの差し替え (from Plana Stats)",
+                "学生情報の更新 (from Schale DB)",
+                "リアルタイムダッシュボード 大決戦S27 (BETA) 終了",
+                "確率型アイテムの表示改善"
+            ]
+        }
+    }
+]

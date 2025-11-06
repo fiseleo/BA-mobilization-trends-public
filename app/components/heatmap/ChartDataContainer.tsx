@@ -1,24 +1,26 @@
-import { useMemo, useEffect, memo } from 'react';
-import dynamic from 'next/dynamic';
+import { useMemo, useEffect, memo, lazy } from 'react';
 import { useShallow } from 'zustand/shallow';
 import { useChartControlsStore } from '../../store/chartControlsStore';
-// import { useChartDataProcessor } from '../hooks/useChartDataProcessor';
-import { ChartData, RaidInfo } from '../../types/data';
 import { useDataCache } from '../../utils/cache';
+import type { ChartData, GameServer } from '~/types/data';
+import { useTranslation } from 'react-i18next';
+import type { Locale } from '~/utils/i18n/config';
 
 interface ChartDataContainerProps {
-    // students: Record<string, Student>;
-    xLabels: RaidInfo[];
-    // maxLvJson: Record<number, number>;
+    server: GameServer;
 }
 
-const DynamicHeatmapChart = dynamic(() => import('./HeatmapChart'), {
-    ssr: false,
-    loading: () => <p>Loading Chart...</p>,
-});
 
-const ChartDataContainer = ({ xLabels }: ChartDataContainerProps) => {
-    console.log('ChartDataContainer is rendering...');
+const DynamicHeatmapChart = lazy(() => import('./HeatmapChart'));
+
+
+const ChartDataContainer = ({
+    // xLabels
+    server
+}: ChartDataContainerProps) => {
+
+    const { t, i18n } = useTranslation("charts", { keyPrefix: 'heatmap.draw' });
+    const locale = i18n.language as Locale
 
     const {
         isLoading,
@@ -27,7 +29,8 @@ const ChartDataContainer = ({ xLabels }: ChartDataContainerProps) => {
         // selectedZValuesArray,
         heatmapMode,
         selectedZValues,
-        fetchAndProcessChartData
+        fetchAndProcessChartData,
+        histogramMode
     } = useChartControlsStore(
         useShallow(state => ({
             isLoading: state.isLoading,
@@ -36,7 +39,8 @@ const ChartDataContainer = ({ xLabels }: ChartDataContainerProps) => {
             // selectedZValuesArray: Array.from(state.selectedZValues),
             heatmapMode: state.heatmapMode,
             selectedZValues: state.selectedZValues,
-            fetchAndProcessChartData: state.fetchAndProcessChartData
+            fetchAndProcessChartData: state.fetchAndProcessChartData,
+            histogramMode: state.histogramMode
         }))
     );
 
@@ -48,23 +52,23 @@ const ChartDataContainer = ({ xLabels }: ChartDataContainerProps) => {
         xRange: state.xRange,
         histogramMode: state.histogramMode,
         heatmapMode: state.heatmapMode,
-        diffculty: state.diffculty
+        difficulty: state.difficulty
     })));
     const fetchAndProcessWithCache = useDataCache<string>();
 
 
     useEffect(() => {
-        fetchAndProcessChartData(fetchAndProcessWithCache, xLabels)
+        fetchAndProcessChartData(server, fetchAndProcessWithCache, locale)
     }, [
-        fetchAndProcessChartData, 
+        fetchAndProcessChartData,
         processingParams.selectedStudentId,
         processingParams.rankWidth,
         processingParams.hideXThreshold,
         processingParams.xRange,
         processingParams.heatmapMode,
         processingParams.histogramMode,
-        processingParams.diffculty,
-        xLabels, 
+        processingParams.difficulty,
+        // xLabels,
         fetchAndProcessWithCache
     ]);
 
@@ -91,52 +95,48 @@ const ChartDataContainer = ({ xLabels }: ChartDataContainerProps) => {
             data.rightBar.values.forEach((val, j) => aggregated.rightBar.values[j] += val);
         }
         return aggregated;
-    // }, [selectedZValues, chartDataByZ]);
+        // }, [selectedZValues, chartDataByZ]);
     }, [selectedZValues, chartDataByZ]);
 
     const layout = useMemo((): Partial<Plotly.Layout> => {
-        console.log('Calculating layout...');
         return {
             autosize: true,
-            xaxis: { domain: [0, 0.83], automargin: true },
-            yaxis: { domain: [0, 0.83], automargin: true },
+            xaxis: { domain: [0, 0.83], automargin: true }, // tickangle:(0), tickmode: 'auto'
+            yaxis: { domain: [0, 0.83], automargin: true, autorange: 'reversed' },
             xaxis2: { domain: [0, 0.83], anchor: 'y2', showticklabels: false },
             yaxis2: { domain: [0.85, 1] },
             xaxis3: { domain: [0.85, 1] },
             yaxis3: { domain: [0, 0.83], anchor: 'x3', showticklabels: false },
             showlegend: false,
+            margin: {
+                l: 0,
+                r: 0,
+                t: 40,
+                b: 0
+            }
+
         };
     }, []);
 
-    function transposeMatrix(matrix:(number | null)[][]) {
-        if (!matrix || matrix.length === 0 || matrix[0].length === 0) {
-          return [];
-        }
-      
-        const rows = matrix.length;
-        const cols = matrix[0].length;
-        const transposed = new Array(cols).fill(null).map(() => new Array(rows));
-      
-        for (let i = 0; i < rows; i++) {
-          for (let j = 0; j < cols; j++) {
-            transposed[j][i] = matrix[i][j];
-          }
-        }
-      
-        return transposed;
-      }
-      
+    const getAvgV = (x: string) => {
+        const [a, b] = x.split('-').map(v => parseInt(v))
+        return ((a + b - 1) / 2) | 0
+    }
 
     const heatmapData = useMemo((): Partial<Plotly.Data> => {
-        // console.log('Calculating heatmapData...');
         if (!aggregatedChartData) return {};
         const data: Partial<Plotly.Data> = {
             x: aggregatedChartData.heatmap.x,
-            y: aggregatedChartData.heatmap.y,
+            y: aggregatedChartData.heatmap.y.map(v => getAvgV(v)),
             z: aggregatedChartData.heatmap.z,
+            customdata: aggregatedChartData.heatmap.y.map(y => aggregatedChartData.heatmap.x_show.map(x => `<b>${x}</b><br>${t(`rank`)} ${y}`)),
             type: 'heatmap',
             colorscale: 'Portland',
             hoverongaps: false,
+            hovertemplate: '%{customdata}<br>' +
+                '→ %{z}%',
+            showscale: false,
+            yaxis: 'rank'
         };
         if (heatmapMode === 'percent') {
             data.zmin = 0;
@@ -147,14 +147,16 @@ const ChartDataContainer = ({ xLabels }: ChartDataContainerProps) => {
 
 
     const chartComponent = useMemo(() => {
-        // console.log('Memoizing chart component itself...');
         return (
+
             <DynamicHeatmapChart
+                // <HeatmapChart
                 isLoading={isLoading}
                 error={error}
                 aggregatedChartData={aggregatedChartData}
                 layout={layout}
                 heatmapData={heatmapData}
+                unit={t(`unit.${histogramMode}`)}
             />
         );
     }, [isLoading, error, aggregatedChartData, layout, heatmapData]);
@@ -163,6 +165,11 @@ const ChartDataContainer = ({ xLabels }: ChartDataContainerProps) => {
     // final chart component rendering
     return (
         <div>
+            <div className='md-4'>
+                <p className='text-xs sm:text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300'>
+                    {t('desp_chart')}
+                </p>
+            </div>
             {chartComponent}
         </div>
     );

@@ -1,0 +1,658 @@
+{
+  "701": {
+    "Name": "Event_Name_701",
+    "Kr": "특수 작전 데카그라마톤 편",
+    "Jp": "特殊作戦・デカグラマトン編",
+    "En": "Special Mission Decagrammaton",
+    "OpenTime": "2023-12-06 11:00:00",
+    "CloseTime": "2023-12-20 10:59:59"
+  },
+  "801": {
+    "Name": "Event_Name_801",
+    "Kr": "벚꽃만발 축제대소동!",
+    "Jp": "桜花爛漫お祭り騒ぎ！",
+    "En": "Cherry Blossom Festival Commotion!",
+    "OpenTime": "2021-02-25 12:30:00",
+    "CloseTime": "2021-03-11 12:00:00"
+  },
+  "802": {
+    "Name": "Event_Name_802",
+    "Kr": "혁명의 이반 쿠팔라",
+    "Jp": "革命のイワン・クパーラ",
+    "En": "A Revolutionary Ivan Kupala",
+    "OpenTime": "2021-04-29 12:30:00",
+    "CloseTime": "2021-05-13 12:00:00"
+  },
+  "803": {
+    "Name": "Event_Name_803",
+    "Kr": "여름 하늘의 위시리스트",
+    "Jp": "夏空のウィッシュリスト",
+    "En": "Summer Sky's Wishlist",
+    "OpenTime": "2021-06-30 12:30:00",
+    "CloseTime": "2021-07-15 12:00:00"
+  },
+  "804": {
+    "Name": "Event_Name_804",
+    "Kr": "히나 선도부장님의 여름방학!",
+    "Jp": "ヒナ委員長のなつやすみっ！",
+    "En": "Head Prefect Hina's Summer Vacation!",
+    "OpenTime": "2021-07-29 12:30:00",
+    "CloseTime": "2021-08-12 12:00:00"
+  },
+  "805": {
+    "Name": "Event_Name_805",
+    "Kr": "네버랜드에서의 술래잡기",
+    "Jp": "ネバーランドでつかまえて",
+    "En": "Playing Tag at Neverland",
+    "OpenTime": "2021-08-26 12:30:00",
+    "CloseTime": "2021-09-09 12:00:00"
+  },
+  "806": {
+    "Name": "Event_Name_806",
+    "Kr": "선상의 바니 체이서",
+    "Jp": "船上のバニーチェイサー",
+    "En": "Bunny Chasers on Board",
+    "OpenTime": "2021-09-29 12:30:00",
+    "CloseTime": "2021-10-12 12:00:00"
+  },
+  "808": {
+    "Name": "Event_Name_808",
+    "Kr": "227호 온천장 운영일지!",
+    "Jp": "227号温泉郷の運営記録！",
+    "En": "Hot Springs Resort No. 227 Daily Logs!",
+    "OpenTime": "2021-11-30 12:30:00",
+    "CloseTime": "2021-12-15 12:00:00"
+  },
+  "809": {
+    "Name": "Event_Name_809",
+    "Kr": "신춘광상곡 제68번",
+    "Jp": "新春狂想曲第68番",
+    "En": "New Year's Rhapsody No. 68",
+    "OpenTime": "2021-12-29 12:30:00",
+    "CloseTime": "2022-01-12 12:00:00"
+  },
+  "810": {
+    "Name": "Event_Name_810",
+    "Kr": "샬레의 해피♡발렌타인 순찰",
+    "Jp": "シャーレのハッピー♡バレンタインパトロール",
+    "En": "Schale's Happy ♥ Valentine Patrol",
+    "OpenTime": "2022-01-26 12:30:00",
+    "CloseTime": "2022-02-09 12:00:00"
+  },
+  "811": {
+    "Name": "Event_Name_811",
+    "Kr": "코사카 와카모의 침묵과 축연",
+    "Jp": "狐坂ワカモの沈黙と祝宴",
+    "En": "Kosaka Wakamo's Silence and Feast",
+    "OpenTime": "2022-01-26 12:30:00",
+    "CloseTime": "2022-02-09 12:00:00"
+  },
+  "812": {
+    "Name": "Event_Name_812",
+    "Kr": "덜렁대는 수녀님과 고서관의 마술사",
+    "Jp": "どたばたシスターと古書館の魔術師",
+    "En": "The Clumsy Sister and the Magician of the Old Library",
+    "OpenTime": "2022-02-23 11:30:00",
+    "CloseTime": "2022-03-09 10:59:59"
+  },
+  "813": {
+    "Name": "Event_Name_813",
+    "Kr": "불인의 마음",
+    "Jp": "不忍ノ心",
+    "En": "An Unconcealed Heart",
+    "OpenTime": "2022-04-27 11:30:00",
+    "CloseTime": "2022-05-11 10:59:59"
+  },
+  "814": {
+    "Name": "Event_Name_814",
+    "Kr": "아비도스 리조트 복구 대책위원회",
+    "Jp": "アビドスリゾート復旧対策委員会",
+    "En": "Abydos Resort Restoration Task Force",
+    "OpenTime": "2022-06-22 11:30:00",
+    "CloseTime": "2022-07-06 10:59:59"
+  },
+  "815": {
+    "Name": "Event_Name_815",
+    "Kr": "출장! 백야당 바다의 집 프랜차이즈 계획",
+    "Jp": "出張！百夜堂海の家FC計画",
+    "En": "Business Trip! Momoyodou Beach Shack Franchise Plan",
+    "OpenTime": "2022-07-14 11:00:00",
+    "CloseTime": "2022-08-03 10:59:59"
+  },
+  "816": {
+    "Name": "Event_Name_816",
+    "Kr": "방과 후 디저트 이야기 ~달콤한 비밀과 총격전~",
+    "Jp": "放課後スイーツ物語　～甘い秘密と銃撃戦～",
+    "En": "After-School Sweets Story: Sweet Secrets and Shootouts",
+    "OpenTime": "2022-08-24 11:00:00",
+    "CloseTime": "2022-09-07 10:59:59"
+  },
+  "817": {
+    "Name": "Event_Name_817",
+    "Kr": "ON YOUR MARK ＠ MILLENNIUM",
+    "Jp": "On your mark ＠ millennium",
+    "En": "On Your Mark @ Millennium",
+    "OpenTime": "2022-09-28 11:00:00",
+    "CloseTime": "2022-10-12 10:59:59"
+  },
+  "818": {
+    "Name": "Event_Name_818",
+    "Kr": "Get Set, Go! ~키보토스 황륜대제~",
+    "Jp": "Get set, go！～キヴォトス晄輪大祭～",
+    "En": "Get Set, Go! Kivotos Halo Festival!",
+    "OpenTime": "2022-10-26 11:00:00",
+    "CloseTime": "2022-11-09 10:59:59"
+  },
+  "819": {
+    "Name": "Event_Name_819",
+    "Kr": "성당의 메리 크리스마스 ~구호기사단의 선물~",
+    "Jp": "聖堂のメリークリスマス〜救護騎士団の贈り物〜",
+    "En": "The Cathedral's Merry Christmas: Remedial Knights' Gift",
+    "OpenTime": "2022-12-14 11:00:00",
+    "CloseTime": "2022-12-28 10:59:59"
+  },
+  "820": {
+    "Name": "Event_Name_820",
+    "Kr": "새해의 아페리티프 ~신년 한판 승부~",
+    "Jp": "喰積の 前にいささか～一番勝負～",
+    "En": "New Year's Aperitif ~One-and-Done Match~",
+    "OpenTime": "2022-12-28 11:00:00",
+    "CloseTime": "2023-01-11 10:59:59"
+  },
+  "822": {
+    "Name": "Event_Name_822",
+    "Kr": "아트라하시스의 방주 점령전",
+    "Jp": "アトラ・ハシースの箱舟占領戦 ",
+    "En": "The Ark of Atrahasis Conquest",
+    "OpenTime": "2023-02-22 11:00:00",
+    "CloseTime": "2023-03-08 10:59:59"
+  },
+  "824": {
+    "Name": "Event_Name_824",
+    "Kr": "복구 작업: D.U. 시라토리구",
+    "Jp": "復旧作業：D.U.シラトリ区",
+    "En": "Restoration Project: D.U. Shiratori City",
+    "OpenTime": "2023-03-12 11:00:00",
+    "CloseTime": "2023-03-22 10:59:59"
+  },
+  "825": {
+    "Name": "Event_Name_825",
+    "Kr": "순백의 예고장 ~허식의 저택과 미학이 머무는 곳~",
+    "Jp": "白亜の予告状～虚飾の館と美学の在り処～",
+    "En": "Alabaster Calling Card: Mansion Masquerade and the Essence of Beauty",
+    "OpenTime": "2023-04-26 11:00:00",
+    "CloseTime": "2023-05-10 10:59:59"
+  },
+  "826": {
+    "Name": "Event_Name_826",
+    "Kr": "용무동주 ~마음에 그리는 것은, 하나의 미래~",
+    "Jp": "龍武同舟～思い描くは、ひとつの未来～",
+    "En": "Dragon & Tortoise, Working Together for a Better Future",
+    "OpenTime": "2023-05-24 11:00:00",
+    "CloseTime": "2023-06-07 10:59:59"
+  },
+  "827": {
+    "Name": "Event_Name_827",
+    "Kr": "여름 특수 작전! 사라진 새우를 향한 토끼의 추적",
+    "Jp": "夏の特殊作戦！RABBIT小隊と消えたエビの謎",
+    "En": "Special Summer Mission! RABBIT SQUAD and the Mystery of the Missing Shrimp",
+    "OpenTime": "2023-06-21 11:00:00",
+    "CloseTime": "2023-07-05 10:59:59"
+  },
+  "828": {
+    "Name": "Event_Name_828",
+    "Kr": "숨겨진 유산을 찾아서 ~트리니티 과외 활동~",
+    "Jp": "隠されし遺産を求めて～トリニティの課外活動～",
+    "En": "Trinity Extracurriculars: In Search of Hidden Ruins",
+    "OpenTime": "2023-07-24 11:00:00",
+    "CloseTime": "2023-08-09 10:59:59"
+  },
+  "829": {
+    "Name": "Event_Name_829",
+    "Kr": "학원 동인 이야기 ~두 명이 도달한 최종회~",
+    "Jp": "学漫同人物語～2人が求める最終回～",
+    "En": "Academy Club Story: A Pair's Final Adventure",
+    "OpenTime": "2023-08-23 11:00:00",
+    "CloseTime": "2023-09-06 10:59:59"
+  },
+  "830": {
+    "Name": "Event_Name_830",
+    "Kr": "Trip-Trap-Train",
+    "Jp": "Trip-Trap-Train",
+    "En": "Trip-Trap-Train",
+    "OpenTime": "2023-09-27 11:00:00",
+    "CloseTime": "2023-10-11 10:59:59"
+  },
+  "831": {
+    "Name": "Event_Name_831",
+    "Kr": "어떤 과학의 청춘기록",
+    "Jp": "とある科学の青春記録",
+    "En": "A Certain Scientific Record of Youth",
+    "OpenTime": "2023-10-24 11:00:00",
+    "CloseTime": "2023-11-08 10:59:59"
+  },
+  "832": {
+    "Name": "Event_Name_832",
+    "Kr": "전뇌신춘행진곡",
+    "Jp": "電脳新春行進曲",
+    "En": "Cyber New Year March",
+    "OpenTime": "2023-12-27 11:00:00",
+    "CloseTime": "2024-01-10 10:59:59"
+  },
+  "833": {
+    "Name": "Event_Name_833",
+    "Kr": "빛으로 나아가는 그녀들의 소야곡",
+    "Jp": "陽ひらく彼女たちの小夜曲",
+    "En": "Basking in the Brilliance of Their Serenade",
+    "OpenTime": "2024-01-24 11:00:00",
+    "CloseTime": "2024-02-07 10:59:59"
+  },
+  "834": {
+    "Name": "Event_Name_834",
+    "Kr": "0068 오페라로부터 사랑을 담아서!",
+    "Jp": "0068 オペラより愛をこめて！",
+    "En": "From Opera 0068 with Love!",
+    "OpenTime": "2024-02-21 11:00:00",
+    "CloseTime": "2024-03-06 10:59:59"
+  },
+  "835": {
+    "Name": "Event_Name_835",
+    "Kr": "와글와글하며 오손도손하게",
+    "Jp": "にぎにぎと ゆきゆきて",
+    "En": "Rowdy and Cheery",
+    "OpenTime": "2024-03-27 11:00:00",
+    "CloseTime": "2024-04-11 10:59:59"
+  },
+  "836": {
+    "Name": "Event_Name_836",
+    "Kr": "-ive aLIVE!",
+    "Jp": "-ive aLIVE!",
+    "En": "-ive aLIVE!",
+    "OpenTime": "2024-04-24 11:00:00",
+    "CloseTime": "2024-05-08 10:59:59"
+  },
+  "837": {
+    "Name": "Event_Name_837",
+    "Kr": "Say-Bing!",
+    "Jp": "Say-Bing!",
+    "En": "Say-Bing!",
+    "OpenTime": "2024-06-26 11:00:00",
+    "CloseTime": "2024-07-10 10:59:59"
+  },
+  "838": {
+    "Name": "Event_Name_838",
+    "Kr": "Sheside outside",
+    "Jp": "Sheside outside",
+    "En": "Sheside outside",
+    "OpenTime": "2024-07-22 11:00:00",
+    "CloseTime": "2024-08-07 10:59:59"
+  },
+  "839": {
+    "Name": "Event_Name_839",
+    "Kr": "월화몽소",
+    "Jp": "月華夢騒",
+    "En": "Radiant Moon, Raucous Dream",
+    "OpenTime": "2024-08-21 11:00:00",
+    "CloseTime": "2024-09-04 10:59:59"
+  },
+  "840": {
+    "Name": "Event_Name_840",
+    "Kr": "오욕내강",
+    "Jp": "五塵来降",
+    "En": "The Senses Descend",
+    "OpenTime": "2024-09-25 11:00:00",
+    "CloseTime": "2024-10-10 10:59:59"
+  },
+  "841": {
+    "Name": "Event_Name_841",
+    "Kr": "Serenade Promenade",
+    "Jp": "Serenade Promenade",
+    "En": "Serenade Promenade",
+    "OpenTime": "2024-10-23 11:00:00",
+    "CloseTime": "2024-11-06 10:59:59"
+  },
+  "842": {
+    "Name": "Event_Name_842",
+    "Kr": "비밀의 미드나잇 파티 ~종이 울리는 술래잡기~",
+    "Jp": "秘密のミッドナイトパーティー～オニの手は鐘と共に～",
+    "En": "Secret Midnight Party: The Chimes of Tag",
+    "OpenTime": "2024-12-24 11:00:00",
+    "CloseTime": "2025-01-08 10:59:59"
+  },
+  "843": {
+    "Name": "Event_Name_843",
+    "Kr": "Code: BOX 밀레니엄에 다가오는 그림자~ 한 가지의 물음과 두 가지 대답 ~",
+    "Jp": "Code:BOXミレニアムに迫る影～一つの問いと二つの答え～",
+    "En": "Code: BOX - The Shadow Approaching MillenniumOne Question, Two Answers",
+    "OpenTime": "2025-01-20 11:00:00",
+    "CloseTime": "2025-02-03 10:59:59"
+  },
+  "844": {
+    "Name": "Event_Name_844",
+    "Kr": "팬데믹 해저드 ~ 기적의 팬케이크 ~",
+    "Jp": "パンデミック・ハザード～奇跡の一枚～",
+    "En": "Pandemic Hazard: Miraculous Pancake",
+    "OpenTime": "2025-02-26 11:00:00",
+    "CloseTime": "2025-03-12 10:59:59"
+  },
+  "845": {
+    "Name": "Event_Name_845",
+    "Kr": "Pray-Ball! ~ 노려라! 만루 홈런 ~",
+    "Jp": "プレイボール！～目指せ！満塁ホームラン～",
+    "En": "Pray-Ball! Swing for the Grand Slam!",
+    "OpenTime": "2025-03-26 11:00:00",
+    "CloseTime": "2025-04-09 10:59:59"
+  },
+  "846": {
+    "Name": "Event_Name_846",
+    "Kr": "하이랜더 철도 폭주 사건 〜그리고 기차는 없었다〜",
+    "Jp": "ハイランダー鉄道爆走事件 〜そして列車はなくなった〜",
+    "En": "Highlander Railroad Runaway Incident: And the Train Disappeared",
+    "OpenTime": "2025-04-22 11:00:00",
+    "CloseTime": "2025-05-07 10:59:59"
+  },
+  "847": {
+    "Name": "Event_Name_847",
+    "Kr": "백에서 피어난 한 송이~정정당당하게, 수상 승부~",
+    "Jp": "百ヨリ出ズル一輪ノ～いざ尋常に、水上勝負～",
+    "En": "A Flower Blooms Among the Hundred: Fair and Square Aquatic Showdown",
+    "OpenTime": "2025-06-25 11:00:00",
+    "CloseTime": "2025-07-09 10:59:59"
+  },
+  "848": {
+    "Name": "Event_Name_848",
+    "Kr": "여름 하늘의 프로미스",
+    "Jp": "夏空のやくそく",
+    "En": "Summer Sky's Promise",
+    "OpenTime": "2025-07-22 11:00:00",
+    "CloseTime": "2025-08-06 10:59:59"
+  },
+  "849": {
+    "Name": "Event_Name_849",
+    "Kr": "우리는 오컬트 연구회! ~학원의 불가사의와 고대 주문~",
+    "Jp": "我らオカルト研究会！～学院の不思議と古の呪文～",
+    "En": null,
+    "OpenTime": "2025-08-20 11:00:00",
+    "CloseTime": "2025-09-03 10:59:59"
+  },
+  "850": {
+    "Name": "Event_Name_850",
+    "Kr": "누구를 위한 예술인가 ～위작과 미학의 행방～",
+    "Jp": "誰が為の芸術～偽飾の絵画と美学の行方～",
+    "En": null,
+    "OpenTime": "2025-09-24 11:00:00",
+    "CloseTime": "2025-10-15 10:59:59"
+  },
+  "851": {
+    "Name": "Event_Name_851",
+    "Kr": "마법소녀 헤비캘리버 ~에라의 야망과 정의의 자격~",
+    "Jp": "魔法少女ヘヴィキャリバー～エラの野望と正義の資格～",
+    "En": null,
+    "OpenTime": "2025-10-22 11:00:00",
+    "CloseTime": "2025-11-05 10:59:59"
+  },
+  "10801": {
+    "Name": "Event_Name_801",
+    "Kr": "벚꽃만발 축제대소동!",
+    "Jp": "桜花爛漫お祭り騒ぎ！",
+    "En": "Cherry Blossom Festival Commotion!",
+    "OpenTime": "2022-02-09 12:30:00",
+    "CloseTime": "2022-02-16 12:00:00"
+  },
+  "10802": {
+    "Name": "Event_Name_802",
+    "Kr": "혁명의 이반 쿠팔라",
+    "Jp": "革命のイワン・クパーラ",
+    "En": "A Revolutionary Ivan Kupala",
+    "OpenTime": "2022-03-09 11:30:00",
+    "CloseTime": "2022-03-16 10:59:59"
+  },
+  "10803": {
+    "Name": "Event_Name_803",
+    "Kr": "여름 하늘의 위시리스트",
+    "Jp": "夏空のウィッシュリスト",
+    "En": "Summer Sky's Wishlist",
+    "OpenTime": "2022-04-20 11:30:00",
+    "CloseTime": "2022-04-27 10:59:59"
+  },
+  "10804": {
+    "Name": "Event_Name_804",
+    "Kr": "히나 선도부장님의 여름방학!",
+    "Jp": "ヒナ委員長のなつやすみっ！",
+    "En": "Head Prefect Hina's Summer Vacation!",
+    "OpenTime": "2022-09-07 11:00:00",
+    "CloseTime": "2022-09-14 10:59:59"
+  },
+  "10805": {
+    "Name": "Event_Name_805",
+    "Kr": "네버랜드에서의 술래잡기",
+    "Jp": "ネバーランドでつかまえて",
+    "En": "Playing Tag at Neverland",
+    "OpenTime": "2022-09-21 11:00:00",
+    "CloseTime": "2022-09-28 10:59:59"
+  },
+  "10806": {
+    "Name": "Event_Name_806",
+    "Kr": "선상의 바니 체이서",
+    "Jp": "船上のバニーチェイサー",
+    "En": "Bunny Chasers on Board",
+    "OpenTime": "2022-10-12 11:00:00",
+    "CloseTime": "2022-10-19 10:59:59"
+  },
+  "10808": {
+    "Name": "Event_Name_808",
+    "Kr": "227호 온천장 운영일지!",
+    "Jp": "227号温泉郷の運営記録！",
+    "En": "Hot Springs Resort No. 227 Daily Logs!",
+    "OpenTime": "2022-11-30 11:00:00",
+    "CloseTime": "2022-12-07 10:59:59"
+  },
+  "10809": {
+    "Name": "Event_Name_809",
+    "Kr": "신춘광상곡 제68번",
+    "Jp": "新春狂想曲第68番",
+    "En": "New Year's Rhapsody No. 68",
+    "OpenTime": "2023-03-22 11:00:00",
+    "CloseTime": "2023-04-05 10:59:59"
+  },
+  "10810": {
+    "Name": "Event_Name_810",
+    "Kr": "샬레의 해피♡발렌타인 순찰",
+    "Jp": "シャーレのハッピー♡バレンタインパトロール",
+    "En": "Schale's Happy ♥ Valentine Patrol",
+    "OpenTime": "2023-01-11 11:00:00",
+    "CloseTime": "2023-01-24 10:59:59"
+  },
+  "10811": {
+    "Name": "Event_Name_811",
+    "Kr": "코사카 와카모의 침묵과 축연",
+    "Jp": "狐坂ワカモの沈黙と祝宴",
+    "En": "Kosaka Wakamo's Silence and Feast",
+    "OpenTime": "2023-01-11 11:00:00",
+    "CloseTime": "2023-01-24 10:59:59"
+  },
+  "10812": {
+    "Name": "Event_Name_812",
+    "Kr": "덜렁대는 수녀님과 고서관의 마술사",
+    "Jp": "どたばたシスターと古書館の魔術師",
+    "En": "The Clumsy Sister and the Magician of the Old Library",
+    "OpenTime": "2023-02-10 11:00:00",
+    "CloseTime": "2023-02-22 10:59:59"
+  },
+  "10813": {
+    "Name": "Event_Name_813",
+    "Kr": "불인의 마음",
+    "Jp": "不忍ノ心",
+    "En": "An Unconcealed Heart",
+    "OpenTime": "2023-04-12 11:00:00",
+    "CloseTime": "2023-04-19 10:59:59"
+  },
+  "10814": {
+    "Name": "Event_Name_814",
+    "Kr": "아비도스 리조트 복구 대책위원회",
+    "Jp": "アビドスリゾート復旧対策委員会",
+    "En": "Abydos Resort Restoration Task Force",
+    "OpenTime": "2023-07-17 11:00:00",
+    "CloseTime": "2023-07-24 10:59:59"
+  },
+  "10815": {
+    "Name": "Event_Name_815",
+    "Kr": "출장! 백야당 바다의 집 프랜차이즈 계획",
+    "Jp": "出張！百夜堂海の家FC計画",
+    "En": "Business Trip! Momoyodou Beach Shack Franchise Plan",
+    "OpenTime": "2023-08-16 11:00:00",
+    "CloseTime": "2023-08-23 10:59:59"
+  },
+  "10816": {
+    "Name": "Event_Name_816",
+    "Kr": "방과 후 디저트 이야기 ~달콤한 비밀과 총격전~",
+    "Jp": "放課後スイーツ物語　～甘い秘密と銃撃戦～",
+    "En": "After-School Sweets Story: Sweet Secrets and Shootouts",
+    "OpenTime": "2023-05-10 11:00:00",
+    "CloseTime": "2023-05-17 10:59:59"
+  },
+  "10817": {
+    "Name": "Event_Name_817",
+    "Kr": "ON YOUR MARK ＠ MILLENNIUM",
+    "Jp": "On your mark ＠ millennium",
+    "En": "On Your Mark @ Millennium",
+    "OpenTime": "2023-09-06 11:00:00",
+    "CloseTime": "2023-09-15 10:59:59"
+  },
+  "10818": {
+    "Name": "Event_Name_818",
+    "Kr": "Get Set, Go! ~키보토스 황륜대제~",
+    "Jp": "Get set, go！～キヴォトス晄輪大祭～",
+    "En": "Get Set, Go! Kivotos Halo Festival!",
+    "OpenTime": "2023-09-15 11:00:00",
+    "CloseTime": "2023-09-27 10:59:59"
+  },
+  "10819": {
+    "Name": "Event_Name_819",
+    "Kr": "성당의 메리 크리스마스 ~구호기사단의 선물~",
+    "Jp": "聖堂のメリークリスマス〜救護騎士団の贈り物〜",
+    "En": "The Cathedral's Merry Christmas: Remedial Knights' Gift",
+    "OpenTime": "2024-02-07 11:00:00",
+    "CloseTime": "2024-02-14 10:59:59"
+  },
+  "10820": {
+    "Name": "Event_Name_820",
+    "Kr": "새해의 아페리티프 ~신년 한판 승부~",
+    "Jp": "喰積の 前にいささか～一番勝負～",
+    "En": "New Year's Aperitif ~One-and-Done Match~",
+    "OpenTime": "2024-03-06 11:00:00",
+    "CloseTime": "2024-03-20 10:59:59"
+  },
+  "10825": {
+    "Name": "Event_Name_825",
+    "Kr": "순백의 예고장 ~허식의 저택과 미학이 머무는 곳~",
+    "Jp": "白亜の予告状～虚飾の館と美学の在り処～",
+    "En": "Alabaster Calling Card: Mansion Masquerade and the Essence of Beauty",
+    "OpenTime": "2024-05-22 11:00:00",
+    "CloseTime": "2024-06-05 10:59:59"
+  },
+  "10826": {
+    "Name": "Event_Name_826",
+    "Kr": "용무동주 ~마음에 그리는 것은, 하나의 미래~",
+    "Jp": "龍武同舟～思い描くは、ひとつの未来～",
+    "En": "Dragon & Tortoise, Working Together for a Better Future",
+    "OpenTime": "2024-05-15 11:00:00",
+    "CloseTime": "2024-05-22 10:59:59"
+  },
+  "10827": {
+    "Name": "Event_Name_827",
+    "Kr": "여름 특수 작전! 사라진 새우를 향한 토끼의 추적",
+    "Jp": "夏の特殊作戦！RABBIT小隊と消えたエビの謎",
+    "En": "Special Summer Mission! RABBIT SQUAD and the Mystery of the Missing Shrimp",
+    "OpenTime": "2024-07-10 11:00:00",
+    "CloseTime": "2024-07-17 10:59:59"
+  },
+  "10828": {
+    "Name": "Event_Name_828",
+    "Kr": "숨겨진 유산을 찾아서 ~트리니티 과외 활동~",
+    "Jp": "隠されし遺産を求めて～トリニティの課外活動～",
+    "En": "Trinity Extracurriculars: In Search of Hidden Ruins",
+    "OpenTime": "2024-09-04 11:00:00",
+    "CloseTime": "2024-09-18 10:59:59"
+  },
+  "10829": {
+    "Name": "Event_Name_829",
+    "Kr": "학원 동인 이야기 ~두 명이 도달한 최종회~",
+    "Jp": "学漫同人物語～2人が求める最終回～",
+    "En": "Academy Club Story: A Pair's Final Adventure",
+    "OpenTime": "2024-08-07 11:00:00",
+    "CloseTime": "2024-08-14 10:59:59"
+  },
+  "10830": {
+    "Name": "Event_Name_830",
+    "Kr": "Trip-Trap-Train",
+    "Jp": "Trip-Trap-Train",
+    "En": "Trip-Trap-Train",
+    "OpenTime": "2024-12-04 11:00:00",
+    "CloseTime": "2024-12-11 10:59:59"
+  },
+  "10832": {
+    "Name": "Event_Name_832",
+    "Kr": "전뇌신춘행진곡",
+    "Jp": "電脳新春行進曲",
+    "En": "Cyber New Year March",
+    "OpenTime": "2025-02-12 11:00:00",
+    "CloseTime": "2025-02-26 10:59:59"
+  },
+  "10833": {
+    "Name": "Event_Name_833",
+    "Kr": "빛으로 나아가는 그녀들의 소야곡",
+    "Jp": "陽ひらく彼女たちの小夜曲",
+    "En": "Basking in the Brilliance of Their Serenade",
+    "OpenTime": "2024-11-20 11:00:00",
+    "CloseTime": "2024-12-04 10:59:59"
+  },
+  "10834": {
+    "Name": "Event_Name_834",
+    "Kr": "0068 오페라로부터 사랑을 담아서!",
+    "Jp": "0068 オペラより愛をこめて！",
+    "En": "From Opera 0068 with Love!",
+    "OpenTime": "2025-04-09 11:00:00",
+    "CloseTime": "2025-04-16 10:59:59"
+  },
+  "10835": {
+    "Name": "Event_Name_835",
+    "Kr": "와글와글하며 오손도손하게",
+    "Jp": "にぎにぎと ゆきゆきて",
+    "En": "Rowdy and Cheery",
+    "OpenTime": "2025-05-14 11:00:00",
+    "CloseTime": "2025-05-21 10:59:59"
+  },
+  "10836": {
+    "Name": "Event_Name_836",
+    "Kr": "-ive aLIVE!",
+    "Jp": "-ive aLIVE!",
+    "En": "-ive aLIVE!",
+    "OpenTime": "2025-06-04 11:00:00",
+    "CloseTime": "2025-06-18 10:59:59"
+  },
+  "10837": {
+    "Name": "Event_Name_837",
+    "Kr": "Say-Bing!",
+    "Jp": "Say-Bing!",
+    "En": "Say-Bing!",
+    "OpenTime": "2025-08-06 11:00:00",
+    "CloseTime": "2025-08-13 10:59:59"
+  },
+  "10838": {
+    "Name": "Event_Name_838",
+    "Kr": "Sheside outside",
+    "Jp": "Sheside outside",
+    "En": "Sheside outside",
+    "OpenTime": "2025-09-03 11:00:00",
+    "CloseTime": "2025-09-17 10:59:59"
+  },
+  "10839": {
+    "Name": "Event_Name_839",
+    "Kr": "월화몽소",
+    "Jp": "月華夢騒",
+    "En": "Radiant Moon, Raucous Dream",
+    "OpenTime": "2025-11-05 11:00:00",
+    "CloseTime": "2025-11-12 10:59:59"
+  }
+}

@@ -1,0 +1,59 @@
+<!-- // The self-made asset to avoid copyright -->
+<svg width="200" height="200" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="leftRect" x1="0%" y1="10%" x2="80%" y2="100%">
+            <stop offset="20%" stop-color="#FFADD2" />
+            <stop offset="80%" stop-color="#8BCFFF" />
+        </linearGradient>
+        <linearGradient id="rightRect" x1="0%" y1="10%" x2="80%" y2="100%">
+            <stop offset="40%" stop-color="#F5F2FF" />
+            <stop offset="60%" stop-color="#C9BEFF" />
+            <stop offset="100%" stop-color="#B1BCFF" />
+        </linearGradient>
+        <linearGradient id="downCenterTrig" x1="0%" y1="20%" x2="70%" y2="100%">
+            <stop offset="30%" stop-color="#8BCFFF" />
+            <stop offset="90%" stop-color="#A38FFF" />
+        </linearGradient>
+
+        <linearGradient id="rainbowEffect" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FF8FAB" />
+            <stop offset="25%" stop-color="#FAFF99" />
+            <stop offset="50%" stop-color="#B0FFAB" />
+            <stop offset="75%" stop-color="#7FF0FF" />
+            <stop offset="100%" stop-color="#A38FFF" />
+        </linearGradient>
+    </defs>
+
+    <line x1="17" y1="31" x2="83" y2="31" stroke="#DCD3FF" stroke-width="0.3" />
+    <line x1="17" y1="69" x2="83" y2="69" stroke="#DCD3FF" stroke-width="0.3" />
+    <line x1="31" y1="31" x2="31" y2="69" stroke="#DCD3FF" stroke-width="0.3" />
+    <line x1="69" y1="31" x2="69" y2="69" stroke="#DCD3FF" stroke-width="0.3" />
+    <line x1="69" y1="31" x2="31" y2="69" stroke="#DCD3FF" stroke-width="0.3" />
+    <line x1="31" y1="31" x2="69" y2="69" stroke="#DCD3FF" stroke-width="0.3" />
+    <line x1="31" y1="31" x2="50" y2="8" stroke="#DCD3FF" stroke-width="0.3" />
+    <line x1="69" y1="31" x2="50" y2="8" stroke="#DCD3FF" stroke-width="0.3" />
+    <line x1="31" y1="69" x2="50" y2="92" stroke="#DCD3FF" stroke-width="0.3" />
+    <line x1="69" y1="69" x2="50" y2="92" stroke="#DCD3FF" stroke-width="0.3" />
+
+    <polygon points="50,8 17,31 31,31" fill="#F5F2FF" stroke="#A38FFF" stroke-width="1" stroke-linejoin="bevel" />
+    <polygon points="50,8 31,31 69,31" fill="url(#rainbowEffect)" stroke="#A38FFF" stroke-width="1"
+        stroke-linejoin="bevel" />
+    <polygon points="50,8 83,31 69,31" fill="#F5F2FF" stroke="#A38FFF" stroke-width="1" stroke-linejoin="bevel" />
+    <polygon points="50,93 17,69 31,69" fill="#8BCFFF" stroke="#A38FFF" stroke-width="1" stroke-linejoin="bevel" />
+    <polygon points="50,93 31,69 69,69" fill="url(#downCenterTrig)" stroke="#A38FFF" stroke-width="1"
+        stroke-linejoin="bevel" />
+    <polygon points="50,93 83,69 69,69" fill="#E2DBFF" stroke="#A38FFF" stroke-width="1" stroke-linejoin="bevel" />
+
+    <polygon points="17,31 31,31 31,69 17,69" fill="url(#leftRect)" stroke="#A38FFF" stroke-width="1"
+        stroke-linejoin="bevel" />
+    <polygon points="83,31 69,31 69,69 83,69" fill="url(#rightRect)" stroke="#A38FFF" stroke-width="1"
+        stroke-linejoin="bevel" />
+
+    <polygon points="31,31 31,69 50,50" fill="#8B78D6" stroke="#A38FFF" stroke-width="1" stroke-linejoin="bevel" />
+    <polygon points="31,69 69,69 50,50" fill="#FFADD2" stroke="#A38FFF" stroke-width="1" stroke-linejoin="bevel" />
+    <polygon points="69,69 69,31 50,50" fill="url(#rainbowEffect)" stroke="#A38FFF" stroke-width="1"
+        stroke-linejoin="bevel" />
+    <polygon points="69,31 31,31 50,50" fill="#C9BEFF" stroke="#A38FFF" stroke-width="1" stroke-linejoin="bevel" />
+
+    <polygon points="50,8 83,31 83,69 50,92 17,69 17,31" fill="none" stroke="#A38FFF" stroke-width="2" />
+</svg>

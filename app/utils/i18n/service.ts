@@ -1,28 +1,42 @@
-'use server';
+import { createInstance } from "i18next";
+import { DEFAULT_LOCALE, SUPORTED_LOCALES, type Locale } from "./config";
+import { initReactI18next } from "react-i18next";
+// import { i18nConfig } from "~/i18n";
 
-import { cookies, headers } from "next/headers";
-import { COOKIE_NAME, defaultLocale, Locale, suportedLocales } from "./config";
+export function getLocaleFromHeaders(request: Request): Locale {
 
-export async function getUserLocale() {
-  return (await cookies()).get(COOKIE_NAME)?.value || null;
+  // Cookie
+  const cookie = request.headers.get('Cookie');
+  if (cookie) {
+    const match = cookie.match(/i18next=([a-zA-Z-]+)/);
+    if (match && match[1]) {
+      const locale = match[1]
+      if (SUPORTED_LOCALES.includes(locale as Locale)) return locale as Locale;
+    }
+  }
+
+  // Accept-Language header
+  const acceptLanguage = request.headers.get('Accept-Language') || ''
+  for (const language of acceptLanguage?.split(',')){
+    for (const locale of SUPORTED_LOCALES){
+      if (language.startsWith(locale)) return locale
+    }
+  }
+
+
+  return DEFAULT_LOCALE;
 }
 
-// Set the user's locale in the cookies
-export async function setUserLocale(locale: Locale) {
-  (await cookies()).set(COOKIE_NAME, locale, { path: '/' });
+/*
+export async function createI18nextServerInstance(locale: Locale) {
+  const i18nextInstance = createInstance();
+  await i18nextInstance
+    .use(initReactI18next)
+    // .use(Backend)
+    .init(i18nConfig);
+
+  await i18nextInstance.changeLanguage(locale);
+  return i18nextInstance
+
 }
-
-export async function getLocaleFromHeaders() {
-  const locale = await getUserLocale()
-  if (locale) return locale
-
-  
-  const headersList = await headers();
-  const acceptLanguage = headersList.get('accept-language');
-  if (!acceptLanguage) return defaultLocale
-
-  const headerLocale = acceptLanguage.split('-')[0].toLocaleLowerCase()
-  if (suportedLocales.includes(headerLocale)) return headerLocale
-  
-  return defaultLocale
-}
+  */

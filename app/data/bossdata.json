@@ -1,0 +1,164 @@
+{
+    "EN0008": {
+        "name": {
+            "ko": "세트의 분노",
+            "ja": "ゲブラ",
+            "en": "Gebura"
+        },
+        "teran": "Outdoor",
+        "armorType": "LightArmor"
+    },
+    "EN0009": {
+        "name": {
+            "ko": "호크마",
+            "ja": "ゲブラ",
+            "en": "Gebura"
+        },
+        "teran": "Outdoor",
+        "armorType": "LightArmor"
+    },
+    "EN0010": {
+        "name": {
+            "ko": "게부라",
+            "ja": "ゲブラ",
+            "en": "Gebura"
+        },
+        "teran": "Outdoor",
+        "armorType": "LightArmor"
+    },
+    "EN0011": {
+        "name": {
+            "ko": "티페리트",
+            "ja": "ゲブラ",
+            "en": "Gebura"
+        },
+        "teran": "Outdoor",
+        "armorType": "ElasticArmor"
+    },
+    "EN0013": {
+        "name": {
+            "ko": "예소드",
+            "ja": "イェソド",
+            "en": "Yesod"
+        }, 
+        "teran": "Street",
+        "armorType": "ElasticArmor"
+    },
+    "Hieronymus_Street": {
+        "name": {
+            "ko": "예로니무스",
+            "ja": "ヒエロニムス",
+            "en": "Hieronymus"
+        }, 
+        "teran": "Street",
+        "armorType": "LightArmor"
+    },
+    "Hieronymus": {
+        "name": {
+            "ko": "예로니무스",
+            "ja": "ヒエロニムス",
+            "en": "Hieronymus"
+        }, 
+        "teran": "Street",
+        "armorType": "LightArmor"
+    },
+    "Binah": {
+        "name": {
+            "ko": "비나",
+            "ja": "Binah",
+            "en": "ビナー"
+        }, 
+        "teran": "Street",
+        "armorType": "LightArmor"
+    },
+    "Kaitenger": {
+        "name": {
+            "ko": "카이텐",
+            "ja": "KAITEN",
+            "en": "カイテン"
+        }, 
+        "teran": "Street",
+        "armorType": "LightArmor"
+    },
+    "EN0005": {
+        "name": {
+            "ko": "그레고리오",
+            "ja": "グレゴリオ",
+            "en": "Gregrios"
+        }, 
+        "teran": "Street",
+        "armorType": "LightArmor"
+    },
+    "Perorozilla": {
+        "name": {
+            "ko": "페로로지라",
+            "ja": "ペロロジラ",
+            "en": "Perorozilla"
+        }, 
+        "teran": "Street",
+        "armorType": "Unarmed"
+    },
+    "Perorozilla_Outdoor": {
+        "name": {
+            "ko": "페로로지라",
+            "ja": "ペロロジラ",
+            "en": "Perorozilla"
+        }, 
+        "teran": "Outdoor",
+        "armorType": "Unarmed"
+    },
+    "ShiroKuro": {
+        "name": {
+            "ko": "시로&쿠로",
+            "ja": "シロ＆クロ",
+            "en": "Shiro&Kuro"
+        }, 
+        "teran": "Street",
+        "armorType": "Unarmed"
+    },
+    "HoverCraft": {
+        "name": {
+            "ko": "호버크래프트",
+            "ja": "ホバークラフト",
+            "en": "HoverCraft"
+        }, 
+        "teran": "Street",
+        "armorType": "LightArmor"
+    },
+    "Chesed": {
+        "name": {
+            "ko": "헤세드",
+            "ja": "ケセド",
+            "en": "Chesed"
+        }, 
+        "teran": "Street",
+        "armorType": "LightArmor"
+    },
+    "Goz": {
+        "name": {
+            "ko": "고즈",
+            "ja": "ゴズ",
+            "en": "Goz"
+        }, 
+        "teran": "Street",
+        "armorType": "Unarmed"
+    },
+    "HOD": {
+        "name": {
+            "ko": "호드",
+            "ja": "ホド",
+            "en": "HOD"
+        }, 
+        "teran": "Street",
+        "armorType": "LightArmor"
+    },
+    "EN0006": {
+        "name": {
+            "ko": "쿠로카게",
+            "ja": "クロカゲ",
+            "en": "Kurokage"
+        }, 
+        "teran": "Street",
+        "armorType": "ElasticArmor"
+    }
+}

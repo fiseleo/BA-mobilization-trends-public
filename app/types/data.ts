@@ -1,6 +1,6 @@
 // app/types/data.ts
 
-import { DifficultyName } from "../components/Difficulty";
+import type { DifficultyName } from "~/components/Difficulty";
 
 // The interface of initial data row after parsing the TSV file
 export interface RawDataRow {
@@ -8,7 +8,7 @@ export interface RawDataRow {
   y: number;
   z: number;
   w: number;
-  diffculty: DifficultyName;
+  difficulty: DifficultyName;
 }
 
 // The interface after dividing the y value by the interval
@@ -17,13 +17,14 @@ export interface BinnedDataRow {
   y_prime: string; // y changed to interval (e.g., "0-499")
   z: number;
   w: number;
-  diffculty: DifficultyName;
+  difficulty: DifficultyName;
 }
 
 // Interface of final chart data to be passed to Plotly
 export interface ChartData {
   heatmap: {
     x: string[]; // number[] -> string[]
+    x_show: string[];
     y: string[];
     z: (number | null)[][];
   };
@@ -45,8 +46,12 @@ export interface Student {
   SquadType: "Main" | "Support"
   TacticRole: "DamageDealer'| 'Healer'| 'Supporter'| 'Tanker'| 'Vehicle"
   School: string
-  BulletType: 'Explosion'|'Mystic'| 'Pierce'| 'Sonic'
-  Portrait: string
+  BulletType: 'Explosion' | 'Mystic' | 'Pierce' | 'Sonic'
+  Portrait?: string
+  CombatStyleIndex?: 1 | 2 // for hosino
+  FamilyName?: string
+  BirthDay: string
+  Id: number
 }
 
 
@@ -54,7 +59,7 @@ export interface Student {
 export interface RaidInfo {
   Id: string
   Boss: string
-  Type?: string
+  Type?: 'LightArmor' | 'HeavyArmor' | 'Unarmed' | 'ElasticArmor'
   Date: string
   Location: string
   Alias: string,
@@ -64,6 +69,32 @@ export interface RaidInfo {
     Lunatic: number,
     Torment: number,
     Insane: number,
-    Extrime?: number
+    Extreme?: number,
+    Hardcore?: number,
+    Veryhard?: number,
+    Hard?: number,
+    Normal?: number
   }
+}
+
+export interface RaidInfoFiltered extends RaidInfo {
+  index: number
+}
+
+
+export type GameServerParams = {
+  server: GameServer;
+};
+
+export type GameServer = "jp" | "kr"
+
+export const GAMESERVER_LIST: GameServer[] = ["jp", "kr"]
+
+export interface FullData {
+  tier_counter: { [key: string]: number };
+  rank: Int32Array;
+  rank_1?: Int32Array;
+  rank_2?: Int32Array;
+  rank_3?: Int32Array;
+  rank_default?: Int32Array;
 }

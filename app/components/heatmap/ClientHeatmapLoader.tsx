@@ -1,40 +1,47 @@
-'use client';
+//'use client';
 
 import { useState, useEffect } from 'react';
-import { RaidInfo, Student } from '../../types/data';
 import { useDataCache } from '../../utils/cache';
 import ChartControls from './ChartControls';
 import ChartDataContainer from './ChartDataContainer';
-import { useTranslations } from 'next-intl';
+import type { GameServer, RaidInfo, Student } from '~/types/data';
+import { useTranslation } from 'react-i18next';
+import { useChartControlsStore } from '~/store/chartControlsStore';
+import { useShallow } from 'zustand/shallow';
 
-const ClientHeatmapLoader = () => {
-  // console.log('(top) ClientHeatmapLoader is rendering...');
+const ClientHeatmapLoader = ({ server }: { server: GameServer }) => {
 
   const [students, setStudents] = useState<Record<string, Student>>({});
-  const [xLabels, setXLabels] = useState<RaidInfo[]>([]);
-  // const [maxLvJson, setMaxLvJson] = useState<Record<number, number>>({});
   const [isStaticDataLoading, setIsStaticDataLoading] = useState(true);
 
   type StudentDataType = Record<string, Student>;
   const fetchAndProcessWithCache_1 = useDataCache<StudentDataType>();
   const fetchRaids = useDataCache<RaidInfo[]>();
-  const fetchAndProcessWithCache_3 = useDataCache<Record<number, number>>();
+  const { setRaidInfo } = useChartControlsStore(useShallow(state => ({
+    setRaidInfo: state.setRaidInfo,
+  })))
 
-  const t = useTranslations();
-  const currentLocale = t('currentLocale');
+  const { t, i18n } = useTranslation("currentLocale");
+  const currentLocale = i18n.language
 
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
         const [studentData, labelData] = await Promise.all([
-          fetchAndProcessWithCache_1(`/w/${currentLocale}.students.json.xz`, (res:Response) => res.json().then(data => data as Promise<Record<string, Student>>)),
-          fetchRaids(`/w/${currentLocale}.raid_info.json.xz`, res => res.json() as Promise<RaidInfo[]>),
-          // fetchAndProcessWithCache_3('/w/max_lv_by_x.json.xz', res => res.json() as Promise<Record<number, number>>)
+          fetchAndProcessWithCache_1(`/w/${currentLocale}.students.bin`, (res: Response) => res.json().then(data => data as Promise<Record<string, Student>>)),
+          fetchRaids(`/w/${server}/${currentLocale}.raid_info.bin`, res => res.json() as Promise<RaidInfo[]>),
         ]);
 
-        setStudents(studentData);
-        setXLabels(labelData);
-        // setMaxLvJson(maxLvData);
+
+        await (async () => {
+          const students_portrait = await fetch('/w/students_portrait.json').then(res => res.json()) as { [key: number]: string }
+          Object.entries(studentData).map(([studentId, student]) => {
+            student.Portrait = students_portrait[parseInt(studentId)]
+          })
+          setStudents(studentData)
+        })();
+
+        setRaidInfo(labelData);
       } catch (e) {
         console.error("Failed to fetch initial data:", e);
       } finally {
@@ -42,8 +49,7 @@ const ClientHeatmapLoader = () => {
       }
     };
     fetchInitialData();
-  }, [fetchAndProcessWithCache_1, fetchRaids, currentLocale]);
-
+  }, [fetchAndProcessWithCache_1, fetchRaids, currentLocale, server]);
 
   if (isStaticDataLoading) {
     return <p>Loading initial assets...</p>;
@@ -53,9 +59,8 @@ const ClientHeatmapLoader = () => {
     <div>
       <ChartControls
         students={students}
-        xLabels={xLabels}
       />
-      <ChartDataContainer xLabels={xLabels} />
+      <ChartDataContainer server={server} />
     </div>
   );
 };

@@ -1,9 +1,10 @@
-import { processChartData } from '@/app/utils/chartDataProcessor';
 import { create } from 'zustand';
-import { fetchCacheProcessor } from '../utils/cache';
-import { ChartData, RaidInfo } from '../types/data';
 import { devtools } from 'zustand/middleware';
-import { DifficultySelect } from '../components/Difficulty';
+import type { DifficultySelect } from '~/components/Difficulty';
+import type { ChartData, GameServer, RaidInfo, RaidInfoFiltered } from '~/types/data';
+import type { fetchCacheProcessor } from '~/utils/cache';
+import { getRawTsvData, processChartData } from '~/utils/chartDataProcessor';
+import type { Locale } from '~/utils/i18n/config';
 
 interface State {
   selectedStudentId: number;
@@ -14,11 +15,12 @@ interface State {
   hideXThreshold: number;
   xRange: [number, number];
   fullXRange: [number, number];
-  availableZValues: Set<number>;
+  availableZValueCounter: Map<number, number>;
   isLoading: boolean;
   chartDataByZ: Map<number, ChartData>;
-  error: string|null;
-  diffculty: DifficultySelect;
+  error: string | null;
+  difficulty: DifficultySelect;
+  raidInfo: RaidInfo[]
 }
 
 interface Actions {
@@ -30,94 +32,117 @@ interface Actions {
   setHistogramMode: (mode: 'percent' | 'absolute') => void;
   setHideXThreshold: (threshold: number) => void;
   setXRange: (range: [number, number]) => void;
-  setDiffculty: (diffculty:DifficultySelect) => void;
-  fetchAndProcessChartData: (fetchAndProcessWithCache: fetchCacheProcessor<string>, xLabels:RaidInfo[])=> Promise<void>;
+  setDifficulty: (difficulty: DifficultySelect) => void;
+  fetchAndProcessChartData: (server: GameServer, fetchAndProcessWithCache: fetchCacheProcessor<string>, locale: Locale) => Promise<void>;
+  getFilteredRaidInfoByDifficulty: () => RaidInfoFiltered[];
+  setRaidInfo: (raidInfo: RaidInfo[]) => void
 }
 
 // Sets the initial state.
 const initialState: State = {
-  selectedStudentId: 20008,
+  selectedStudentId: 10000, //20008 1st,
   selectedZValues: new Set(),
-  rankWidth: 500,
+  rankWidth: 200,
   heatmapMode: 'absolute',
   histogramMode: 'absolute',
-  hideXThreshold: 1000,
+  hideXThreshold: 0,
   xRange: [0, 150],
   fullXRange: [0, 150],
-  availableZValues: new Set(),
+  availableZValueCounter: new Map<number, number>(),
   isLoading: false,
   chartDataByZ: new Map(),
   error: null,
-  diffculty: 'All'
+  difficulty: 'All',
+  raidInfo: [],
 };
 
 // Create Store
 export const useChartControlsStore = create<State & Actions>()(devtools(
   (set, get) => ({
-  ...initialState,
+    ...initialState,
 
-  setSelectedStudentId: (id) => set({ selectedStudentId: id }),
-  setRankWidth: (width) => set({ rankWidth: width }),
-  setHeatmapMode: (mode) => set({ heatmapMode: mode }),
-  setHistogramMode: (mode) => set({ histogramMode: mode }),
-  setHideXThreshold: (threshold) => set({ hideXThreshold: threshold }),
-  setXRange: (range) => set({ xRange: range }),
-  setDiffculty: (diffculty) => set({ diffculty: diffculty }),
-  
-  handleZSelectionChange: (z) => set((state) => {
-    const newSet = new Set(state.selectedZValues);
-    if (newSet.has(z)) {
-      newSet.delete(z);
-    } else {
-      newSet.add(z);
-    }
-    return { selectedZValues: newSet };
-  }),
-  setSelectedZValues: (zs)=>set(() => {
-    const newSet = new Set(zs);
-    return { selectedZValues: newSet };
-  }),
-  fetchAndProcessChartData: async (fetchAndProcessWithCache, xLabels) => {
-    const {
+    setSelectedStudentId: (id) => set({ selectedStudentId: id }),
+    setRankWidth: (width) => set({ rankWidth: width }),
+    setHeatmapMode: (mode) => set({ heatmapMode: mode }),
+    setHistogramMode: (mode) => set({ histogramMode: mode }),
+    setHideXThreshold: (threshold) => set({ hideXThreshold: threshold }),
+    setXRange: (range) => set({ xRange: range }),
+    setDifficulty: (difficulty) => set({ difficulty: difficulty }),
+    handleZSelectionChange: (z) => set((state) => {
+      const newSet = new Set(state.selectedZValues);
+      if (newSet.has(z)) {
+        newSet.delete(z);
+      } else {
+        newSet.add(z);
+      }
+      return { selectedZValues: newSet };
+    }),
+    setSelectedZValues: (zs) => set(() => {
+      const newSet = new Set(zs);
+      return { selectedZValues: newSet };
+    }),
+    getFilteredRaidInfoByDifficulty: () => {
+      const {
+        raidInfo,
+        difficulty
+      } = get();
+      return raidInfo.map((raid, index) => ({ ...raid, index })).filter(raidInfo => {
+        if (difficulty == 'All') return true
+        return difficulty in raidInfo.Cnt
+      })
+    },
+    setRaidInfo: (raidInfo: RaidInfo[]) => {
+      set({ raidInfo })
+    },
+    fetchAndProcessChartData: async (server, fetchAndProcessWithCache, locale) => {
+      const {
         selectedStudentId,
         rankWidth,
         hideXThreshold,
         xRange,
         heatmapMode,
         histogramMode,
-        diffculty
-    } = get();
+        difficulty,
+        getFilteredRaidInfoByDifficulty
+      } = get();
 
-    if (!selectedStudentId) {
+      const xLabels = getFilteredRaidInfoByDifficulty()
+
+      if (!selectedStudentId) {
         set({ isLoading: false, chartDataByZ: new Map() });
         return;
-    }
+      }
 
-    set({ isLoading: true, error: null });
+      set({ isLoading: true, error: null });
 
-    try {
+      const rawTsvData = await getRawTsvData(server, selectedStudentId, fetchAndProcessWithCache)
+
+      try {
+
+
         const result = await processChartData({
-            selectedStudentId,
-            rankWidth,
-            hideXThreshold,
-            xRange,
-            heatmapMode,
-            histogramMode,
-            diffculty,
-            xLabels,
-            fetchAndProcessWithCache: fetchAndProcessWithCache
+          rankWidth,
+          hideXThreshold,
+          xRange,
+          heatmapMode,
+          histogramMode,
+          difficulty,
+          xLabels,
+          rawTsvData,
+          locale
         });
 
         // Update processing results to store status
         set({
-            isLoading: false,
-            chartDataByZ: result.chartDataByZ,
-            availableZValues: result.availableZValues,
-            fullXRange: result.fullXRange,
+          isLoading: false,
+          chartDataByZ: result.chartDataByZ,
+          availableZValueCounter: result.availableZValueCounter,
+          fullXRange: result.fullXRange,
         });
 
-    } catch (e) {
+
+      } catch (e) {
         set({ isLoading: false, error: (e as Error).message });
+      }
     }
-  }
-})));
+  })));

@@ -1,35 +1,71 @@
-import Plot from 'react-plotly.js';
-import { ChartData } from '../../types/data';
-import { useTranslations } from 'next-intl';
+import { lazy } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { ChartData } from '~/types/data';
 
-interface HeatmapChartProps {
+export interface HeatmapChartProps {
   isLoading: boolean;
   error: string | null;
   aggregatedChartData: ChartData | null;
   layout: Partial<Plotly.Layout>;
   heatmapData: Partial<Plotly.Data>;
+  unit: string
 }
 
-const HeatmapChart = ({ 
-  isLoading, 
-  error, 
+
+// import Plotly from 'plotly.js';
+// import Plotly from 'plotly.js/lib/core';
+
+// Plotly.register([
+//     require('plotly.js/lib/heatmap'),
+//     require('plotly.js/lib/bar')
+// ]);
+// const PlotlyComponent = lazy(() => import('react-plotly.js'));
+// import PlotlyComponent = lazy(()=> import('react-plotly.js'))
+// const Plotly = lazy(() => import('react-plotly.js'));
+
+
+// import createPlotlyComponent from 'react-plotly.js/factory';
+// const PlotlyComponent = lazy(async () => {
+//   const  createPlotlyComponent = await import('react-plotly.js/factory')
+//   return {
+//     default: await (async () => {
+//       const Plotly = (await import('plotly.js/lib/core')).default
+//       // const Plotly = require('plotly.js/lib/core')
+//       Plotly.register([
+//         await import('plotly.js/lib/heatmap'),
+//         await import('plotly.js/lib/bar')
+//         // require('plotly.js/lib/heatmap'),
+//         // require('plotly.js/lib/bar')
+//       ]);
+//       return createPlotlyComponent.default(Plotly);
+//     })()
+//   };
+// })
+
+const PlotlyComponent = lazy(() => { return import('./PlotlyComponent') });
+
+const HeatmapChart = ({
+  isLoading,
+  error,
   aggregatedChartData,
   layout,
-  heatmapData
+  heatmapData,
+  unit
 }: HeatmapChartProps) => {
-  const t = useTranslations('charts.heatmap')
-  if (error) return <p style={{color: 'red'}}>Error: {error}</p>;
-  if (isLoading) {/*console.log('HeatmapChart-isLoading', isLoading);*/ return <p className='p-4'>{t('processingMessage')} ⏳</p>;}
+  const { t } = useTranslation("charts", { keyPrefix: 'heatmap' });
+  if (error) return <p style={{ color: 'red' }}>Error: {error}</p>;
+  if (isLoading) { return <p className='p-4'>{t('processingMessage')} ⏳</p>; }
   if (!aggregatedChartData) return <p className='p-4'>{t('noDataMessage')}</p>;
-  console.log('HeatmapChart', {isLoading, error}, {aggregatedChartData, heatmapData,layout})
 
   return (
-    <Plot
+    <PlotlyComponent
       data={[
         heatmapData,
         {
           x: aggregatedChartData.topBar.x,
           y: aggregatedChartData.topBar.values,
+          customdata: aggregatedChartData.heatmap.x_show,
+          hovertemplate: `%{customdata}<br>%{y} %`,
           type: 'bar',
           xaxis: 'x2',
           yaxis: 'y2',
@@ -37,6 +73,7 @@ const HeatmapChart = ({
         {
           x: aggregatedChartData.rightBar.values,
           y: aggregatedChartData.rightBar.y,
+          hovertemplate: `%{y}<br>%{x} ${unit}`,
           type: 'bar',
           orientation: 'h',
           xaxis: 'x3',
@@ -44,7 +81,7 @@ const HeatmapChart = ({
         },
       ]}
       layout={layout}
-      style={{ width: '100%', height: '80vh', minHeight: `max(60vh, 60vw, 500px)` }}
+      style={{ width: '100%', height: '90vh', maxHeight: '1300px', minHeight: `min(1300px, max(85vh, 45vw, 600px))`, }}
       useResizeHandler
     />
   );

@@ -1,0 +1,299 @@
+// src/components/BonusSelector.tsx
+
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { usePlanForEvent } from '~/store/planner/useEventPlanStore';
+import type { EventData, IconData, StudentData, StudentPortraitData } from '~/types/plannerData';
+
+interface BonusData {
+  [studentId: string]: {
+    EventContentItemType: string[];
+    BonusPercentage: number[];
+  };
+}
+
+export type TotalBonusMap = { [itemUniqueId: number]: number };
+
+interface BonusSelectorProps {
+  eventId: number;
+  eventData: EventData;
+  iconData: IconData;
+  allStudents: StudentData;
+  studentPortraits: StudentPortraitData;
+  // selectedStudents: string[];
+  // onSelectStudent: (studentId: string) => void;
+  onBonusCalculate: (bonusMap: TotalBonusMap) => void;
+}
+
+export const BonusSelector = ({
+  eventId,
+  eventData,
+  iconData,
+  allStudents,
+  studentPortraits,
+  // selectedStudents,
+  // onSelectStudent,
+  onBonusCalculate,
+}: BonusSelectorProps) => {
+  const bonusData = eventData.bonus;
+  const { plan, setSelectedStudents } = usePlanForEvent(eventId);
+  const { selectedStudents } = plan
+  const onSelectStudent = useCallback((studentId: string) => {
+    if (selectedStudents) {
+      const newSelectedStudent = selectedStudents.includes(studentId) ? selectedStudents.filter(id => id !== studentId) : [...selectedStudents, studentId]
+      setSelectedStudents(newSelectedStudent)
+    }
+  }, [selectedStudents, setSelectedStudents]);
+  const { t } = useTranslation("planner");
+
+
+
+
+  if (!selectedStudents) return null
+
+  const bonusStudents = React.useMemo(() => {
+    return Object.keys(bonusData).map(id => {
+      const studentInfo = allStudents[Number(id)];
+      const bonusInfo = bonusData[id];
+      const totalBonusValue = bonusInfo.BonusPercentage.reduce((sum, current) => sum + current, 0);
+      return {
+        id,
+        name: studentInfo?.Name || `${id}`,
+        portrait: studentPortraits[Number(id)],
+        totalBonusValue,
+      };
+    }).sort((a, b) => b.totalBonusValue - a.totalBonusValue);
+  }, [bonusData, allStudents, studentPortraits]);
+
+  const handleSelectAll = useCallback(() => {
+    setSelectedStudents(bonusStudents.map(s => s.id))
+
+  }, [bonusStudents, selectedStudents, onSelectStudent]);
+
+  const handleDeselectAll = useCallback(() => {
+    setSelectedStudents([])
+  }, [selectedStudents, onSelectStudent]);
+
+
+  const totalBonus = useMemo(() => {
+    const finalBonusMap: TotalBonusMap = {};
+    if (!eventData) return finalBonusMap;
+
+    eventData.currency.forEach(currency => {
+      const itemType = currency.EventContentItemType;
+      const itemUniqueId = currency.ItemUniqueId;
+      const relevantStudents = selectedStudents.map(id => {
+        const bonusInfo = eventData.bonus[id as keyof typeof eventData.bonus];
+        const studentInfo = allStudents[Number(id)];
+        if (!bonusInfo || !studentInfo) return null;
+        const typeIndex = bonusInfo.EventContentItemType.indexOf(itemType);
+        if (typeIndex === -1) return null;
+        return {
+          id,
+          squadType: studentInfo.SquadType,
+          bonusValue: bonusInfo.BonusPercentage[typeIndex],
+        };
+      }).filter((s): s is NonNullable<typeof s> => s !== null);
+
+      const strikers = relevantStudents.filter(s => s.squadType === 'Main');
+      const specials = relevantStudents.filter(s => s.squadType === 'Support');
+      strikers.sort((a, b) => b.bonusValue - a.bonusValue);
+      specials.sort((a, b) => b.bonusValue - a.bonusValue);
+
+      const topStrikers = strikers.slice(0, 4);
+      const topSpecials = specials.slice(0, 2);
+      const totalStrikersBonus = topStrikers.reduce((sum, s) => sum + s.bonusValue, 0);
+      const totalSpecialsBonus = topSpecials.reduce((sum, s) => sum + s.bonusValue, 0);
+      finalBonusMap[itemUniqueId] = totalStrikersBonus + totalSpecialsBonus;
+    });
+    return finalBonusMap;
+  }, [selectedStudents, allStudents, eventData]);
+
+
+  // 1. Get the list of currencies to use for toggles
+  const eventCurrencies = useMemo(() => {
+
+    const eventBonusItems = new Set(Object.entries(bonusData).map(v => v[1].EventContentItemType).flatMap(v => v))
+
+    return eventData.currency.filter(v => {
+      return eventBonusItems.has(v.EventContentItemType)
+    }).map(c => ({
+      itemType: c.EventContentItemType,
+      itemUniqueId: c.ItemUniqueId,
+      icon: iconData.Item?.[c.ItemUniqueId.toString()]
+    }));
+  }, [eventData.currency, iconData.Item]);
+
+  // 2. State for active filters, default to all active
+  const [activeItemFilters, setActiveItemFilters] = useState<Set<number>>(
+    () => new Set(eventCurrencies.map(c => c.itemType)) // Use number
+  );
+
+  // 3. Handle toggling a filter
+  const handleToggleFilter = useCallback((itemType: number) => {
+    setActiveItemFilters(prev => {
+      const next = new Set(prev);
+      if (next.has(itemType)) {
+        next.delete(itemType);
+      } else {
+        next.add(itemType);
+      }
+      return next;
+    });
+  }, []);
+
+  // 4. Filter the students based on active filters
+  const filteredBonusStudents = useMemo(() => {
+    // If all filters are active, return the full list
+    if (activeItemFilters.size === eventCurrencies.length) {
+      return bonusStudents;
+    }
+    // If no filters are active, return an empty list
+    if (activeItemFilters.size === 0) {
+      return [];
+    }
+
+    return bonusStudents.filter(student => {
+      const bonusInfo = bonusData[student.id];
+      if (!bonusInfo) return false;
+      // Show student if they have a bonus for AT LEAST ONE active filter
+      return bonusInfo.EventContentItemType.some(type =>
+        activeItemFilters.has(type)
+      );
+    });
+  }, [bonusStudents, activeItemFilters, eventCurrencies.length, bonusData]);
+
+  useEffect(() => {
+    onBonusCalculate(totalBonus);
+  }, [totalBonus, onBonusCalculate]);
+
+
+
+  return (
+    <>
+      {/* Header: Title on left, controls on right. */}
+      <div
+        className="flex flex-wrap justify-between items-center cursor-pointer group pt-6 gap-3"
+      >
+        {/* 1. Title (Always left-aligned) */}
+        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 shrink-0">{t('ui.bonusStudent')}</h2>
+
+        {/* [NEW] Wrapper for all controls, aligned to the right */}
+        <div className="flex flex-wrap justify-end items-center gap-2">
+
+          {/* 2. Item Filter Toggles (MOVED HERE) */}
+          {eventCurrencies.map(currency => {
+            const isActive = activeItemFilters.has(currency.itemType);
+            return (
+              <button
+                key={currency.itemType}
+                onClick={() => handleToggleFilter(currency.itemType)}
+                title={String(currency.itemUniqueId)}
+                // Styling: Smaller, simpler states to match action buttons
+                className={`relative w-9 h-9 p-1 rounded-md transition-all transform hover:scale-110 ${isActive
+                    ? 'bg-white dark:bg-neutral-700 ring-2 dark:ring-1 ring-blue-500' // Active: Ring
+                    : 'bg-gray-200 dark:bg-neutral-800 opacity-60 hover:opacity-100' // Inactive: Grayed out
+                  }`}
+              >
+                <img src={`data:image/webp;base64,${currency.icon}`} className="w-full h-full object-contain" alt={String(currency.itemUniqueId)} />
+                {/* Checkmark: Smaller, no extra border */}
+                {isActive && (
+                  <div className="absolute top-0 right-0 w-3 h-3 bg-blue-500 rounded-full flex items-center justify-center">
+                    <svg className="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M5 13l4 4L19 7"></path></svg>
+                  </div>
+                )}
+              </button>
+            );
+          })}
+
+          {/* [NEW] Visual Separator */}
+          <div className="border-l border-gray-300 dark:border-neutral-600 h-9 mx-1"></div>
+
+          {/* 3. Action Buttons */}
+          <button
+            onClick={handleSelectAll}
+            // Set fixed height to match toggles
+            className="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold text-xs py-1 px-3 rounded-md transition-all hover:scale-105 active:scale-95 h-9"
+          >
+            {t('button.selectAll')}
+          </button>
+          <button
+            onClick={handleDeselectAll}
+            // Set fixed height to match toggles
+            className="bg-gray-400 hover:bg-gray-500 dark:bg-neutral-600 dark:hover:bg-neutral-700 text-white font-bold text-xs py-1 px-3 rounded-md transition-all hover:scale-105 active:scale-95 h-9"
+          >
+            {t('button.deselectAll')}
+          </button>
+        </div>
+      </div>
+
+      {/* [DELETED] The wrapper div for toggles is removed from here */}
+      {/* <div className="my-4 p-3 bg-gray-50 dark:bg-neutral-800/50 ..."> ... </div> */}
+
+      <div className="mt-4">
+
+
+
+        <div className="flex flex-wrap gap-3 justify-center">
+          {filteredBonusStudents.map((student) => {
+            const isSelected = selectedStudents.includes(student.id);
+            const bonusInfo = bonusData[student.id];
+
+            return (
+              <div
+                key={student.id}
+                onClick={() => onSelectStudent(student.id)}
+                title={student.name}
+                className={`w-14 cursor-pointer relative rounded-sm overflow-hidden transition-all duration-200 flex flex-col group
+            ${isSelected
+                    ? 'ring-2 dark:ring-1 ring-blue-500 dark:ring-blue-400 shadow-sm shadow-blue-500/50'
+                    : 'ring-1 ring-gray-200 dark:ring-neutral-700 bg-white dark:bg-neutral-800 opacity-60 hover:opacity-100 hover:-translate-y-1'
+                  }`}
+              >
+                {isSelected && (
+                  <div className="absolute top-1 right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center border-2 border-white dark:border-neutral-800">
+                    <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M5 13l4 4L19 7"></path></svg>
+                  </div>
+                )}
+                <img
+                  src={`data:image/webp;base64,${student.portrait}`}
+                  alt={student.name}
+                  className="w-full h-auto object-cover aspect-square"
+                  loading="lazy"
+                />
+                <div className={`p-0.5 text-center grow flex flex-col justify-center
+            ${isSelected
+                    ? 'bg-white dark:bg-neutral-800'
+                    : ''
+                  }`}
+                >
+
+                  <div className={`mt-0.5 text-[10px] leading-tight flex flex-col items-center gap-0.5 ${isSelected ? 'dark:text-blue-100' : 'text-gray-600 dark:text-gray-400'}`}>
+                    {bonusInfo.EventContentItemType.map((type, index) => {
+                      const item = eventData.currency.find(c => c.EventContentItemType === type);
+                      if (!item) return null;
+
+                      const itemID = item.ItemUniqueId.toString();
+                      const percentage = bonusInfo.BonusPercentage[index] / 100;
+
+                      return (
+                        <div key={type} className="flex items-center justify-center gap-1">
+                          <img
+                            src={`data:image/webp;base64,${iconData.Item?.[itemID]}`}
+                            className="w-4 h-4 object-contain"
+                          />
+                          <span className="font-semibold">+{percentage}%</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+    </>
+  );
+};

@@ -2,7 +2,7 @@
 import React from 'react';
 
 interface StarIconProps {
-  number: number|string;
+  number: number | string;
   height?: number;
   color?: string;
 }

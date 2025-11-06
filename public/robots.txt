@@ -1,4 +1,8 @@
 User-agent: *
+Content-Signal: ai-train=no, search=yes, ai-input=no
 Disallow: /
 Allow: /$
 Allow: /charts/
+Allow: /dashboard/
+Allow: /planner/
+Allow: /utils/

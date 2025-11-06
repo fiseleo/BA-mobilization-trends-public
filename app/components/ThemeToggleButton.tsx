@@ -1,6 +1,4 @@
-"use client";
-
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { useIsDarkState } from '../store/isDarkState';
 
 type Theme = 'light' | 'dark' | 'system';
@@ -14,7 +12,7 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 interface ThemeProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 /**
@@ -97,15 +95,15 @@ export function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className="flex items-center space-x-1 p-1 rounded-full bg-gray-200 dark:bg-gray-800 shadow-inner">
+    <div className="flex items-center space-x-1 p-1 rounded-full bg-neutral-200 dark:bg-neutral-700 shadow-inner">
       {(['light', 'dark', 'system'] as Theme[]).map((t) => (
         <button
           key={t}
           onClick={() => setTheme(t)}
           aria-label={`${t} theme`}
           className={`p-2 rounded-full transition-colors duration-200 ${theme === t
-              ? 'bg-bluearchive-botton-blue text-black shadow-md'
-              : 'text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700'
+            ? 'bg-bluearchive-botton-blue text-black shadow-md'
+            : 'text-neutral-600 dark:text-neutral-300 hover:bg-neutral-300 dark:hover:bg-neutral-700 cursor-pointer'
             }`}
         >
           {t === 'light' && <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>}

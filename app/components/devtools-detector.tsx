@@ -1,21 +1,25 @@
-'use client'
-import { addListener, launch } from 'devtools-detector';
+import devtoolsDetector from 'devtools-detector';
 import { useEffect } from 'react';
 
-addListener((isOpen) => {
-    if (isOpen) {
-        window.open("", "_self");
-        window.close();
-    }
-});
+let isDevtoolsDetectorInitialized = false;
 
 export default function Devtoolsdetector() {
     useEffect(() => {
-        console.log('launch', launch);
-        if (process.env.NODE_ENV != 'development') {
-            launch();
+        if (!isDevtoolsDetectorInitialized) {
+
+            devtoolsDetector.addListener((isOpen) => {
+                if (isOpen) {
+                    if (isOpen) {
+                        window.open("", "_self");
+                        window.close();
+                    }
+                }
+            });
+            devtoolsDetector.launch();
+            isDevtoolsDetectorInitialized = true;
         }
-    }, [launch]);
+
+    }, []);
 
     return null;
 }

@@ -1,15 +1,6 @@
-'use client';
-
 import { useEffect, useRef, useState } from "react";
-import { Locale } from "../utils/i18n/config";
-import { setUserLocale } from "../utils/i18n/service";
-
-type Props = {
-  defaultValue: string;
-  items: Array<{value: string; label: string}>;
-  label: string;
-};
-
+import { useLocation, useNavigate } from "react-router";
+import { DEFAULT_LOCALE, type Locale } from "~/utils/i18n/config";
 
 type LocaleItem = {
   value: string;
@@ -17,35 +8,46 @@ type LocaleItem = {
 };
 
 type LocaleSwitcherProps = {
-defaultValue: string;
-items: LocaleItem[];
-label: string;
+  defaultValue: string;
+  items: LocaleItem[];
+  label: string;
 };
 
+const BLACKLISTED_PATHS = ["/source"];
 
-// export default function LocaleSwitcherSelect({
-//   defaultValue,
-//   items,
-//   label
-// }: Props) {
-//   function onChange(value: string) {
-//     const locale = value as Locale;
-//     setUserLocale(locale);
-//   }
 
-//   return (
-//     <div className="locale-switcher">
-//       <select defaultValue={defaultValue} onChange={(e) => onChange(e.target.value)} aria-label={label}>
-//         {items.map((item) => (
-//           <option key={item.value} value={item.value}>
-//             {item.label}
-//           </option>
-//         ))}
-//       </select>
-//     </div>
-//   );
-// }
+export function changePathLanguage(currentLocale: Locale, newLocale: Locale, pathname: string) {
+  let basePath = pathname;
+  if (currentLocale && pathname.startsWith(`/${currentLocale}`)) {
+    basePath = pathname.replace(`/${currentLocale}`, "");
+  }
+  // e.g., '/ko' -> '/' (root path must be '/' not an empty string)
+  if (basePath === "") {
+    basePath = "/";
+  }
 
+  // 2. Check if the base path is included in the blacklist.
+  const isBlacklisted = BLACKLISTED_PATHS.some((path) =>
+    basePath.startsWith(path)
+  );
+
+  let newPath;
+
+  if (isBlacklisted) {
+    newPath = basePath;
+  } else if (newLocale === DEFAULT_LOCALE) {
+    // 3b. If the new language is the default (en), do not add a prefix.
+    // e.g., '/page'
+    newPath = basePath;
+  } else {
+    // 3c. If the new language is not the default, add the prefix.
+    // e.g., '/ja/page'
+    // (Handle case where basePath is '/', to become '/ja' instead of '/ja/')
+    newPath = basePath === "/" ? `/${newLocale}` : `/${newLocale}${basePath}`;
+  }
+
+  return newPath
+}
 
 export default function LocaleSwitcherSelect({ defaultValue, items, label }: LocaleSwitcherProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -53,6 +55,8 @@ export default function LocaleSwitcherSelect({ defaultValue, items, label }: Loc
     () => items.find(item => item.value === defaultValue) || items[0]
   );
   const switcherRef = useRef<HTMLDivElement>(null);
+  const { pathname, search } = useLocation();
+  const navigate = useNavigate()
 
   // Effect of closing the dropdown when clicking outside a component
   useEffect(() => {
@@ -70,15 +74,23 @@ export default function LocaleSwitcherSelect({ defaultValue, items, label }: Loc
   const handleItemClick = (item: LocaleItem) => {
     setSelectedItem(item);
     setIsOpen(false);
-    setUserLocale(item.value as Locale);
+
+    const newPath = changePathLanguage(selectedItem.value as Locale, item.value as Locale, pathname)
+
+    // document
+    if (item.value)
+      document.documentElement.lang = item.value;
+
+    navigate(newPath + search);
+    // setUserLocale(item.value as Locale);
   };
 
   return (
-    <div className="relative inline-block text-left w-36" ref={switcherRef} aria-label={label}>
+    <div className="relative inline-block text-left w-28" ref={switcherRef} aria-label={label}>
       <div>
         <button
           type="button"
-          className="inline-flex justify-between items-center w-full rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-sm font-medium text-gray-800 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 dark:focus:ring-offset-gray-800 focus:ring-blue-500 transition-colors duration-200"
+          className="inline-flex justify-between items-center w-full rounded-lg border border-neutral-300 dark:border-neutral-600 shadow-sm px-4 py-2 bg-white dark:bg-neutral-700 text-sm font-medium text-neutral-800 dark:text-neutral-100 hover:bg-neutral-50 dark:hover:bg-neutral-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-neutral-100 dark:focus:ring-offset-neutral-800 focus:ring-blue-500 transition-colors duration-200"
           id="options-menu"
           aria-haspopup="true"
           aria-expanded={isOpen}
@@ -93,7 +105,7 @@ export default function LocaleSwitcherSelect({ defaultValue, items, label }: Loc
 
       {isOpen && (
         <div
-          className="origin-top-right absolute right-0 mt-2 w-full rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-gray-300 ring-opacity-5 focus:outline-none z-20"
+          className="origin-top-right absolute right-0 mt-2 w-full rounded-md shadow-lg bg-white dark:bg-neutral-700 ring-1 ring-neutral-300 ring-opacity-5 focus:outline-none z-20"
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="options-menu"
@@ -103,11 +115,10 @@ export default function LocaleSwitcherSelect({ defaultValue, items, label }: Loc
               <button
                 key={item.value}
                 onClick={() => handleItemClick(item)}
-                className={`${
-                  selectedItem.value === item.value
-                    ? 'font-semibold bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-white'
-                    : 'text-gray-700 dark:text-gray-300'
-                } block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-900 dark:hover:text-white transition-colors duration-150`}
+                className={`${selectedItem.value === item.value
+                    ? 'font-semibold bg-neutral-100 dark:bg-neutral-600 text-neutral-900 dark:text-white'
+                    : 'text-neutral-700 dark:text-neutral-300'
+                  } block w-full text-left px-4 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-600 hover:text-neutral-900 dark:hover:text-white transition-colors duration-150`}
                 role="menuitem"
               >
                 {item.label}
