@@ -1,4 +1,4 @@
-import React, { useState, useEffect, type KeyboardEventHandler } from 'react';
+import { useState, useEffect } from 'react';
 interface CustomNumberInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'min' | 'max' | 'type'> {
     value: number | null;
     onChange: (newValue: number | null) => void;
@@ -16,9 +16,12 @@ export const CustomNumberInput: React.FC<CustomNumberInputProps> = ({
     ...rest
 }) => {
     const [displayValue, setDisplayValue] = useState<string>(value !== null ? String(value) : '');
+    const [state, setState] = useState<'standby' | 'enable'>('enable');
 
+    // console.log('value', value)
     useEffect(() => {
-        setDisplayValue(value !== null ? String(value) : '');
+        if (state == 'enable')
+            setDisplayValue(value !== null ? String(value) : '');
     }, [value]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -27,6 +30,7 @@ export const CustomNumberInput: React.FC<CustomNumberInputProps> = ({
 
         if (inputValue === '') {
             setDisplayValue('');
+            setState('standby')
             onChange(null);
             return;
         }
@@ -35,26 +39,33 @@ export const CustomNumberInput: React.FC<CustomNumberInputProps> = ({
             return;
         }
 
-        const num = parseInt(inputValue, 10);
+        let num = parseInt(inputValue, 10);
 
         if (isNaN(num)) {
             setDisplayValue(inputValue);
             return;
         }
 
+        setState('enable')
+        if (num) {
+            num = Math.max(min, Math.min(max === Infinity ? num : max, num));
+            onChange(num)
+        }
         setDisplayValue(String(num));
+
     };
 
     const handleBlur = () => {
-
         const value = Number(displayValue)
+        console.log('handleBlur', { value, displayValue })
         if (value === null || isNaN(value)) {
             return;
         }
         const clampedValue = Math.max(min, Math.min(max === Infinity ? value : max, value));
 
         onChange(clampedValue);
-        setDisplayValue(String(value));
+        setDisplayValue(String(clampedValue));
+        setState('enable')
     };
 
     const handleKeyUp = (e: React.KeyboardEvent) => {

@@ -22,7 +22,7 @@ function HistogramAnalysis({ allPlayers }: HistogramAnalysisProps) {
     const [histFilter, setHistFilter] = useState({
         scoreMin: 0,
         scoreMax: 900_000_000,
-        binSize: 200_000,
+        binSize: 20_000,
     });
     const [bracketVisibility, setBracketVisibility] = useState<Record<string, boolean>>({});
 
@@ -30,7 +30,7 @@ function HistogramAnalysis({ allPlayers }: HistogramAnalysisProps) {
     useEffect(() => {
         const initialVisibility: Record<string, boolean> = {};
         SCORE_BRACKETS.forEach(bracket => {
-            if (['TTT', 'TTI', 'TII', 'III'].includes(bracket.name))
+            if (['TTT', 'TTI', 'TII'].includes(bracket.name))
                 initialVisibility[bracket.name] = true;
             else initialVisibility[bracket.name] = false;
         });
@@ -64,17 +64,37 @@ function HistogramAnalysis({ allPlayers }: HistogramAnalysisProps) {
             bins.set(binStart, current);
         }
 
+        const binEntries = Array.from(bins.entries());
+        // const totalBinnedPlayers = binEntries.reduce((sum, [, data]) => sum + data.count, 0);
+        binEntries.sort((a, b) => a[0] - b[0]);
+        let cumulativeRank = 1 //totalBinnedPlayers;
+
+
         return Array.from(bins.entries()).map(([binStart, data]) => {
             const binEnd = binStart + binSize;
             const avgScore = data.count > 0 ? data.totalScore / data.count : 0;
             const difficulty = getDifficultyFromScore(avgScore);
+
+            const rankEnd = cumulativeRank;
+            cumulativeRank += data.count;
+            const rankStart = cumulativeRank + 1;
+
+            // return {
+            //     name: `${(binStart / 1_000_000).toFixed(1)}M-${(binEnd / 1_000_000).toFixed(1)}M`,
+            //     count: data.count,
+            //     color: DIFFICULTY_COLORS[difficulty],
+            //     bracket: getBracketFromTotalScore(avgScore),
+            // };
+
             return {
-                name: `${(binStart / 1_000_000).toFixed(1)}M-${(binEnd / 1_000_000).toFixed(1)}M`,
+                binStart, 
+                binEnd,  
                 count: data.count,
                 color: DIFFICULTY_COLORS[difficulty],
                 bracket: getBracketFromTotalScore(avgScore),
+                cumulativeRankRange: `${rankEnd.toLocaleString()}-${rankStart.toLocaleString()}`,
             };
-        }).sort((a, b) => parseFloat(a.name) - parseFloat(b.name));
+        })//.sort((a, b) => parseFloat(a.name) - parseFloat(b.name));
     }, [bracketFilteredPlayers, histFilter]);
 
 
@@ -91,14 +111,31 @@ function HistogramAnalysis({ allPlayers }: HistogramAnalysisProps) {
     };
 
     // Tooltip component is also moved here
+    // const HistogramTooltip = ({ active, payload }: any) => {
+    //     const { t } = useTranslation("dashboard");
+    //     if (active && payload && payload.length) {
+    //         const data = payload[0].payload;
+    //         return (
+    //             <div className="bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm p-3 border rounded-lg shadow-lg text-sm">
+    //                 <p className="font-bold">{t('tooltipScore', { name: data.name })}</p>
+    //                 <p>{t('tooltipPlayers', { count: data.count.toLocaleString() })}</p>
+    //                 {data.bracket && <p className="font-semibold" style={{ color: data.color }}>{t('tooltipAvgBracket', { bracket: data.bracket })}</p>}
+    //             </div>
+    //         );
+    //     }
+    //     return null;
+    // };
     const HistogramTooltip = ({ active, payload }: any) => {
         const { t } = useTranslation("dashboard");
         if (active && payload && payload.length) {
             const data = payload[0].payload;
+            // const scoreRange = `${(data.binStart / 1_000_000).toFixed(1)}M-${(data.binEnd / 1_000_000).toFixed(1)}M`;
+            const scoreRange = `${data.binStart.toLocaleString()}-${data.binEnd.toLocaleString()}`;
             return (
                 <div className="bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm p-3 border rounded-lg shadow-lg text-sm">
-                    <p className="font-bold">{t('tooltipScore', { name: data.name })}</p>
+                    <p className="font-bold">{t('tooltipScore', { name: scoreRange })}</p>
                     <p>{t('tooltipPlayers', { count: data.count.toLocaleString() })}</p>
+                    <p>{t('tooltipRank', 'rank')}: {data.cumulativeRankRange}</p>
                     {data.bracket && <p className="font-semibold" style={{ color: data.color }}>{t('tooltipAvgBracket', { bracket: data.bracket })}</p>}
                 </div>
             );
@@ -126,12 +163,22 @@ function HistogramAnalysis({ allPlayers }: HistogramAnalysisProps) {
             <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={histogramData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" angle={-45} textAnchor="end" height={50} tickFormatter={(value) => value.split('-')[0]}
+                    {/* <XAxis dataKey="name" angle={-45} textAnchor="end" height={50} tickFormatter={(value) => value.split('-')[0]}
+                    /> */}
+                    <XAxis
+                        dataKey="binStart"
+                        angle={-45}
+                        textAnchor="end"
+                        height={50}
+                        tickFormatter={(value) => `${(value / 1_000_000).toFixed(1)}M`}
                     />
                     <YAxis />
                     <Tooltip content={<HistogramTooltip />} />
                     <Bar dataKey="count" name={t('playerCount')}>
-                        {histogramData.map((entry, index) => (<Cell key={`cell-${index}`} fill={entry.color} />))}
+                        {/* {histogramData.map((entry, index) => (<Cell key={`cell-${index}`} fill={entry.color} />))} */}
+                        {histogramData.map((entry, index) => (
+                            <Cell key={`cell-${entry.binStart}`} fill={entry.color} />
+                        ))}
                     </Bar>
                 </BarChart>
             </ResponsiveContainer>

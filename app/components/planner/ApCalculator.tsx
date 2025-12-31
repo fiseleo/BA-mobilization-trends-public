@@ -1,11 +1,12 @@
 // src/components/ApCalculator.tsx
 
-import { useState, useCallback, useEffect, type ChangeEvent } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePlanForEvent } from '~/store/planner/useEventPlanStore';
 import { ChevronIcon } from '../Icon';
 import type { IconData } from '~/types/plannerData';
 import { globalEventDates } from '~/data/globalEventDates';
+import { CustomNumberInput } from '../CustomInput';
 
 // AP generation per hour by cafe rank
 const CAFE_AP_PER_HOUR = [0, 0, 0, 0, 0, 0, 19.49, 22.32, 25.15, 27.97, 30.80]; // Ranks 0 to 10
@@ -59,7 +60,7 @@ export const ApCalculator = ({ eventId, startTime, endTime, iconData, onCalculat
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [showDetails, setShowDetails] = useState(false); // Details display state
 
-    const { plan, setApConfig: setConfig, apConfig: config } = usePlanForEvent(eventId);
+    const { setApConfig: setConfig, apConfig: config } = usePlanForEvent(eventId);
     if (config) {
         if (!config.startDate) config.startDate = startTime.slice(0, 16)
         if (!config.endDate) config.endDate = endTime.slice(0, 16)
@@ -181,7 +182,7 @@ export const ApCalculator = ({ eventId, startTime, endTime, iconData, onCalculat
                 else if (cycleDay === 8) daily.attendance = 100;
             }
 
-            const gains = daily.dailyQuests + daily.cafe + daily.gem + daily.pvp + daily.weekly + daily.attendance + daily.apPackage;
+            const gains = daily.natural + daily.dailyQuests + daily.cafe + daily.gem + daily.pvp + daily.weekly + daily.attendance + daily.apPackage;
             const spends = daily.spendHard + daily.spendExchange + daily.spendMisc;
             daily.total = Math.round(gains - spends);
 
@@ -189,10 +190,7 @@ export const ApCalculator = ({ eventId, startTime, endTime, iconData, onCalculat
             totalAp += daily.total;
 
         }
-
-        totalAp += config.bonusAp;
-
-
+        
         const finalTotal = Math.round(totalAp);
         setResult({ daily: dailyBreakdown, total: finalTotal });
 
@@ -205,6 +203,7 @@ export const ApCalculator = ({ eventId, startTime, endTime, iconData, onCalculat
 
     const setNumericConfig = (key: keyof typeof config, value: string, max?: number) => {
         let numValue = parseInt(value) || 0;
+        console.log("[setNumericConfig] numvalue:", numValue, config, value, max)
         if (max !== undefined) {
             numValue = Math.min(numValue, max);
         }
@@ -314,7 +313,7 @@ export const ApCalculator = ({ eventId, startTime, endTime, iconData, onCalculat
                             </div>
                             <div>
                                 <label className="text-sm font-bold dark:text-gray-300">{t('label.dailyPyroRefills')}</label>
-                                <input type="number" min="0" max="20" value={config.gemRefills} onChange={e => setNumericConfig('gemRefills', e.target.value, 20)} className="w-full p-2 text-sm rounded border dark:bg-neutral-700 dark:border-neutral-600 dark:text-gray-200" />
+                                <CustomNumberInput min={0} max={20} value={config.gemRefills} onChange={e => setNumericConfig('gemRefills', String(e || 0), 20)} className="w-full p-2 text-sm rounded border dark:bg-neutral-700 dark:border-neutral-600 dark:text-gray-200" />
                             </div>
                         </div>
 
@@ -322,8 +321,8 @@ export const ApCalculator = ({ eventId, startTime, endTime, iconData, onCalculat
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                             {[
                                 { label: t('gameTerm.tacticalChallenge') + ' (x90 AP)', type: 'select', value: config.pvpRefills, onChange: (e: any) => setNumericConfig('pvpRefills', e.target.value, 4), options: [0, 1, 2, 3, 4] },
-                                { label: t('ui.hardFarming') + ' (x-20 AP)', type: 'number', value: config.hardStages, onChange: (e: any) => setNumericConfig('hardStages', e.target.value) },
-                                { label: t('ui.scrimmageCount'), type: 'number', value: config.exchangeRuns, onChange: (e: any) => setNumericConfig('exchangeRuns', e.target.value) },
+                                { label: t('ui.hardFarming') + ' (x-20 AP)', type: 'number', value: config.hardStages, onChange: (e: any /*number | null */) => setNumericConfig('hardStages', String(e || 0)) },
+                                { label: t('ui.scrimmageCount'), type: 'number', value: config.exchangeRuns, onChange: (e: any /*number | null */) => setNumericConfig('exchangeRuns', String(e || 0)) },
                                 { label: t('ui.scrimmageCost'), type: 'select', value: config.exchangeCost, onChange: (e: any) => setNumericConfig('exchangeCost', e.target.value), options: [0, 5, 10, 15] }
                             ].map((item, index) => (
                                 <div key={index}>
@@ -333,14 +332,14 @@ export const ApCalculator = ({ eventId, startTime, endTime, iconData, onCalculat
                                             {item.options?.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                         </select>
                                     ) : (
-                                        <input type="number" value={item.value} onChange={item.onChange} className="w-full p-1 text-sm mt-1 rounded border dark:bg-neutral-700 dark:border-neutral-600 dark:text-gray-200" />
+                                        <CustomNumberInput value={item.value} onChange={item.onChange} className="w-full p-1 text-sm mt-1 rounded border dark:bg-neutral-700 dark:border-neutral-600 dark:text-gray-200" />
                                     )}
                                 </div>
                             ))}
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            <div><label className="text-xs font-semibold dark:text-gray-300">{t('ui.otherDailyApConsumption')}</label><input type="number" value={config.miscDailySpend} onChange={e => setNumericConfig('miscDailySpend', e.target.value)} className="w-full p-1 text-sm mt-1 rounded border dark:bg-neutral-700 dark:border-neutral-600 dark:text-gray-200" /></div>
-                            <div><label className="text-xs font-semibold dark:text-gray-300">{t('ui.prefarmedAp')}</label><input type="number" value={config.bonusAp} onChange={e => setNumericConfig('bonusAp', e.target.value)} className="w-full p-1 text-sm mt-1 rounded border dark:bg-neutral-700 dark:border-neutral-600 dark:text-gray-200" /></div>
+                            <div><label className="text-xs font-semibold dark:text-gray-300">{t('ui.otherDailyApConsumption')}</label><CustomNumberInput value={config.miscDailySpend} onChange={e => setNumericConfig('miscDailySpend', String(e || 0))} className="w-full p-1 text-sm mt-1 rounded border dark:bg-neutral-700 dark:border-neutral-600 dark:text-gray-200" /></div>
+                            <div><label className="text-xs font-semibold dark:text-gray-300">{t('ui.prefarmedAp')}</label><CustomNumberInput value={config.bonusAp} onChange={e => setNumericConfig('bonusAp', String(e || 0))} className="w-full p-1 text-sm mt-1 rounded border dark:bg-neutral-700 dark:border-neutral-600 dark:text-gray-200" /></div>
                             <div><label className="text-xs font-semibold dark:text-gray-300">{t('ui.aronaAttendanceStartDate')}</label><input type="date" value={config.attendanceStartDate} onChange={e => setConfig(({ ...config, attendanceStartDate: e.target.value }))} className="w-full p-1 text-sm mt-1 rounded border dark:bg-neutral-700 dark:border-neutral-600 dark:text-gray-200" /></div>
                             <div>
                                 <label className="text-xs font-semibold dark:text-gray-300">{t('ui.aronaAttendanceDay')}</label>
@@ -395,7 +394,7 @@ export const ApCalculator = ({ eventId, startTime, endTime, iconData, onCalculat
                                             <div className="flex justify-between items-center">
                                                 <span className="font-bold dark:text-gray-200">{date} ({dayOfWeek})</span>
                                                 <span className="font-bold text-blue-700 dark:text-blue-400">
-                                                    {t('ui.total')} {Math.round(daily.total + daily.natural).toLocaleString()} AP
+                                                    {t('ui.total')} {Math.round(daily.total).toLocaleString()} AP
                                                 </span>
                                             </div>
                                             {/* Detailed breakdown */}

@@ -2,8 +2,9 @@
     "EN0008": {
         "name": {
             "ko": "세트의 분노",
-            "ja": "ゲブラ",
-            "en": "Gebura"
+            "ja": "セトの憤怒",
+            "en": "The Fury of Set",
+            "zh_Hant": "賽特的憤怒"
         },
         "teran": "Outdoor",
         "armorType": "LightArmor"
@@ -11,8 +12,9 @@
     "EN0009": {
         "name": {
             "ko": "호크마",
-            "ja": "ゲブラ",
-            "en": "Gebura"
+            "ja": "コクマー",
+            "en": "Chokmah",
+            "zh_Hant": "霍刻瑪"
         },
         "teran": "Outdoor",
         "armorType": "LightArmor"
@@ -21,16 +23,18 @@
         "name": {
             "ko": "게부라",
             "ja": "ゲブラ",
-            "en": "Gebura"
+            "en": "Gebura",
+            "zh_Hant": "葛夫拉"
         },
         "teran": "Outdoor",
         "armorType": "LightArmor"
     },
     "EN0011": {
         "name": {
-            "ko": "티페리트",
-            "ja": "ゲブラ",
-            "en": "Gebura"
+            "ko": "티페레트",
+            "ja": "ティファレト",
+            "en": "Tiphareth",
+            "zh_Hant": "Tiphareth"
         },
         "teran": "Outdoor",
         "armorType": "ElasticArmor"
@@ -39,7 +43,8 @@
         "name": {
             "ko": "예소드",
             "ja": "イェソド",
-            "en": "Yesod"
+            "en": "Yesod",
+            "zh_Hant": "Yesod"
         }, 
         "teran": "Street",
         "armorType": "ElasticArmor"
@@ -48,7 +53,8 @@
         "name": {
             "ko": "예로니무스",
             "ja": "ヒエロニムス",
-            "en": "Hieronymus"
+            "en": "Hieronymus",
+            "zh_Hant": "耶羅尼姆斯"
         }, 
         "teran": "Street",
         "armorType": "LightArmor"
@@ -57,61 +63,68 @@
         "name": {
             "ko": "예로니무스",
             "ja": "ヒエロニムス",
-            "en": "Hieronymus"
+            "en": "Hieronymus",
+            "zh_Hant": "耶羅尼姆斯"
         }, 
         "teran": "Street",
         "armorType": "LightArmor"
     },
     "Binah": {
         "name": {
+            "en": "Binah",
             "ko": "비나",
-            "ja": "Binah",
-            "en": "ビナー"
+            "ja": "ビナー",
+            "zh_Hant": "薇娜"
         }, 
         "teran": "Street",
         "armorType": "LightArmor"
     },
     "Kaitenger": {
         "name": {
+            "en": "KAITEN",
             "ko": "카이텐",
-            "ja": "KAITEN",
-            "en": "カイテン"
+            "ja": "カイテン",
+            "zh_Hant": "凱坦澤"
         }, 
         "teran": "Street",
         "armorType": "LightArmor"
     },
     "EN0005": {
         "name": {
+            "en": "Gregrios",
             "ko": "그레고리오",
             "ja": "グレゴリオ",
-            "en": "Gregrios"
+            "zh_Hant": "葛利果"
         }, 
         "teran": "Street",
         "armorType": "LightArmor"
     },
     "Perorozilla": {
         "name": {
+            "en": "Perorozilla",
             "ko": "페로로지라",
             "ja": "ペロロジラ",
-            "en": "Perorozilla"
+            "zh_Hant": "佩洛洛吉拉"
         }, 
         "teran": "Street",
         "armorType": "Unarmed"
     },
     "Perorozilla_Outdoor": {
         "name": {
+            "en": "Perorozilla",
             "ko": "페로로지라",
             "ja": "ペロロジラ",
-            "en": "Perorozilla"
+            "zh_Hant": "佩洛洛吉拉"
         }, 
         "teran": "Outdoor",
         "armorType": "Unarmed"
     },
     "ShiroKuro": {
         "name": {
+            "en": "Shiro&Kuro",
             "ko": "시로&쿠로",
             "ja": "シロ＆クロ",
-            "en": "Shiro&Kuro"
+            "zh_Hant": "白&黑"
         }, 
         "teran": "Street",
         "armorType": "Unarmed"
@@ -120,7 +133,8 @@
         "name": {
             "ko": "호버크래프트",
             "ja": "ホバークラフト",
-            "en": "HoverCraft"
+            "en": "HoverCraft",
+            "zh_Hant": "氣墊船"
         }, 
         "teran": "Street",
         "armorType": "LightArmor"
@@ -129,7 +143,8 @@
         "name": {
             "ko": "헤세드",
             "ja": "ケセド",
-            "en": "Chesed"
+            "en": "Chesed",
+            "zh_Hant": "赫賽德"
         }, 
         "teran": "Street",
         "armorType": "LightArmor"
@@ -138,7 +153,8 @@
         "name": {
             "ko": "고즈",
             "ja": "ゴズ",
-            "en": "Goz"
+            "en": "Goz",
+            "zh_Hant": "高茲"
         }, 
         "teran": "Street",
         "armorType": "Unarmed"
@@ -147,7 +163,8 @@
         "name": {
             "ko": "호드",
             "ja": "ホド",
-            "en": "HOD"
+            "en": "HOD",
+            "zh_Hant": "霍德"
         }, 
         "teran": "Street",
         "armorType": "LightArmor"
@@ -156,7 +173,8 @@
         "name": {
             "ko": "쿠로카게",
             "ja": "クロカゲ",
-            "en": "Kurokage"
+            "en": "Kurokage",
+            "zh_Hant": "黑影"
         }, 
         "teran": "Street",
         "armorType": "ElasticArmor"

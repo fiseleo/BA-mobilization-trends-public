@@ -1,3 +1,4 @@
+// app/types/plannerData.ts
 import type { Student as StudentBase } from './data'
 // src/types/student.ts
 export interface Student extends StudentBase {
@@ -82,13 +83,15 @@ export interface EventData {
   };
   minigame_mission?: MinigameMission[];
   minigame_dream?: MinigameDreamData
+  minigame_ccg?: MinigameCCG;
+  concentration?: MinigameConcentration
 
 }
 
 export interface IconInfos {
   Item: Record<string, IconInfo>; // key: Item ID
   Equipment: Record<string, IconInfo>; // key: Item ID
-  Furniture: Record<string, IconInfo>; // key: Item ID
+  Furniture?: Record<string, IconInfo>; // key: Item ID
   Currency: Record<string, IconInfo>; // key: Item ID
   Emblem?: Record<string, IconInfo>;
   GachaGroup?: Record<string, GachaGroupInfo>;
@@ -161,16 +164,19 @@ interface GoodsInfo {
 }
 
 export interface LocalizeEtc {
+  NameEn: string;
   NameKr: string;
   NameJp: string;
-  NameEn: string;
+  NameTw: string;
+  DescriptionEn: string;
   DescriptionKr: string;
   DescriptionJp: string;
-  DescriptionEn: string;
+  DescriptionTw: string;
 }
 
 // Icon metadata (name, etc.)
-interface IconInfo {
+export interface IconInfo {
+  Icon?: string;
   ItemCategory?: number;
   LocalizeEtc?: LocalizeEtc;
   TagsStr: string[]
@@ -299,6 +305,7 @@ export interface Skills {
   Passive: Skill;
   ExtraPassive: Skill;
   WeaponPassive: Skill;
+  GearPublic?: Skill
 }
 
 
@@ -466,8 +473,95 @@ export interface MinigameMission {
   CategoryStr: string;
 }
 
+export interface MinigameCCGInfo {
+  CostParcelId: number;
+  CostParcelTypeStr: string;
+  CostParcelAmount: number;
+}
+
+export interface MinigameCCGRewardItem {
+  MinPoint: number; // Stage number (e.g., 21 for 3-7)
+  RewardParcelId: number;
+  RewardParcelTypeStr: string;
+  RewardParcelAmount: number;
+}
+
+export interface MinigameCCG {
+  info: MinigameCCGInfo[];
+  reward_item: MinigameCCGRewardItem[];
+}
+
+export interface ConcentrationInfo {
+  BackImagePath: string;
+  CardBoardPrefabs: string;
+  CostGoodsId: number;
+  InstantClearRound: number; // e.g. 10
+  MaxCardOpenCount: number; // e.g. 12 (Max attempts)
+  MaxCardPairCount: number; // e.g. 6
+  CostGoods: {
+    ConsumeParcelId: number[];
+    ConsumeParcelAmount: number[];
+    ConsumeParcelTypeStr: string[];
+    // ... other fields if needed
+  };
+}
+
+export interface ConcentrationCard {
+  CardId: number;
+  ImagePath: string;
+  Rarity: number; // 0:N, 1:R, 2:SR, 3:SSR
+}
+
+export interface ConcentrationReward {
+  UniqueId: number;
+  Round: number;
+  IsLoop: boolean;
+  Rarity: number;
+  RewardParcelType: number[];
+  RewardParcelId: number[];
+  RewardParcelAmount: number[];
+  RewardParcelTypeStr: string[];
+  ConcentrationRewardTypeStr: string; // 'PairMatch' | 'RoundRenewal'
+}
+
+export interface MinigameConcentration {
+  info: ConcentrationInfo[];
+  card: ConcentrationCard[];
+  reward: ConcentrationReward[];
+}
 
 export type TransactionEntry = {
   source: string; // ex: 'shop_cost', 'farming', 'studentGrowth_cost'
   items: Record<string, { amount: number; isBonusApplied: boolean }>;
 };
+
+
+export interface CampaignReward {
+  GroupId: number;
+  IsDisplayed: boolean;
+  RewardTag: number;
+  StageRewardAmount: number;
+  StageRewardId: number;
+  StageRewardParcelType: number;
+  StageRewardProb: number;
+  RewardTagStr: "Default" | "Rare" | string; // 'Default', 'Rare', etc.
+  StageRewardParcelTypeStr: "Equipment" | "GachaGroup" | "Item" | "Currency" | string;
+}
+
+export interface CampaignStage {
+  Type: "Normal" | "Hard";
+  Chapter: number;
+  Stage: number;
+  Name: string;
+  RecommandLevel: number;
+  StageEnterCostTypeStr: "Currency" | string;
+  AP: number;
+  Reward: CampaignReward[];
+}
+
+/**
+ * Overall structure of the campaigns.json file.
+ * Key: Stage ID (string)
+ * Value: CampaignStage
+ */
+export type CampaignData = Record<string, CampaignStage>;

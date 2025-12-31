@@ -1,16 +1,19 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import emblemDataList from 'app/data/jp/emblem_counter/list.json';
-import type { PortraitData } from './dashboard/common';
+import type { PortraitData } from '../dashboard/common';
 import Group_Name_Translation from '~/locales/club.json'
 const s_locale = Group_Name_Translation as any
 import { IoTriangleSharp } from 'react-icons/io5';
-import { FiHash, FiTrendingUp, FiArrowUp, FiArrowDown, FiMinus } from 'react-icons/fi';
+import { FiHash, FiTrendingUp, FiArrowUp, FiArrowDown } from 'react-icons/fi';
 import type { TFunction } from 'i18next';
+import EmblemTreemap from './EmblemTreemap';
+import { cdn } from '~/utils/cdn';
+import { getLocaleShortName, type Locale } from '~/utils/i18n/config';
 
 const emblemDataModules = import.meta.glob('/app/data/jp/emblem_counter/*.json');
 
-export type EmblemCountEntry = [number, number, number, number]; // [tier, bond_level, student_id, count]
+export type EmblemCountEntry = [number, number, number, number];
 export type EmblemCountData = EmblemCountEntry[];
 
 export interface StudentMiniData {
@@ -26,8 +29,17 @@ export interface DisplayResult {
   count: number;
   percentage: number;
   iconId: number | null; // Student ID for the icon
-  diff: number | null; // [NEW] Difference from the previous dataset
+  diff: number | null; // Difference from the previous dataset
 }
+
+export type TreemapSourceEntry = {
+  school: string;
+  club: string;
+  baseName: string;
+  seasonalName: string; // Student's unique name (e.g., "Akari (New Year)")
+  count: number;
+  iconId: number;
+};
 
 const parseStudentName = (rawName: string): { baseName: string; seasonal: string | null } => {
   // const match = rawName.match(/(.+?)(?:\((.+)\))?$/);
@@ -58,6 +70,8 @@ const processEmblemData = (
     if (bondLevelFilter !== bondLevel) return false;
     if (tierFilter === 4) return tier === 4;
     if (tierFilter === 3) return tier === 3 || tier === 4;
+    if (tierFilter === 2) return tier === 3 || tier === 4 || tier === 2;
+    if (tierFilter === 1) return tier === 3 || tier === 4 || tier === 2 || tier === 1;
     return false;
   });
 
@@ -71,7 +85,7 @@ const processEmblemData = (
 
     if (!student) {
       key = `Unknown (${studentId})`;
-      currentStudentIdForIcon = null;
+      currentStudentIdForIcon = studentId;
     } else {
       switch (aggregationType) {
         case 'student_separate': key = student.Name; break;
@@ -116,10 +130,9 @@ type SortOrder = 'asc' | 'desc';
 export function EmblemCounter({ }) {
 
   const { t, i18n } = useTranslation("emblemCounter");
-  const { t: t_c } = useTranslation("common");
   const { t: t_d } = useTranslation("dashboard");
 
-  const locale = i18n.language;
+  const locale = i18n.language as Locale;
   const t_s = (x: string) => {
     if (!s_locale[locale]) return x
     if (!s_locale[locale][x]) return x
@@ -133,7 +146,7 @@ export function EmblemCounter({ }) {
   const [studentData, setStudentData] = useState<StudentCollection>({});
   const [portraitData, setPortraitData] = useState<PortraitData>({}); // State for portraits
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingData, setIsLoadingData] = useState(true); // [NEW] Specific loader for data file changes
+  const [isLoadingData, setIsLoadingData] = useState(true); // Specific loader for data file changes
   const [error, setError] = useState<string | null>(null);
 
   const [selectedDate, setSelectedDate] = useState<string>(dataList[0].name);
@@ -168,10 +181,16 @@ export function EmblemCounter({ }) {
   useEffect(() => {
     setIsLoading(true);
     Promise.all([
-      fetch(`/schaledb.com/${locale}.students.min.json`).then(res => res.json()),
-      fetch('/w/students_portrait.json').then(res => res.json())
+      fetch(cdn(`/schaledb.com/${getLocaleShortName(locale)}.students.min.json`)).then(res => res.json()),
+      fetch(cdn('/w/students_portrait.json')).then(res => res.json())
     ])
       .then(([studentJson, portraitJson]) => {
+        // studentJson[10131] = {
+        //   Id: 10131,
+        //   Name: 'Takane',
+        //   Club: 'PublicationDepartment',
+        //   School: 'RedWinter'
+        // }
         setStudentData(studentJson);
         setPortraitData(portraitJson);
         setError(null);
@@ -232,11 +251,11 @@ export function EmblemCounter({ }) {
 
   }, [selectedDate, dataList, t]);
 
-  const { displayData, totalCount } = useMemo((): { displayData: DisplayResult[], totalCount: number } => {
+  const { displayData, totalCount, totalDelta, totalRaidPlayers } = useMemo((): { displayData: DisplayResult[], totalCount: number, totalDelta: number | null, totalRaidPlayers:number } => {
 
     // Wait for all data to be ready
     if (isLoading || !studentData || Object.keys(studentData).length === 0 || Object.keys(portraitData).length === 0) {
-      return { displayData: [], totalCount: 0 };
+      return { displayData: [], totalCount: 0, totalDelta: null, totalRaidPlayers: 20000 };
     }
 
     // Process both current and previous data with the same filters
@@ -248,6 +267,7 @@ export function EmblemCounter({ }) {
 
     // Get total count from *current* data for percentage calculation
     const totalCount = Array.from(currentMap.values()).reduce((sum, data) => sum + data.count, 0);
+    const totalRaidPlayers = Array.from(processEmblemData(emblemData, studentData, 1 , 0, aggregationType, t).values()).reduce((sum, data) => sum + data.count, 0);
 
     // Use all keys from both maps to include items that dropped to 0
     const allKeys = new Set([...currentMap.keys(), ...prevMap.keys()]);
@@ -308,16 +328,65 @@ export function EmblemCounter({ }) {
       return 0;
     });
 
-    return { displayData: results, totalCount: totalCount };
+    const totalDelta = Array.from(results.values()).reduce((sum, data) => sum + (data.diff || 0), 0);
+
+    return { displayData: results, totalCount: totalCount, totalDelta, totalRaidPlayers };
 
   }, [emblemData, prevEmblemData, studentData, portraitData, tierFilter, bondLevelFilter, aggregationType, t, isLoading, sortKey, sortOrder]);
 
-  const totalPlayers = tierFilter === 4 ? 20000 : 120000;
-  const possessionRate = totalCount > 0 ? ((totalCount / totalPlayers) * 100).toFixed(2) : "0.00";
+  const treemapSourceData = useMemo((): TreemapSourceEntry[] => {
+    // 1. Verify data load
+    if (isLoading || !studentData || Object.keys(studentData).length === 0) {
+      return [];
+    }
 
-  console.log(displayData)
+    // 2. Filter current data (based on tier, bondLevel)
+    const filteredEntries = emblemData.filter(entry => {
+      const [tier, bondLevel] = entry;
+      if (bondLevelFilter !== bondLevel) return false;
+      if (tierFilter === 4) return tier === 4;
+      if (tierFilter === 3) return tier === 3 || tier === 4;
+      if (tierFilter === 2) return tier === 3 || tier === 4 || tier === 2;
+      if (tierFilter === 1) return tier === 3 || tier === 4 || tier === 2 || tier === 1;
+      return false;
+    });
+
+    // 3. Aggregate counts based on Student ID (studentId) (Resolve duplication issue) [!!!]
+    const studentCountMap = new Map<number, number>(); // <StudentId, total count>
+    filteredEntries.forEach(entry => {
+      const studentId = Number(entry[2]);
+      const count = entry[3];
+      // Accumulate to existing count
+      studentCountMap.set(studentId, (studentCountMap.get(studentId) || 0) + count);
+    });
+
+    // 4. Convert aggregated data to TreemapSourceEntry[] format
+    const sourceData: TreemapSourceEntry[] = [];
+    studentCountMap.forEach((count, studentId) => {
+      const student = studentData[String(studentId)];
+      if (!student) return; // Skip if student info is missing
+
+      const { baseName } = parseStudentName(student.Name);
+
+      sourceData.push({
+        school: student.School || t('etc', 'etc'),
+        club: student.Club || t('etc', 'etc'),
+        baseName: baseName,
+        seasonalName: student.Name,
+        count: count,
+        iconId: student.Id,
+      });
+    });
+
+    return sourceData;
+
+  }, [emblemData, studentData, tierFilter, bondLevelFilter, t, isLoading]); // 'aggregationType' dependency removed
+
+  const totalPlayers = tierFilter === 4 ? 20000 : (tierFilter === 3 ? 120000: tierFilter === 2 ? 240000: totalRaidPlayers);
+  const possessionRate = (totalCount <= totalPlayers && totalCount > 0) ? ((totalCount / totalPlayers) * 100).toFixed(2) : totalCount > totalPlayers ? "???" : "0.00";
+
   return (
-    <div className=" border-neutral-200 dark:border-neutral-700 p-6">
+    <div className=" border-neutral-200 dark:border-neutral-700 p-6 px-3 sm:px-6">
       <h2 className="text-xl font-bold mb-4 text-neutral-800 dark:text-white">{t('title')} (JP)</h2>
       <h2 className="text-sm font-light mb-4 text-neutral-600 dark:text-neutral-400">{t('description')}</h2>
 
@@ -344,6 +413,8 @@ export function EmblemCounter({ }) {
           <select value={tierFilter} onChange={(e) => setTierFilter(Number(e.target.value))} className="w-full p-2 border rounded bg-white dark:bg-neutral-700 dark:border-neutral-600">
             <option value={4}>{t('in20k')}</option>
             <option value={3}>{t('in120k')}</option>
+            <option value={2}>{t('in240k')}</option>
+            <option value={1}>{t('overall')}</option>
           </select>
         </div>
 
@@ -352,6 +423,7 @@ export function EmblemCounter({ }) {
           <label className="block font-medium mb-1 text-neutral-700 dark:text-neutral-300">{t('emblemType')}</label>
           <select value={bondLevelFilter} onChange={(e) => setBondLevelFilter(Number(e.target.value))} className="w-full p-2 border rounded bg-white dark:bg-neutral-700 dark:border-neutral-600">
             <option value={0}>{t('bond0')}</option>
+            <option value={20}>{t('bond20')}</option>
             <option value={50}>{t('bond50')}</option>
             <option value={100}>{t('bond100')}</option>
           </select>
@@ -377,15 +449,31 @@ export function EmblemCounter({ }) {
       {!isLoading && !isLoadingData && !error && displayData.length > 0 && (
         <>
           <div className="mb-2 text-sm text-neutral-600 dark:text-neutral-400">
-            <span>
+            <span className='flex items-center'>
               {t('emblemSummary', {
                 counts: totalCount.toLocaleString(),
                 rate: possessionRate
               })}
+
+              {totalDelta != null && <span className={`ml-2 text-xs sm:text-sm font-medium ${totalDelta > 0 ? 'text-green-500' : totalDelta < 0 ? 'text-red-500' : 'text-neutral-500'
+                }`}>
+                {<> (</>}
+                {totalDelta > 0 && <IoTriangleSharp size={12} className="inline mr-0.5" />}
+                {totalDelta < 0 && <IoTriangleSharp size={12} className="inline rotate-180 mr-0.5" />}
+                {(((x: number) => { return x > 0 ? x : -x })(totalDelta || 0))}
+                {< >)</>}
+              </span>}
             </span>
           </div>
 
 
+          <EmblemTreemap
+            data={treemapSourceData}
+            totalCount={totalCount}
+            t_s={t_s}
+            portraitData={portraitData}
+            aggregationType={aggregationType}
+          />
 
 
           <div className="overflow-x-auto">
@@ -403,7 +491,7 @@ export function EmblemCounter({ }) {
                     onClick={handleSort} // Attach the cycling handler
                     title={sortKey === 'count' ? t('sortByChange', "sortByChange") : t('sortByCount', "sortByCount")} // Tooltip for next action
                   >
-                    <div className="flex items-center justify-end gap-1">
+                    <div className="flex items-center sm:justify-start justify-end gap-1">
                       {/* Dynamic Icon */}
                       {sortKey === 'count' ?
                         <FiHash size={12} /> :

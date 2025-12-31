@@ -2,7 +2,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useIsDarkState } from "~/store/isDarkState";
 import { getBackgroundRatingColor, getCharacterStarValue, type PortraitData, type ReportEntry, type StudentData } from "../common";
-import { Bar, BarChart, CartesianGrid, Label, LabelList, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, LabelList, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { StarRating } from "~/components/StarRatingProps";
 import { useTranslation } from "react-i18next";
 

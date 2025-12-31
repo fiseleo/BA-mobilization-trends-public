@@ -48,8 +48,7 @@ function DashboardUI({ dashboardData: allData, studentData, portraitData, raidIn
 
     const [displayData, setDisplayData] = useState<ReportEntryRank[]>([]);
 
-    const { t, i18n } = useTranslation("dashboard");
-    const { t: t_c } = useTranslation("common");
+    const { t } = useTranslation("dashboard");
 
     const rank_ranges: RankRange[] = []
     rank_ranges.push({ id: 'all', name: 'All', min: 1, max: raidInfo.Cnt.All })
@@ -205,12 +204,11 @@ function DashboardUI({ dashboardData: allData, studentData, portraitData, raidIn
     };
 
 
-    const tableAreaRef = useRef<HTMLDivElement>(null);
     const handleScrollToTableArea = () => scrollToSection(tableRef);
 
     const usageStats: UsageStats = useMemo(() => {
         const stats: UsageStats = new Map();
-        allData.forEach(entry => {
+        rankFilteredData.forEach(entry => {
             const uniqueChars = new Set<Character>();
             entry.t.forEach(team => [...team.m, ...team.s].forEach(c => c && uniqueChars.add(c)));
             uniqueChars.forEach(char => {
@@ -222,7 +220,7 @@ function DashboardUI({ dashboardData: allData, studentData, portraitData, raidIn
             });
         });
         return stats;
-    }, [allData]);
+    }, [rankFilteredData]);
 
 
     const isRaid = isTotalAssault(raidInfo)
@@ -245,6 +243,7 @@ function DashboardUI({ dashboardData: allData, studentData, portraitData, raidIn
         { id: 'rankings', title: t("rankingsAndTeams").replace(/\{.*\}/, '').trim(), ref: tableRef, icon: <HiOutlineTableCells className="w-4 h-4" /> },
     ], [t]);
 
+    /*
     const [visibleSection, setVisibleSection] = useState<string>(sections[0].id);
 
     useEffect(() => {
@@ -278,6 +277,7 @@ function DashboardUI({ dashboardData: allData, studentData, portraitData, raidIn
             });
         };
     }, [sections]);
+    */
 
     const scrollToSection = (ref: React.RefObject<HTMLDivElement | null>) => {
         ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -341,7 +341,7 @@ function DashboardUI({ dashboardData: allData, studentData, portraitData, raidIn
                 <button
                     onClick={() => setIsNavOpen(true)}
                     className="p-4 bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 rounded-full shadow-lg ring-1 ring-black/5 dark:ring-white/10 hover:bg-neutral-50 dark:hover:bg-neutral-700 active:scale-95 transition-all"
-                    aria-label={t('openNavigation')}
+                    aria-label={t('openNavigation', 'open')}
                 >
                     <HiOutlineBars3 className="w-6 h-6" />
                 </button>
@@ -364,7 +364,7 @@ function DashboardUI({ dashboardData: allData, studentData, portraitData, raidIn
                     <button
                         onClick={() => setIsNavOpen(false)}
                         className="p-2 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-full"
-                        aria-label={t('closeNavigation')}
+                        aria-label={t('closeNavigation', 'close')}
                     >
                         <HiOutlineXMark className="w-6 h-6" />
                     </button>

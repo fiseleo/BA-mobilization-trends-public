@@ -1,6 +1,6 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { ItemIcon } from '../common/Icon';
-import type { EventData, IconData, LocalizeEtc, MinigameDreamData, MinigameDreamParameter, MinigameDreamScheduleResult, MinigameMission } from '~/types/plannerData';
+import type { EventData, LocalizeEtc, MinigameDreamData, MinigameDreamParameter, MinigameDreamScheduleResult, MinigameMission } from '~/types/plannerData';
 import { ChevronIcon } from '~/components/Icon';
 import { useTranslation } from 'react-i18next';
 import { DreamMakerInteractiveSimulator } from './dreamMaker/DreamMakerInteractiveSimulator';
@@ -25,7 +25,7 @@ const runSimulation = (
     console.log('runSimulation', simConfig)
     const { simRuns, targetLoops, isFirstRun, clearedFirstRewards, initialStats, strategy } = simConfig;
     const { daily_point, ending, ending_reward, info: [gameInfo], parameter, schedule_result } = dreamData;
-    const minigame_mission = eventDataRef.minigame_mission || []; // Use correct key
+    // const minigame_mission = eventDataRef.minigame_mission || []; // Use correct key
 
     const days = gameInfo.DreamMakerDays;
     const actionsPerDay = gameInfo.DreamMakerActionPoint;
@@ -541,9 +541,9 @@ export const DreamMakerPlanner = ({ eventId, eventData, iconData, onCalculate, r
         { id: 'missions', name: t('tabs.missions') },
         { id: 'calculator', name: t('tabs.calculator') }
     ];
-    const eventPointItemId = dreamData.info[0].DreamMakerDailyPointId;
-    const eventPointItemType = dreamData.info[0].DreamMakerDailyPointParcelTypeStr;
-    const eventPointKey = `${eventPointItemType}_${eventPointItemId}`;
+    // const eventPointItemId = dreamData.info[0].DreamMakerDailyPointId;
+    // const eventPointItemType = dreamData.info[0].DreamMakerDailyPointParcelTypeStr;
+    // const eventPointKey = `${eventPointItemType}_${eventPointItemId}`;
 
     const formatMissionDesc = (mission: MinigameMission): string => {
         let desc = mission.DescriptionStr[locale_key];
@@ -715,7 +715,7 @@ export const DreamMakerPlanner = ({ eventId, eventData, iconData, onCalculate, r
                         </div>
                     )}
                     {activeTab === 'calculator' && (
-                        <div className="p-4 rounded-b-lg bg-gray-50 dark:bg-neutral-700/50 space-y-6 text-sm dark:text-gray-300">
+                        <>
                             <div className="space-y-4 border-b dark:border-neutral-600 pb-4">
                                 <h3 className="font-bold text-base dark:text-gray-100">{t('calculator.settingsTitle')}</h3>
                                 <div className="grid grid-cols-2 gap-2">
@@ -896,7 +896,7 @@ export const DreamMakerPlanner = ({ eventId, eventData, iconData, onCalculate, r
                                 </div>
                             )}
 
-                        </div>
+                        </>
                     )}
                 </div>
             )}

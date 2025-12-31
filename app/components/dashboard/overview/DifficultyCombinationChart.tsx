@@ -12,7 +12,7 @@ interface GrandAssaultTotalScoreAnalysisProps {
 }
 
 
-import React, { useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { getDifficultyFromScoreAndBoss, getBracketFromTotalScore, getBracketColorFromTotalScore } from '~/components/Difficulty';
 import type { FullData, GameServer, RaidInfo } from '~/types/data';
@@ -62,11 +62,11 @@ const TooltipContent = ({ data }: { data: ChartData }) => {
 };
 
 
-export default function GrandAssaultTotalScoreAnalysis({ fullData, raidInfos, tierCounter, boss, server, id }: GrandAssaultTotalScoreAnalysisProps) {
+export default function GrandAssaultTotalScoreAnalysis({ fullData, raidInfos, tierCounter, server, id }: GrandAssaultTotalScoreAnalysisProps) {
 
     const tooltipRef = useRef<HTMLDivElement>(null);
     const { t } = useTranslation("dashboard");
-    const [isPending, startTransition] = useTransition();
+    const [_isPending, startTransition] = useTransition();
     const [allPlayers, setAllPlayers] = useState<PlayerAnalysisData[]>([]);
 
     useEffect(() => {

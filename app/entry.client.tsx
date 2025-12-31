@@ -15,6 +15,7 @@ async function main() {
       fallbackLng: "en", // Change this to your default language
       // Here we only want to detect the language from the html tag
       // since the middleware already detected the language server-side
+      ns: ['home', 'common'],
       detection: { order: ["htmlTag"], caches: [] },
       // Update this to the path where your locales will be served
       backend: { loadPath: "/api/locales/{{lng}}/{{ns}}" },

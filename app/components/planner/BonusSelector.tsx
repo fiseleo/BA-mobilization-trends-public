@@ -1,16 +1,16 @@
 // src/components/BonusSelector.tsx
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePlanForEvent } from '~/store/planner/useEventPlanStore';
 import type { EventData, IconData, StudentData, StudentPortraitData } from '~/types/plannerData';
 
-interface BonusData {
-  [studentId: string]: {
-    EventContentItemType: string[];
-    BonusPercentage: number[];
-  };
-}
+// interface BonusData {
+//   [studentId: string]: {
+//     EventContentItemType: string[];
+//     BonusPercentage: number[];
+//   };
+// }
 
 export type TotalBonusMap = { [itemUniqueId: number]: number };
 
@@ -51,7 +51,7 @@ export const BonusSelector = ({
 
   if (!selectedStudents) return null
 
-  const bonusStudents = React.useMemo(() => {
+  const bonusStudents = useMemo(() => {
     return Object.keys(bonusData).map(id => {
       const studentInfo = allStudents[Number(id)];
       const bonusInfo = bonusData[id];
@@ -85,16 +85,18 @@ export const BonusSelector = ({
       const relevantStudents = selectedStudents.map(id => {
         const bonusInfo = eventData.bonus[id as keyof typeof eventData.bonus];
         const studentInfo = allStudents[Number(id)];
-        if (!bonusInfo || !studentInfo) return null;
+        if (!bonusInfo) return null;
         const typeIndex = bonusInfo.EventContentItemType.indexOf(itemType);
         if (typeIndex === -1) return null;
         return {
           id,
-          squadType: studentInfo.SquadType,
+          squadType: studentInfo?.SquadType || (Number(id) < 20000 ? 'Main' : 'Support'), // Reflect cases where students are not yet updated
           bonusValue: bonusInfo.BonusPercentage[typeIndex],
         };
       }).filter((s): s is NonNullable<typeof s> => s !== null);
 
+      // console.log('selectedStudents',selectedStudents)
+      // console.log('relevantStudents',relevantStudents)
       const strikers = relevantStudents.filter(s => s.squadType === 'Main');
       const specials = relevantStudents.filter(s => s.squadType === 'Support');
       strikers.sort((a, b) => b.bonusValue - a.bonusValue);
@@ -178,7 +180,7 @@ export const BonusSelector = ({
         {/* 1. Title (Always left-aligned) */}
         <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 shrink-0">{t('ui.bonusStudent')}</h2>
 
-        {/* [NEW] Wrapper for all controls, aligned to the right */}
+        {/* Wrapper for all controls, aligned to the right */}
         <div className="flex flex-wrap justify-end items-center gap-2">
 
           {/* 2. Item Filter Toggles (MOVED HERE) */}
@@ -191,8 +193,8 @@ export const BonusSelector = ({
                 title={String(currency.itemUniqueId)}
                 // Styling: Smaller, simpler states to match action buttons
                 className={`relative w-9 h-9 p-1 rounded-md transition-all transform hover:scale-110 ${isActive
-                    ? 'bg-white dark:bg-neutral-700 ring-2 dark:ring-1 ring-blue-500' // Active: Ring
-                    : 'bg-gray-200 dark:bg-neutral-800 opacity-60 hover:opacity-100' // Inactive: Grayed out
+                  ? 'bg-white dark:bg-neutral-700 ring-2 dark:ring-1 ring-blue-500' // Active: Ring
+                  : 'bg-gray-200 dark:bg-neutral-800 opacity-60 hover:opacity-100' // Inactive: Grayed out
                   }`}
               >
                 <img src={`data:image/webp;base64,${currency.icon}`} className="w-full h-full object-contain" alt={String(currency.itemUniqueId)} />
@@ -206,7 +208,7 @@ export const BonusSelector = ({
             );
           })}
 
-          {/* [NEW] Visual Separator */}
+          {/* Visual Separator */}
           <div className="border-l border-gray-300 dark:border-neutral-600 h-9 mx-1"></div>
 
           {/* 3. Action Buttons */}
@@ -227,8 +229,6 @@ export const BonusSelector = ({
         </div>
       </div>
 
-      {/* [DELETED] The wrapper div for toggles is removed from here */}
-      {/* <div className="my-4 p-3 bg-gray-50 dark:bg-neutral-800/50 ..."> ... </div> */}
 
       <div className="mt-4">
 

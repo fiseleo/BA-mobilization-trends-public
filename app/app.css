@@ -36,7 +36,7 @@ body {
   font-family: "GyeonggiTitle";
   font-weight: 500;
   font-style: normal;
-  src: url("/fonts/GyeonggiTitle_Medium.woff2") format("woff2");
+  src: url("https://cdn.yuzutrends.app/assets/fonts/GyeonggiTitle_Medium.woff2") format("woff2");
   font-display: swap;
   unicode-range: U+20-17F, U+2B0-2FF, U+2000-206F, U+20A0-20CF, U+2100-21FF, U+2600-26FF, U+AC00-D7A3, U+3131-318E;
   /* Latin and Ko */
@@ -45,7 +45,7 @@ body {
   font-family: "GyeonggiTitle";
   font-weight: 600;
   font-style: normal;
-  src: url("/fonts/GyeonggiTitle_Medium.woff2") format("woff2");
+  src: url("https://cdn.yuzutrends.app/assets/fonts/GyeonggiTitle_Medium.woff2") format("woff2");
   font-display: swap;
   unicode-range: U+20-17F, U+2B0-2FF, U+2000-206F, U+20A0-20CF, U+2100-21FF, U+2600-26FF, U+AC00-D7A3, U+3131-318E;
 }
@@ -53,7 +53,7 @@ body {
   font-family: "GyeonggiTitle";
   font-weight: 700;
   font-style: normal;
-  src: url("/fonts/GyeonggiTitle_Bold.woff2") format("woff2");
+  src: url("https://cdn.yuzutrends.app/assets/fonts/GyeonggiTitle_Bold.woff2") format("woff2");
   font-display: swap;
   unicode-range: U+20-17F, U+2B0-2FF, U+2000-206F, U+20A0-20CF, U+2100-21FF, U+2600-26FF, U+AC00-D7A3, U+3131-318E;
 }
@@ -61,7 +61,7 @@ body {
   font-family: "GyeonggiTitle";
   font-weight: 300;
   font-style: normal;
-  src: url("/fonts/GyeonggiTitle_Light.woff2") format("woff2");
+  src: url("https://cdn.yuzutrends.app/assets/fonts/GyeonggiTitle_Light.woff2") format("woff2");
   font-display: swap;
   unicode-range: U+20-17F, U+2B0-2FF, U+2000-206F, U+20A0-20CF, U+2100-21FF, U+2600-26FF, U+AC00-D7A3, U+3131-318E;
 }

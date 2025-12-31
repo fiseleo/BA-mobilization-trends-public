@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Locale } from '~/utils/i18n/config'; // Adjust the path if needed
 
@@ -25,12 +25,35 @@ export function Changelog({ changelogData }: ChangelogProps) {
     [changelogData]
   );
 
+  const hasRecentChanges = useMemo(() => {
+    const sevenDaysAgo = new Date();
+    // Based on exactly 7 days ago at midnight (00:00:00).
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+
+    // Check only the latest date (first item) among sorted data.
+    if (sortedData.length === 0) {
+      return false;
+    }
+
+    const mostRecentDate = new Date(sortedData[0].date);
+    return mostRecentDate >= sevenDaysAgo;
+  }, [sortedData]);
+
   return (
     // Style similar to the Link cards but as a section
     <section className="bg-white dark:bg-neutral-800 rounded-2xl shadow-lg border border-neutral-200 dark:border-neutral-700 p-6">
-      <h2 className="text-xl font-bold mb-4 text-neutral-800 dark:text-white">
-        {t('changelog.title')} {/* Add this key to your translation files */}
+      <h2 className="relative inline-block text-xl font-bold mb-4 text-neutral-800 dark:text-white">
+        {t('changelog.title')}
+
+        {hasRecentChanges && (
+          <div
+            className="absolute -top-1 -right-2.5 w-1.5 h-1.5 bg-red-500 rounded-full"
+            title={t('changelog.newUpdate')}
+          />
+        )}
       </h2>
+
       {/* Add scrolling if the list becomes long */}
       <div className="space-y-4 max-h-60 overflow-y-auto pr-2 custom-scrollbar"> {/* Added scrollbar styling class */}
         {sortedData.map((entry, index) => (

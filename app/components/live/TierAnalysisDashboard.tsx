@@ -1,16 +1,24 @@
+// app/components/live/TierAnalysisDashboard.tsx
+
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, AreaChart, Area, LabelList, Label, ReferenceLine } from 'recharts';
-import { type FC, useEffect, useMemo, useState } from 'react';
+import { type FC, useMemo, useState } from 'react';
 import type { TierData, TimelineData } from '~/types/livetype';
 import { DIFFICULTY_COLORS } from '~/data/raidInfo';
 import type { RaidInfo } from '~/types/data';
 import { type_translation } from '../raidToString';
 import { useTranslation } from 'react-i18next';
-import type { Locale } from '~/utils/i18n/config';
+import { getLocaleShortName, type Locale } from '~/utils/i18n/config';
 import { formatDateToDayString } from './formatDateToDayString';
 import { useIsDarkState } from '~/store/isDarkState';
+import { useTierDashboardStore } from '~/store/tierDashboardStore';
+
+// [New Imports]
+import { DateRangeSlider } from './DateRangeSlider';
+import { DifficultySelector } from './DifficultySelector';
+import { getKSTResetTimestamps } from './getKSTResetTimestamps';
 
 interface TierAnalysisDashboardProps {
-    isRaid: boolean
+    isRaid: boolean;
     timelineData: TimelineData;
     raidInfos: RaidInfo[];
 }
@@ -124,8 +132,12 @@ const CustomAreaChartTooltip = ({ active, payload, label, raidInfos }: {
 
 export const TierAnalysisDashboard: FC<TierAnalysisDashboardProps> = ({ isRaid, timelineData, raidInfos }) => {
     const { t, i18n } = useTranslation("liveDashboard");
-    const { t:t_c } = useTranslation("common");
-    const locale = i18n.language as Locale
+    const { t: t_c } = useTranslation("common");
+    const locale = i18n.language as Locale;
+    const { isDark } = useIsDarkState();
+
+    // --- Store State ---
+    const { selectedDiffs, dateRangeIndex } = useTierDashboardStore();
 
     const TABS: { id: TierTab, name: string }[] = useMemo(() => isRaid ? [
         { id: 'total', name: t('total_clear') },
@@ -134,20 +146,48 @@ export const TierAnalysisDashboard: FC<TierAnalysisDashboardProps> = ({ isRaid, 
     ] : [
         { id: 'total', name: t('total_clear') },
         { id: 'change', name: t('hourly_change') },
-        { id: 'boss1', name: type_translation[raidInfos?.[0]?.Type as keyof typeof type_translation][locale] || 'Boss 1' },
-        { id: 'boss2', name: type_translation[raidInfos?.[1]?.Type as keyof typeof type_translation][locale] || 'Boss 2' },
-        { id: 'boss3', name: type_translation[raidInfos?.[2]?.Type as keyof typeof type_translation][locale] || 'Boss 3' },
+        { id: 'boss1', name: type_translation[raidInfos?.[0]?.Type as keyof typeof type_translation][getLocaleShortName(locale)] || 'Boss 1' },
+        { id: 'boss2', name: type_translation[raidInfos?.[1]?.Type as keyof typeof type_translation][getLocaleShortName(locale)] || 'Boss 2' },
+        { id: 'boss3', name: type_translation[raidInfos?.[2]?.Type as keyof typeof type_translation][getLocaleShortName(locale)] || 'Boss 3' },
     ], [raidInfos, isRaid]);
-    const [activeTab, setActiveTab] = useState<TierTab>('total');
-    const [selectedDifficulties, setSelectedDifficulties] = useState<Set<string>>(new Set(['Lunatic', 'Torment', 'Insane']));
-    const { isDark } = useIsDarkState();
 
+    const [activeTab, setActiveTab] = useState<TierTab>('total');
+
+    // --- Data Prep for Components ---
+    
+    // 1. Extract Distinct Days (For Slider)
+    const distinctDays = useMemo(() => {
+        if (!timelineData) return [];
+        const days = new Set<string>();
+        timelineData.forEach(p => {
+            const dayStr = formatDateToDayString(new Date(p.time.replace(" ", "T") + "Z"), raidInfos[0]);
+            days.add(dayStr);
+        });
+        return Array.from(days);
+    }, [timelineData, raidInfos]);
+
+    // 2. Filter Timeline Data based on Slider State
+    const filteredTimelineData = useMemo(() => {
+        if (!timelineData || distinctDays.length === 0) return [];
+        
+        const startIndex = Math.max(0, Math.min(dateRangeIndex[0], distinctDays.length - 1));
+        const endIndex = Math.max(0, Math.min(dateRangeIndex[1], distinctDays.length - 1));
+        
+        return timelineData.filter(p => {
+            const dayStr = formatDateToDayString(new Date(p.time.replace(" ", "T") + "Z"), raidInfos[0]);
+            const dayIndex = distinctDays.indexOf(dayStr);
+            return dayIndex >= startIndex && dayIndex <= endIndex;
+        });
+    }, [timelineData, distinctDays, dateRangeIndex, raidInfos]);
+
+    // 3. Extract Available Difficulties (For Selector) - based on Filtered Data
     const availableDifficulties = useMemo(() => {
         const difficulties = new Set<string>();
-        if (!timelineData || !activeTab.startsWith('boss')) return [];
+        const sourceData = filteredTimelineData.length > 0 ? filteredTimelineData : timelineData;
+        
+        if (!sourceData || !activeTab.startsWith('boss')) return [];
 
-        for (const timePoint of timelineData) {
-
+        for (const timePoint of sourceData) {
             const bossTierData = isRaid ? timePoint.data.tier : timePoint.data.tier[activeTab as keyof typeof timePoint.data.tier];
             if (bossTierData) {
                 for (const diff of Object.keys(bossTierData)) {
@@ -155,69 +195,46 @@ export const TierAnalysisDashboard: FC<TierAnalysisDashboardProps> = ({ isRaid, 
                 }
             }
         }
-
         const difficultyOrder = ["Lunatic", "Torment", "Insane", "Extreme", "Hardcore", "Veryhard", "Hard", "Normal"];
         return difficultyOrder.filter(d => difficulties.has(d));
-    }, [timelineData, activeTab]);
-    useEffect(() => {
-        setSelectedDifficulties(new Set(availableDifficulties));
-    }, [availableDifficulties]);
+    }, [filteredTimelineData, timelineData, activeTab, isRaid]);
 
+
+    // --- Analysis Data Calculation ---
     const analysisData = useMemo(() => {
-        if (!timelineData || timelineData.length === 0) return null;
+        // Use filtered data for analysis
+        if (!filteredTimelineData || filteredTimelineData.length === 0) return null;
 
-        // Change time to numeric timestamp
-        const clearsOverTime = timelineData.map(point => {
-            const time = new Date(point.time.replace(" ", "T") + "Z").getTime(); // toLocaleString() -> getTime()
-            const bossTiers = point.data.tier;
-            const entry = { time } as any;
-
-            if (isRaid)
-                Object.entries(bossTiers).forEach(([diff, count]) => {
-                    entry[`${diff}`] = count;
-                });
-            else
-                Object.entries(bossTiers).forEach(([bossId, tiers]) => {
-                    Object.entries(tiers).forEach(([diff, count]) => {
-                        entry[`${bossId}_${diff}`] = count;
-                    });
-                });
-            return entry;
+        const clearsOverTime = filteredTimelineData.map(point => {
+             const time = new Date(point.time.replace(" ", "T") + "Z").getTime();
+             const bossTiers = point.data.tier;
+             const entry = { time } as any;
+             if (isRaid) Object.entries(bossTiers).forEach(([diff, count]) => { entry[`${diff}`] = count; });
+             else Object.entries(bossTiers).forEach(([bossId, tiers]) => { Object.entries(tiers).forEach(([diff, count]) => { entry[`${bossId}_${diff}`] = count; }); });
+             return entry;
         });
 
-
-        const clearsChangeOverTime = timelineData.slice(1).map((point, i) => {
-            const prevPoint = timelineData[i];
-
-            const currentTimeMs = new Date(point.time.replace(" ", "T") + "Z").getTime();
-            const prevTimeMs = new Date(prevPoint.time.replace(" ", "T") + "Z").getTime();
-
-            const durationMs = currentTimeMs - prevTimeMs;
-            const durationHours = durationMs / (1000 * 60 * 60); // milliseconds -> hours
-
-            let currentTotal, prevTotal, change;
-
-            if (isRaid) {
-                currentTotal = Object.values(point.data.tier).flat().reduce((sum, t) => sum + (t as number), 0);
-                prevTotal = Object.values(prevPoint.data.tier).flat().reduce((sum, t) => sum + (t as number), 0);
-                change = currentTotal - prevTotal;
-            } else {
-                currentTotal = Object.values(point.data.tier as TierData).flat().reduce((sum, t) => sum + Object.values(t).reduce((s, c) => s + c, 0), 0);
-                prevTotal = Object.values(prevPoint.data.tier as TierData).flat().reduce((sum, t) => sum + Object.values(t).reduce((s, c) => s + c, 0), 0);
-                change = currentTotal - prevTotal;
-            }
-
-            const changePerHour = durationHours > 0 ? (change / durationHours) : 0;
-
-            return {
-                time: currentTimeMs,
-                changePerHour: changePerHour,
-                originalChange: change,
-                durationHours: durationHours
-            };
+        const clearsChangeOverTime = filteredTimelineData.slice(1).map((point, i) => {
+             const prevPoint = filteredTimelineData[i];
+             const currentTimeMs = new Date(point.time.replace(" ", "T") + "Z").getTime();
+             const prevTimeMs = new Date(prevPoint.time.replace(" ", "T") + "Z").getTime();
+             const durationMs = currentTimeMs - prevTimeMs;
+             const durationHours = durationMs / (1000 * 60 * 60);
+             let currentTotal, prevTotal, change;
+             if (isRaid) {
+                 currentTotal = Object.values(point.data.tier).flat().reduce((sum, t) => sum + (t as number), 0);
+                 prevTotal = Object.values(prevPoint.data.tier).flat().reduce((sum, t) => sum + (t as number), 0);
+                 change = currentTotal - prevTotal;
+             } else {
+                 currentTotal = Object.values(point.data.tier as TierData).flat().reduce((sum, t) => sum + Object.values(t).reduce((s, c) => s + c, 0), 0);
+                 prevTotal = Object.values(prevPoint.data.tier as TierData).flat().reduce((sum, t) => sum + Object.values(t).reduce((s, c) => s + c, 0), 0);
+                 change = currentTotal - prevTotal;
+             }
+             const changePerHour = durationHours > 0 ? (change / durationHours) : 0;
+             return { time: currentTimeMs, changePerHour, originalChange: change, durationHours };
         });
 
-        const latestTierData = timelineData[timelineData.length - 1].data.tier;
+        const latestTierData = filteredTimelineData[filteredTimelineData.length - 1].data.tier;
         const bossNameMap = isRaid ? {} : {
             boss1: raidInfos?.[0]?.Type || 'Boss 1',
             boss2: raidInfos?.[1]?.Type || 'Boss 2',
@@ -228,7 +245,6 @@ export const TierAnalysisDashboard: FC<TierAnalysisDashboardProps> = ({ isRaid, 
             name: 'total',
             ...latestTierData,
             total: Object.values(latestTierData).reduce((s: number, c: any) => s + c, 0)
-
         }] : Object.entries(latestTierData).map(([bossId, tiers]) => {
             const total = Object.values(tiers).reduce((s: number, c: any) => s + c, 0);
             return {
@@ -238,64 +254,67 @@ export const TierAnalysisDashboard: FC<TierAnalysisDashboardProps> = ({ isRaid, 
             };
         });
 
-        return { clearsOverTime, clearsChangeOverTime, latestClearsByBoss };
-    }, [timelineData]);
+        // Vertical Lines (Reset Lines)
+        const startTime = clearsOverTime[0].time;
+        const endTime = clearsOverTime[clearsOverTime.length - 1].time;
+        const resetTimestamps = getKSTResetTimestamps(startTime, endTime);
 
-    const toggleDifficulty = (difficulty: string) => {
-        setSelectedDifficulties(prev => {
-            const next = new Set(prev);
-            if (next.has(difficulty)) {
-                next.delete(difficulty);
-            } else {
-                next.add(difficulty);
-            }
-            return next;
-        });
-    };
+        return { clearsOverTime, clearsChangeOverTime, latestClearsByBoss, resetTimestamps };
+    }, [filteredTimelineData, isRaid, raidInfos]);
 
+    const showDifficultySelector = activeTab.startsWith('boss');
 
-    if (!analysisData) return <div className="p-4 text-center">Tier data is loading...</div>;
-
-
-    // const difficultyOrder = useMemo(() => ["Lunatic", "Torment", "Insane", "Extreme", "Hardcore", "Veryhard", "Hard", "Normal"], []);
-    // const totalLegendPayload = useMemo(() => {
-    //     if (!analysisData || analysisData.latestClearsByBoss.length === 0) return [];
-    //     const existingDifficulties = new Set(
-    //         Object.keys(analysisData.latestClearsByBoss[0]).filter(key => key !== 'name' && key !== 'total')
-    //     );
-    //     return difficultyOrder
-    //         .filter(diff => existingDifficulties.has(diff))
-    //         .map(diff => ({
-    //             value: diff,
-    //             type: 'rect', // Or 'square' etc.
-    //             color: DIFFICULTY_COLORS[diff] || '#8884d8'
-    //         }));
-    // }, [analysisData, difficultyOrder]);
+    if (!analysisData) return <div className="p-4 text-center">Data is loading or range is empty...</div>;
 
     return (
         <>
-            <nav className="flex flex-wrap gap-2 border-b border-gray-200 dark:border-neutral-700 pb-3 mb-4">
-                {TABS.map(tab => (
-                    <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                        className={`px-3 py-1.5 text-sm font-semibold rounded-md transition-colors ${activeTab === tab.id ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-neutral-700 hover:bg-gray-200 dark:hover:bg-neutral-600'}`}>
-                        {tab.name}
-                    </button>
-                ))}
-            </nav>
-            <div className="min-h-[500px]">
-                {/* Full Clear Count Tab */}
-                {activeTab === 'total' && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="md:col-span-2">
-                        <ResponsiveContainer width="100%" height={isRaid ? 200 : 500}>
-                                <BarChart data={analysisData.latestClearsByBoss} layout="vertical"
-                                    barCategoryGap={isRaid ? '20%' : '10%'}
-                                >
-                                    <XAxis type="number" tickFormatter={(val) => val.toLocaleString()} />
-                                    <YAxis type="category" dataKey="name" width={isRaid ? 0 : 80} tickFormatter={(name) => isRaid ? '' : name === 'total' ? t_c('total') : t(name, { ns: 'term', defaultValue: name })} />
+            {/* Header & Tabs */}
+            <div className="flex flex-col gap-4 mb-4">
+                <nav className="flex flex-wrap gap-2 border-b border-gray-200 dark:border-neutral-700 pb-3">
+                    {TABS.map(tab => (
+                        <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                            className={`px-3 py-1.5 text-sm font-semibold rounded-md transition-colors ${activeTab === tab.id ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-neutral-700 hover:bg-gray-200 dark:hover:bg-neutral-600'}`}>
+                            {tab.name}
+                        </button>
+                    ))}
+                </nav>
 
+                {/* [New] Components: Range Slider & Difficulty Selector */}
+                <div className="bg-gray-50 dark:bg-neutral-900/50 rounded-lg border border-gray-200 dark:border-neutral-700 p-3">
+                    <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
+                        
+                        <div className="flex-1 min-w-0">
+                            <DateRangeSlider distinctDays={distinctDays} />
+                        </div>
+
+                        {showDifficultySelector && (
+                            <>
+                                <div className="hidden lg:block w-px bg-gray-300 dark:bg-neutral-700 self-stretch"></div>
+                                
+                                <div className="lg:hidden w-full h-px bg-gray-200 dark:bg-neutral-700"></div>
+
+                                <div className="flex-1 lg:flex-none lg:w-1/3 min-w-0">
+                                    <DifficultySelector availableDifficulties={availableDifficulties} />
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Chart Area */}
+            <div className="min-h-[500px]">
+                {activeTab === 'total' && (
+                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="md:col-span-2">
+                            <ResponsiveContainer width="100%" height={isRaid ? 200 : 500}>
+                                <BarChart data={analysisData.latestClearsByBoss} layout="vertical" barCategoryGap={isRaid ? '20%' : '10%'}>
+                                    {/* ... Axes, Tooltip, Legend ... */}
+                                    <XAxis type="number" tickFormatter={(val) => val.toLocaleString()} />
+                                    {/* <YAxis type="category" dataKey="name" width={isRaid ? 0 : 80} tickFormatter={(name) => isRaid ? '' : name === 'total' ? t_c('total') : t(name, { ns: 'term', defaultValue: name })} /> */}
+                                    <YAxis type="category" dataKey="name" width={isRaid ? 0 : 80} tickFormatter={(name) => isRaid ? '' : name === 'total' ? t_c('total') : type_translation[name as keyof typeof type_translation][getLocaleShortName(locale)]} />
                                     <Legend content={<CustomSortedLegend />} />
-                                    <Tooltip content={<CustomTotalClearTooltip />} cursor={{ fill: 'rgba(200, 200, 200, 0.1)' }}/>
+                                    <Tooltip content={<CustomTotalClearTooltip />} cursor={{ fill: 'rgba(200, 200, 200, 0.1)' }} />
                                     {Object.keys(DIFFICULTY_COLORS).map(diff => (
                                         <Bar key={diff} dataKey={diff} stackId="a" fill={DIFFICULTY_COLORS[diff]} >
                                             <LabelList
@@ -322,17 +341,15 @@ export const TierAnalysisDashboard: FC<TierAnalysisDashboardProps> = ({ isRaid, 
                         <div className="flex flex-col gap-4">
                             {analysisData.latestClearsByBoss.map(boss => (
                                 <div key={boss.name} className="flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-neutral-800/50 rounded-lg text-center h-full">
-                                    {!isRaid && <h3 className="font-semibold text-lg mb-1">{type_translation[boss.name as keyof typeof type_translation][locale]} Clear</h3>
-                                    }                                    <p className="text-4xl font-bold text-sky-500">{boss.total.toLocaleString()}</p>
+                                    {!isRaid && <h3 className="font-semibold text-lg mb-1">{type_translation[boss.name as keyof typeof type_translation][getLocaleShortName(locale)]} {t_c("clear", "Clear")}</h3>}
+                                    <p className="text-4xl font-bold text-sky-500">{boss.total.toLocaleString()}</p>
                                 </div>
                             ))}
                         </div>
                     </div>
                 )}
 
-                {/* Change per hour tab */}
                 {activeTab === 'change' && (
-
                     <ResponsiveContainer width="100%" height={500}>
                         <LineChart data={analysisData.clearsChangeOverTime}>
                             <XAxis
@@ -375,56 +392,34 @@ export const TierAnalysisDashboard: FC<TierAnalysisDashboardProps> = ({ isRaid, 
                                 }}
                             />
                             <Legend />
-                            <Line
-                                type="monotone"
-                                dataKey="changePerHour"
-                                name={t('hourly_change')}
-                                yAxisId="left"
-                                stroke="#82ca9d"
-                                strokeWidth={2}
-                                dot={{ r: 3 }}
-                                activeDot={{ r: 6 }}
-                            />
+                            
+                            {/* Vertical Lines (Reset Lines) - from analysisData */}
+                            {analysisData.resetTimestamps.map(ts => (
+                                <ReferenceLine key={ts} x={ts} stroke={isDark ? "#555" : "#ccc"} strokeDasharray="3 3" label={{ value: "Day Change", position: 'insideTop', fontSize: 10, fill: '#888' }} />
+                            ))}
+                            
+                            <Line type="monotone" dataKey="changePerHour" stroke="#82ca9d" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 6 }} />
                         </LineChart>
                     </ResponsiveContainer>
                 )}
 
-                {/* Tabs by Boss */}
-                {(activeTab === 'boss1' || activeTab === 'boss2' || activeTab === 'boss3') && (
-                    <>
-                        {/* Difficulty Selection Filter UI */}
-                        <div className="flex flex-wrap gap-x-4 gap-y-2 p-3 mb-4 bg-gray-50 dark:bg-neutral-900/50 rounded-lg">
-                            {availableDifficulties.map(diff => (
-                                <label key={diff} className="flex items-center gap-1.5 text-sm cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedDifficulties.has(diff)}
-                                        onChange={() => toggleDifficulty(diff)}
-                                        className="w-4 h-4 rounded"
-                                        style={{ accentColor: DIFFICULTY_COLORS[diff] }}
-                                    />
-                                    <span style={{ color: DIFFICULTY_COLORS[diff] }}>{diff}</span>
-                                </label>
+                {(activeTab.startsWith('boss')) && (
+                    <ResponsiveContainer width="100%" height={500}>
+                        <AreaChart data={analysisData.clearsOverTime}>
+                            <XAxis type="number" dataKey="time" scale="time" domain={['dataMin', 'dataMax']} tickFormatter={(ts) => formatDateToDayString(new Date(ts), raidInfos[0])} fontSize={12} />
+                            <YAxis tickFormatter={(val) => val.toLocaleString()} />
+                            <Tooltip content={<CustomAreaChartTooltip raidInfos={raidInfos} />} cursor={{ fill: 'rgba(200, 200, 200, 0.1)' }} />
+                            <Legend content={<CustomSortedLegend />} />
+
+                            {/* Vertical Lines */}
+                            {analysisData.resetTimestamps.map(ts => (
+                                <ReferenceLine key={ts} x={ts} stroke={isDark ? "#555" : "#ccc"} strokeDasharray="3 3" />
                             ))}
-                        </div>
 
-                        <ResponsiveContainer width="100%" height={500}>
-                            <AreaChart data={analysisData.clearsOverTime}>
-                                <XAxis
-                                    type="number" dataKey="time" scale="time" domain={['dataMin', 'dataMax']}
-                                    tickFormatter={(ts) => formatDateToDayString(new Date(ts), raidInfos[0])}
-                                    fontSize={12}
-                                />
-                                <YAxis tickFormatter={(val) => val.toLocaleString()} />
-
-                                <Tooltip
-                                    content={<CustomAreaChartTooltip raidInfos={raidInfos} />}
-                                    cursor={{ fill: 'rgba(200, 200, 200, 0.1)' }}
-                                />
-                                <Legend content={<CustomSortedLegend />} />
-
-                                {/* Only the selected difficulty is dynamically rendered */}
-                                {Array.from(selectedDifficulties).map(diff => (
+                            {/* Filtered Areas based on STORE State */}
+                            {Array.from(selectedDiffs)
+                                .filter(d => availableDifficulties.includes(d))
+                                .map(diff => (
                                     <Area
                                         key={diff}
                                         type="monotone"
@@ -435,9 +430,8 @@ export const TierAnalysisDashboard: FC<TierAnalysisDashboardProps> = ({ isRaid, 
                                         fill={DIFFICULTY_COLORS[diff]}
                                     />
                                 ))}
-                            </AreaChart>
-                        </ResponsiveContainer>
-                    </>
+                        </AreaChart>
+                    </ResponsiveContainer>
                 )}
             </div>
         </>

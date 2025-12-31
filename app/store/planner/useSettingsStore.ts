@@ -1,8 +1,10 @@
+// app/store/planner/useSettingsStore.ts
 import { create } from 'zustand';
 import type { SimulationResult as CardSimulationResult } from '~/components/planner/minigame/CardShopPlanner';
 import type { FarmingTab } from '~/components/planner/FarmingPlanner';
 import type { DiceRaceTab } from '~/components/planner/minigame/DiceRacePlanner';
 import type { AvgPtDisplayMode, DreamMakerResult, DreamMakerSimResult, DreamMakerTab } from '~/components/planner/minigame/dreamMaker/type';
+import type { CardMatchResult, CardMatchTab, CardMatchViewMode } from '~/components/planner/minigame/CardMatchPlanner';
 
 
 interface EventSettings {
@@ -36,6 +38,10 @@ interface EventSettings {
   dreamMakerInteractiveResult: DreamMakerSimResult | null; // Direct Play Results
   dreamMakerAvgPtDisplayMode: AvgPtDisplayMode;
   dreamMakerShowInteractiveSim: boolean;
+
+  cardMatchActiveTab: CardMatchTab;
+  cardMatchViewMode: CardMatchViewMode;
+  cardMatchDisplayResult: CardMatchResult | null;
 }
 
 // Store Status Type
@@ -78,6 +84,12 @@ interface SettingsState {
   setDreamMakerAvgPtDisplayMode: (eventId: number, mode: AvgPtDisplayMode) => void;
   setDreamMakerShowInteractiveSim: (eventId: number, show: boolean) => void;
 
+  setCardMatchActiveTab: (eventId: number, tab: CardMatchTab) => void;
+  setCardMatchViewMode: (eventId: number, mode: CardMatchViewMode) => void;
+  setCardMatchDisplayResult: (eventId: number, result: CardMatchResult | null) => void;
+
+
+
 }
 
 const initialSettings: EventSettings = {
@@ -96,7 +108,10 @@ const initialSettings: EventSettings = {
   dreamMakerResult: null,
   dreamMakerInteractiveResult: null,
   dreamMakerAvgPtDisplayMode: 'per_day',
-  dreamMakerShowInteractiveSim: false
+  dreamMakerShowInteractiveSim: false,
+  cardMatchActiveTab: 'simulation',
+  cardMatchViewMode: 'total',
+  cardMatchDisplayResult: null
 };
 
 export const useSettingsStore = create<SettingsState>((set, get) => ({
@@ -169,6 +184,10 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   setDreamMakerAvgPtDisplayMode: (eventId, mode) => get().updateSettings(eventId, { dreamMakerAvgPtDisplayMode: mode }),
   setDreamMakerShowInteractiveSim: (eventId, show) => get().updateSettings(eventId, { dreamMakerShowInteractiveSim: show }),
 
+  setCardMatchActiveTab: (eventId, tab) => get().updateSettings(eventId, { cardMatchActiveTab: tab }),
+  setCardMatchViewMode: (eventId, mode) => get().updateSettings(eventId, { cardMatchViewMode: mode }),
+  setCardMatchDisplayResult: (eventId, result) => get().updateSettings(eventId, { cardMatchDisplayResult: result }),
+
 }));
 
 
@@ -228,6 +247,10 @@ export const useEventSettings = (eventId: number) => {
     setDreamMakerResult: (result: DreamMakerResult | null) => store.setDreamMakerResult(eventId, result),
     setDreamMakerAvgPtDisplayMode: (mode: AvgPtDisplayMode) => store.setDreamMakerAvgPtDisplayMode(eventId, mode),
     setDreamMakerShowInteractiveSim: (show: boolean) => store.setDreamMakerShowInteractiveSim(eventId, show),
+
+    setCardMatchActiveTab: (tab: CardMatchTab) => store.setCardMatchActiveTab(eventId, tab),
+    setCardMatchViewMode: (mode: CardMatchViewMode) => store.setCardMatchViewMode(eventId, mode),
+    setCardMatchDisplayResult: (result: CardMatchResult | null) => store.setCardMatchDisplayResult(eventId, result),
 
   };
 

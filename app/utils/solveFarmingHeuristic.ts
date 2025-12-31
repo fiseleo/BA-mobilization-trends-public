@@ -1,4 +1,4 @@
-// src/utils/solveOptimalRuns.ts
+// app/utils/solveFarmingHeuristic.ts
 
 interface SolveOptimalRunsParams {
   /** [stages x items] matrix: Item(j) drop quantity per stage(i) */
@@ -127,11 +127,11 @@ function simplexSolver(c: number[], A: number[][], b: number[]): SimplexSolution
   // console.log(A.map(v=>v.join('\t')).join('\n'))
   // console.log('simplexSolver>b',b)
   // console.log('simplexSolver>c',c)
-  type SimplexSolution = {
-    status: 'optimal' | 'infeasible' | 'unbounded';
-    result: number[];
-    objectiveValue?: number; // Objective function value of the optimal solution
-  };
+  // type SimplexSolution = {
+  //   status: 'optimal' | 'infeasible' | 'unbounded';
+  //   result: number[];
+  //   objectiveValue?: number; // Objective function value of the optimal solution
+  // };
 
   const TOLERANCE = 1e-9;
 

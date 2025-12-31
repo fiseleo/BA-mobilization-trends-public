@@ -5,12 +5,11 @@
 All copyright of <a href='https://bluearchive.jp/' target="_blank" rel="noopener noreferrer"><b className='hover:underline'>"Blue Archive"</b></a> belongs to <a href='https://www.nexon.com' target="_blank" rel="noopener noreferrer"><b className='hover:underline'>NEXON Korea Corp.</b></a>, <a href='https://www.nexongames.co.kr/' target="_blank" rel="noopener noreferrer"><b className='hover:underline'>NEXON GAMES Co., Ltd.</b></a>, and <a href="https://www.yo-star.com" target="_blank" rel="noopener noreferrer"><b className='hover:underline'>YOSTAR, Inc.</b></a>
 
 ## Notice
-- For the avoidance of copyright issues and efficient version management, some data from /public and /app/data/ was not included in the project; however, There is no intention of preventing crawling at the server level, and data can be crawled easily with user scripts, packet analysis, and code reading.
-- For the same reason, the data processing code was not included in the project.
+- For the avoidance of copyright issues and efficient version management, some data from /public and /app/data/ was not included in the project.
 - The code is updated manually and may differ from the actual live service
 
-## Project Env. Infonation
-- Vite 7 + React Router V7.9 (Remix renamed since v7 in November 2024) + *.tsx + tailwindcss. Deploying in a vercel environment
+## Requirements
+- Vite 7 + React Router v7.11 (Remix renamed since v7 in November 2024) + *.tsx + Tailwind CSS. Deploying in a Vercel environment
 
 ## Q&A
 - Q. Why was obfuscation used?

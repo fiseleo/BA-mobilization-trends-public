@@ -1,16 +1,16 @@
-import { useLoaderData, useParams, type LoaderFunctionArgs } from "react-router";
+import { type LoaderFunctionArgs } from "react-router";
 import { useTranslation } from "react-i18next";
 import { getInstance } from "~/middleware/i18next";
-import type { Locale } from "~/utils/i18n/config";
+import { getLocaleShortName, type Locale } from "~/utils/i18n/config";
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 
 // Import UI components and data loader from the calendar page
 
-import type { StudentCollection } from "~/components/EmblemCounter";
 import type { Student, StudentPortraitData } from "~/types/plannerData";
 import { loadScheduleData, type ScheduleItem, type ScheduleTrack } from "~/utils/calender.data";
 import { GanttChartDisplay } from "~/routes/calendar";
 import type { GameServer } from "~/types/data";
+import { cdn } from "~/utils/cdn";
 
 // --- Constants (Keep consistent with calendar file) ---
 const PIXELS_PER_HOUR = 1.5;
@@ -71,8 +71,8 @@ export function CalendarWidget({ loaderData, server }: CalendarWidgetProps) { //
   const scrollContainerRef = useRef<HTMLDivElement>(null); // ref specific to the widget
 
   useEffect(() => {
-    fetch(`/schaledb.com/${locale}.students.min.json`).then(res => res.json()).then(setStudentData).catch(e => console.error(e));
-    fetch(`/w/students_portrait.json`).then(res => res.json()).then(setStudentPortraits).catch(e => console.error(e));
+    fetch(cdn(`/schaledb.com/${getLocaleShortName(locale)}.students.min.json`)).then(res => res.json()).then(setStudentData).catch(e => console.error(e));
+    fetch(cdn(`/w/students_portrait.json`)).then(res => res.json()).then(setStudentPortraits).catch(e => console.error(e));
   }, [locale]);
 
   const calculateLeftPx = useCallback((startTime: string) => {
@@ -138,7 +138,7 @@ export function CalendarWidget({ loaderData, server }: CalendarWidgetProps) { //
     while (currentDate <= endDate) {
       const left = calculateLeftPx(currentDate.toISOString());
       const month = currentDate.getMonth() + 1;
-      const year = currentDate.getFullYear();
+      // const year = currentDate.getFullYear();
       markers.push({ date: currentDate.toISOString(), label: currentDate.toLocaleDateString(locale, { year: 'numeric', month: '2-digit' }), isYearMarker: month === 1, left });
       currentDate.setMonth(currentDate.getMonth() + 1);
     }
@@ -149,7 +149,7 @@ export function CalendarWidget({ loaderData, server }: CalendarWidgetProps) { //
     if (!timeRange.min) return [];
     // ... (Weekly marker calculation is the same)
     const markers = [];
-    const startDate = new Date(timeRange.min);
+    // const startDate = new Date(timeRange.min);
     const endDate = new Date(timeRange.max);
     const targetDay = server === 'kr' ? 2 : 3;
     let currentDate = new Date(timeRange.min);

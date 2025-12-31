@@ -1,5 +1,5 @@
 // StudentGrowthPlanCard.tsx
-import React, { useMemo, useCallback } from 'react';
+import { useMemo, useCallback } from 'react';
 import { useRef } from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
@@ -13,6 +13,7 @@ import { EquipmentTab } from './EquipmentTab';
 import { PotentialTab } from './PotentialTab';
 import { AffectionTab, HighFlowerBouquetItemIds, LowFlowerBouquetItemIds } from './FaverTab';
 import StudentSearchDropdown from '~/components/StudentSearchDropdown';
+import { boolean } from 'zod';
 
 interface StudentGrowthPlanCardProps {
     plan: GrowthPlan;
@@ -34,7 +35,25 @@ export const TIER_TO_LEVEL: Record<number, number> = {
     6: 50, 7: 55, 8: 60, 9: 65, 10: 70
 };
 
-export const SkillDisplay = ({ studentInfo, skillKey, skillLabel, currentLevel, targetLevel, currentUW, targetUW, skillData }: {
+
+const formatSkillBuffDesc = (str:string)=>{
+    const { t } = useTranslation("stat");
+   return str.replace(/<b:(\w+)>/g, (match, paramIndexStr) => {
+        const i18nKey = `Buff_${paramIndexStr}`
+        return `<strong>${t(i18nKey, match)}</strong>`
+    }).replace(/<d:(\w+)>/g, (match, paramIndexStr) => {
+        const i18nKey = `Debuff_${paramIndexStr}`
+        return `<strong>${t(i18nKey, match)}</strong>`
+    }).replace(/<s:(\w+)>/g, (match, paramIndexStr) => {
+        const i18nKey = `Special_${paramIndexStr}`
+        return `<strong>${t(i18nKey, match)}</strong>`
+    }).replace(/<c:(\w+)>/g, (match, paramIndexStr) => {
+        const i18nKey = `CC_${paramIndexStr}`
+        return `<strong>${t(i18nKey, match)}</strong>`
+    }).replace(/\\n/g, '<br/>');
+}
+
+export const SkillDisplay = ({ studentInfo, skillKey, skillLabel, currentLevel, targetLevel, currentUW, targetUW, skillData, currentRank, targetRank }: {
     studentInfo: Student;
     skillKey: 'Ex' | 'Public' | 'Passive' | 'ExtraPassive';
     skillLabel: string;
@@ -43,9 +62,16 @@ export const SkillDisplay = ({ studentInfo, skillKey, skillLabel, currentLevel, 
     currentUW: number;
     targetUW: number;
     skillData: Skill | undefined;
+    currentRank: number,
+    targetRank: number,
 }) => {
     let currentSkillData: Skill | undefined = skillData;
     let targetSkillData: Skill | undefined = skillData;
+
+    let skill_desp_diff = false
+
+
+    const { t, i18n } = useTranslation("stat");
     // let currentSkillData: Skill | undefined = studentInfo.Skills[skillKey];
     // let targetSkillData: Skill | undefined = studentInfo.Skills[skillKey];
 
@@ -56,26 +82,46 @@ export const SkillDisplay = ({ studentInfo, skillKey, skillLabel, currentLevel, 
         if (targetUW >= 2 && studentInfo.Skills.WeaponPassive) {
             targetSkillData = studentInfo.Skills.WeaponPassive;
         }
+        if (
+            (currentUW >= 2 ) != (targetUW >= 2 )
+        ){
+            skill_desp_diff = true
+        }
     }
+
+    if (skillKey === 'Public' && studentInfo.Skills.GearPublic){
+        if (currentRank >= 20 && studentInfo.Skills.GearPublic) {
+            currentSkillData = studentInfo.Skills.GearPublic;
+        }
+        if (targetRank >= 20 && studentInfo.Skills.GearPublic) {
+            targetSkillData = studentInfo.Skills.GearPublic;
+        }
+        if (
+            (currentRank >= 20 ) != (targetRank >= 20 )
+        ){
+            skill_desp_diff = true
+        }
+    }
+
 
     if (!currentSkillData || !targetSkillData) return null;
 
     const formatSkillDesc = (skillData: Skill, level: number) => {
         if (!skillData.Desc || !skillData.Parameters) return '';
-        return skillData.Desc.replace(/<\?(\d)>/g, (match, paramIndexStr) => {
+        return formatSkillBuffDesc(skillData.Desc.replace(/<\?(\d)>/g, (match, paramIndexStr) => {
             const paramIndex = parseInt(paramIndexStr, 10) - 1;
             const levelIndex = level - 1;
             if (skillData.Parameters[paramIndex] && skillData.Parameters[paramIndex][levelIndex] !== undefined) {
                 return `<strong class="text-blue-600 dark:text-blue-400">${skillData.Parameters[paramIndex][levelIndex]}</strong>`;
             }
             return match;
-        }).replace(/\\n/g, '<br/>');
+        }))
     };
 
     const formatSkillDiffDesc = (skillData: Skill, level: [number, number]) => {
         if (!skillData.Desc || !skillData.Parameters) return '';
 
-        return skillData.Desc.replace(/<\?(\d)>/g, (match, paramIndexStr) => {
+        return formatSkillBuffDesc(skillData.Desc.replace(/<\?(\d)>/g, (match, paramIndexStr) => {
             const paramIndex = parseInt(paramIndexStr, 10) - 1;
             const levelIndex = [level[0] - 1, level[1] - 1]; // [current, target]
 
@@ -97,11 +143,11 @@ export const SkillDisplay = ({ studentInfo, skillKey, skillLabel, currentLevel, 
                 `<span class="text-blue-600 dark:text-blue-400">${valAfter}</span>` +
                 `</strong>`;
 
-        }).replace(/\\n/g, '<br/>');
+        }))
     };
 
     const currentDesc = formatSkillDesc(currentSkillData, currentLevel);
-    // const targetDesc = formatSkillDesc(targetSkillData, targetLevel);
+    const targetDesc = formatSkillDesc(targetSkillData, targetLevel);
     const changeDesc = formatSkillDiffDesc(targetSkillData, [currentLevel, targetLevel]);
 
     const currentCost = skillKey === 'Ex' ? currentSkillData.Cost?.[currentLevel - 1] : null;
@@ -129,19 +175,24 @@ export const SkillDisplay = ({ studentInfo, skillKey, skillLabel, currentLevel, 
             </div>
 
             {/* Skill Description */}
-            <div className="text-gray-700 dark:text-neutral-300 space-y-1 grow bg-gray-50 dark:bg-neutral-700/50 p-1.5 rounded">
+            <div className="font-light text-gray-700 dark:text-neutral-300 space-y-1 grow bg-gray-50 dark:bg-neutral-700/50 p-1.5 rounded">
 
-                {currentLevel == targetLevel &&
+                {(currentLevel == targetLevel && !skill_desp_diff) &&
                     <div dangerouslySetInnerHTML={{ __html: currentDesc }} />
                 }
 
                 {/* If the goal level is higher, show the goal skill description */}
-                {currentLevel < targetLevel && (
+                {(currentLevel < targetLevel || skill_desp_diff) && (
                     <>
-                        {/* <div className="text-center text-gray-400 dark:text-neutral-500 text-lg leading-none">↓</div> */}
+                        {skill_desp_diff ?
+                            <>
+                                <div dangerouslySetInnerHTML={{ __html: currentDesc }} />
+                                <div className="text-center text-gray-400 dark:text-neutral-500 text-lg leading-none">↓</div>
+                                <div className="p-1.5 bg-blue-50 dark:bg-blue-900/50 rounded" dangerouslySetInnerHTML={{ __html: targetDesc }} />
+                            </> :
+                            <div dangerouslySetInnerHTML={{ __html: changeDesc }} />
 
-                        {/* <div className="p-1.5 bg-blue-50 dark:bg-blue-900/50 rounded" dangerouslySetInnerHTML={{ __html: targetDesc }} /> */}
-                        <div dangerouslySetInnerHTML={{ __html: changeDesc }} />
+                        }
                     </>
                 )}
             </div>
@@ -307,7 +358,7 @@ export const StudentGrowthPlanCard = ({ plan, allStudents, studentPortraits, stu
 
 
     return (
-        <div className="p-4 border rounded-lg bg-gray-50 shadow-sm dark:bg-neutral-800 border-gray-200 dark:border-neutral-700 text-black dark:text-neutral-200">
+        <div className="p-0 sm:p-4 sm:border sm:rounded-lg sm:bg-gray-50 sm:shadow-sm sm:dark:bg-neutral-800 sm:border-gray-200 sm:dark:border-neutral-700 text-black dark:text-neutral-200">
             <div className="flex flex-col sm:flex-row justify-between items-start mb-3 gap-3">
                 <div className="flex items-center gap-2 w-full sm:w-auto flex-1">
                     {plan.studentId && studentPortraits[plan.studentId] && (
@@ -330,7 +381,7 @@ export const StudentGrowthPlanCard = ({ plan, allStudents, studentPortraits, stu
                 </div>
             </div>
 
-            <div className="flex border-b border-gray-200 dark:border-neutral-700 mb-4 overflow-x-auto whitespace-nowrap">
+            <div className="flex border-b border-gray-200 dark:border-neutral-700 mb-4 overflow-x-auto overflow-y-hidden whitespace-nowrap">
                 {tabData.map(tab => (
                     <button
                         key={tab.id}

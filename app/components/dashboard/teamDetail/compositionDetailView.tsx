@@ -5,7 +5,7 @@ import { calculateTimeFromScore } from '~/utils/calculateTimeFromScore';
 import type { GameServer } from '~/types/data';
 import { getBackgroundRatingColor, getCharacterStarValue, type Character, type PortraitData, type ReportEntryRank, type StudentData } from "../common";
 import { formatTimeToTimestamp } from '~/utils/time';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell, Legend, LabelList } from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, LabelList } from 'recharts';
 import { useIsDarkState } from '~/store/isDarkState';
 import { StudentIcon } from '../studentIcon';
 import { StarRating } from '~/components/StarRatingProps';

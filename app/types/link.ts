@@ -10,7 +10,7 @@ export interface CollectedLink {
   hrefLang?: string
 }
 
-// Add a custom type to the handle object on the React Router.
+// Custom type to the handle object on the React Router.
 export interface AppHandle {
   preload?: (data: any) => CollectedLink[];
 }

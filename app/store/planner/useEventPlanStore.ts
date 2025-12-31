@@ -10,6 +10,8 @@ import type { FortuneGachaAvgRates } from '~/components/planner/minigame/Fortune
 import { DefaultTreasureSimConfig, type TreasureSimConfig } from '~/components/planner/minigame/TreasurePlanner';
 import { getDefaultApConfig, type ApCalculatorConfig } from '~/components/planner/ApCalculatorConfig';
 import { defaultDreamMakerConfig, type DreamMakerSimConfig, type DreamMakerSimResult } from '~/components/planner/minigame/dreamMaker/type';
+import { defaultCardMatchSimConfig, type CardMatchSimConifg } from '~/components/planner/minigame/CardMatchPlanner';
+import type { CcgRunInput } from '~/components/planner/minigame/MinigameCCGPlanner';
 
 type StagePrio = 'include' | 'exclude' | 'priority';
 
@@ -29,6 +31,7 @@ export interface EventPlan {
   stagePrio: Record<number, StagePrio>;
   // MissionPlanner
   completedMissions: number[]; // Store Set as array
+  minigameMissionStatus: Record<number, boolean>;
   durationDays: number;
   // ApCalculator
   apConfig: ApCalculatorConfig;
@@ -68,6 +71,11 @@ export interface EventPlan {
   dreamMakerSimConfig: DreamMakerSimConfig;
   dreamMakerClaimedMissions: number[];
   dreamMakerInteractiveResult: DreamMakerSimResult | null;
+
+  // MinigameCCGPlanner
+  minigameCCGConfig: CcgRunInput[]; // New
+
+  cardMatchSimConfig: CardMatchSimConifg | null;
 
   // TotalRewardPlanner
   totalRewardCurrentAmount: number
@@ -115,6 +123,9 @@ interface EventPlanStoreState {
   setDreamMakerSimConfig: (eventId: number, config: DreamMakerSimConfig) => void;
   setDreamMakerClaimedMissions: (eventId: number, missions: number[]) => void;
   setDreamMakerInteractiveResult: (eventId: number, result: DreamMakerSimResult | null) => void;
+  setMinigameCCGConfig: (eventId: number, config: CcgRunInput[]) => void;
+  setMinigameMissionStatus: (eventId: number, status: Record<number, boolean>) => void;
+  setCardMatchSimConfig: (eventId: number, result: CardMatchSimConifg | null) => void;
 
   setTotalRewardCurrentAmount: (eventId: number, amount: number) => void;
   setTotalRewardTargetAmount: (eventId: number, amount: number) => void;
@@ -173,6 +184,12 @@ const defaultPlan: EventPlan = {
   dreamMakerSimConfig: defaultDreamMakerConfig,
   dreamMakerClaimedMissions: [],
   dreamMakerInteractiveResult: null,
+
+  // MinigameCCGPlanner Default
+  minigameCCGConfig: [{ id: 'initial', stage: 21, count: 0 }],
+  minigameMissionStatus: {},
+
+  cardMatchSimConfig: defaultCardMatchSimConfig,
 
   // totalRewardPlanner
   totalRewardCurrentAmount: 0,
@@ -233,10 +250,11 @@ export const useEventPlanStore = create<EventPlanStoreState>()(
         setDreamMakerSimConfig: (eventId, config) => updatePlanForEvent(eventId, { dreamMakerSimConfig: config }),
         setDreamMakerClaimedMissions: (eventId, missions) => updatePlanForEvent(eventId, { dreamMakerClaimedMissions: missions }),
         setDreamMakerInteractiveResult: (eventId, result) => updatePlanForEvent(eventId, { dreamMakerInteractiveResult: result }),
+        setCardMatchSimConfig: (eventId, result) => updatePlanForEvent(eventId, { cardMatchSimConfig: result }),
         setTotalRewardCurrentAmount: (eventId, amount) => updatePlanForEvent(eventId, { totalRewardCurrentAmount: amount }),
         setTotalRewardTargetAmount: (eventId, amount) => updatePlanForEvent(eventId, { totalRewardTargetAmount: amount }),
-
-
+        setMinigameCCGConfig: (eventId, config) => updatePlanForEvent(eventId, { minigameCCGConfig: config }),
+        setMinigameMissionStatus: (eventId, status) => updatePlanForEvent(eventId, { minigameMissionStatus: status }),
 
         resetAllPlans: (allPlans) => set({ plans: allPlans }),
       };
@@ -310,9 +328,16 @@ export const usePlanForEvent = (eventId: number) => {
     setDreamMakerSimConfig: (updater: (prev: DreamMakerSimConfig) => DreamMakerSimConfig) => { if (eventId) actions.setDreamMakerSimConfig(eventId, updater(plan.dreamMakerSimConfig || defaultDreamMakerConfig)) },
     setDreamMakerInteractiveResult: (result: DreamMakerSimResult | null) => { if (eventId) actions.setDreamMakerInteractiveResult(eventId, result) },
     setDreamMakerClaimedMissions: (missions: number[]) => { if (eventId) actions.setDreamMakerClaimedMissions(eventId, missions) },
+    setCardMatchSimConfig: (result: CardMatchSimConifg | null) => { if (eventId) actions.setCardMatchSimConfig(eventId, result) },
     setTotalRewardCurrentAmount: (amount: number) => eventId && actions.setTotalRewardCurrentAmount(eventId, amount),
     setTotalRewardTargetAmount: (amount: number) => eventId && actions.setTotalRewardTargetAmount(eventId, amount),
-
+    // setMinigameCCGConfig: (updater: (prev: CcgRunInput[]) => CcgRunInput[]) => {
+    //   if (eventId) actions.setMinigameCCGConfig(eventId, updater(plan.minigameCCGConfig || defaultPlan.minigameCCGConfig));
+    // },
+    setMinigameCCGConfig: (config: CcgRunInput[]) => { if (eventId) actions.setMinigameCCGConfig(eventId, config) },
+    setMinigameMissionStatus: (status: Record<number, boolean>) => {
+      if (eventId) actions.setMinigameMissionStatus(eventId, status);
+    },
   };
 
   return { plan, ...plan, ...setters, completedMissionsSet, setCompletedMissions };

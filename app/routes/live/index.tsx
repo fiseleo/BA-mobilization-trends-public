@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { data, useLoaderData, type LoaderFunctionArgs, type MetaFunction } from 'react-router';
+import { data, useLoaderData, type LoaderFunctionArgs } from 'react-router';
 import type { LastData, TimelineData } from '~/types/livetype';
 import type { Student } from '~/types/data';
 import { isTotalAssault, type PortraitData } from '~/components/dashboard/common';
@@ -11,33 +11,35 @@ import { Top10Rankings } from '~/components/live/Top10Rankings';
 import { MaxScoreTimelineChart } from '~/components/live/MaxScoreTimelineChart';
 import { useTranslation } from 'react-i18next';
 import { formatDateToDayString } from '~/components/live/formatDateToDayString';
-import { getLiveRaidInfo, LiveRaidInfos } from '~/data/liveRaid';
+import { getLiveRaidInfo } from '~/data/liveRaid';
 
-import { type Locale } from '~/utils/i18n/config';
+import { getLocaleShortName, type Locale } from '~/utils/i18n/config';
 import { createLinkHreflang, createMetaDescriptor } from '~/components/head';
-import { getMostDifficultLevel, type_translation } from '~/components/raidToString';
+import { getMostDifficultLevel } from '~/components/raidToString';
 import { TerrainIconGameStyle, type Terrain } from '~/components/teran';
 import { lastdataURL, timelineURL } from '~/data/livedataServer.json'
 import { getInstance } from '~/middleware/i18next';
 import type { Route } from './+types';
+import { cdn } from '~/utils/cdn';
 
 export function meta({ loaderData }: Route.MetaArgs) {
     const raidInfo = loaderData.raidInfos[0]
-    const { pageTitle, siteTitle, description, raidType, locale } = loaderData
+    const { pageTitle, siteTitle, description, raidType } = loaderData
 
     if (raidInfo) {
         const raid = raidInfo
-        const bosaType = raid.Type ? type_translation[raid.Type][locale] : undefined
-        const isRaid = isTotalAssault(raidInfo)
+        // const bosaType = raid.Type ? type_translation[raid.Type][locale] : undefined
+        // const isRaid = isTotalAssault(raidInfo)
         return createMetaDescriptor(
             // ${raid.Id.replace(/\w/, 'S')}
-            `[Live] ${raidType} ${raid.Boss} ${bosaType ? ' ' + bosaType : ''}` + ' - ' + pageTitle,
+            // `${raid.Boss} ${bosaType ? ' ' + bosaType : ''} - ${raidType} ${pageTitle}` + ' | ' + siteTitle,
+            `${raid.Id.replace(/\w/, 'S')} ${raid.Boss} ${raidType} -  ${pageTitle}` + ' | ' + siteTitle,
             description,
             "/img/3.webp"
         )
     }
 
-    const title = pageTitle + ' - ' + siteTitle
+    const title = pageTitle + ' | ' + siteTitle
     return [
         { title },
         { property: "og:title", content: title },
@@ -50,6 +52,10 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
     let i18n = getInstance(context);
     const locale = i18n.language as Locale
     const raidInfos = getLiveRaidInfo(locale)
+
+    if (raidInfos.length == 0){
+        throw new Response("There is currently no raid in progress.", { status: 503 });
+    }
     const isRaid = isTotalAssault(raidInfos[0])
 
     try {
@@ -57,6 +63,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
             fetch(lastdataURL),
             fetch(timelineURL)
             // for dev
+            // fetch('http://localhost:8080/lastdata-error.json'),
             // fetch('http://localhost:5173/dummy_lastdata.json'),
             // fetch('http://localhost:5173/dummy_timeline.json')
         ]);
@@ -93,10 +100,9 @@ export function links() {
 }
 
 export default function LiveDashboardPage() {
-    const { lastData: lastData_f, timelineData: timelineData_f, raidInfos } = useLoaderData<typeof loader>();
-
-    const [lastData, setLastData] = useState<LastData>(lastData_f as LastData);
-    const [timelineData, setTimelineData] = useState<TimelineData>(timelineData_f as any);
+    const { lastData: lastData, timelineData: timelineData, raidInfos } = useLoaderData<typeof loader>();
+    // const [lastData, setLastData] = useState<LastData>(lastData_f as LastData);
+    // const [timelineData, setTimelineData] = useState<TimelineData>(timelineData_f as any);
 
     const [studentData, setStudentData] = useState<Record<string, Student>>({});
     const [portraitData, setPortraitData] = useState<PortraitData>({});
@@ -104,12 +110,12 @@ export default function LiveDashboardPage() {
     const { t: t_d, i18n } = useTranslation('dashboardIndex');
     const { t } = useTranslation('liveDashboard');
     const { t: t_c } = useTranslation('common');
-    const locale = i18n.language
+    const locale = i18n.language as Locale
 
     useEffect(() => {
         Promise.all([
-            fetchStudents(`/w/${locale}.students.bin`),
-            fetch('/w/students_portrait.json').then(res => res.json()),
+            fetchStudents(cdn(`/w/${getLocaleShortName(locale)}.students.bin`)),
+            fetch(cdn('/w/students_portrait.json')).then(res => res.json()),
         ]).then(([studentJson, portraitJson,]) => {
             setStudentData(studentJson);
             setPortraitData(portraitJson);
@@ -156,9 +162,10 @@ export default function LiveDashboardPage() {
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                         {t('service_discontinuation_notice')} {t('irregular_update_notice')}
                     </p>
-                    <p className="text-sm font-medium text-red-500 dark:text-red-400">
+                    {/* for yesod */}
+                    {/* <p className="text-sm font-medium text-red-500 dark:text-red-400">
                         The clear times above Insane are estimates.
-                    </p>
+                    </p> */}
                 </div>
             </header>
 

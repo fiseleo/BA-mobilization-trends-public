@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
-import Papa from "papaparse";
+// import Papa from "papaparse";
 import { type_translation, typecolor } from "~/components/raidToString";
-// Add useParams import
 import { Link, useLoaderData, type LoaderFunctionArgs, useParams } from "react-router";
-// Add kr EventList import
 import Tooltip from 'rc-tooltip';
 import 'rc-tooltip/assets/bootstrap.css';
 import { FaShield } from 'react-icons/fa6';
@@ -12,7 +10,7 @@ import { TerrainIconGameStyle, type Terrain } from "~/components/teran";
 import type { Student, StudentPortraitData } from "~/types/plannerData";
 import { useTranslation } from "react-i18next";
 import { getInstance } from "~/middleware/i18next";
-import type { Locale } from "~/utils/i18n/config";
+import { getLocaleShortName, type Locale } from "~/utils/i18n/config";
 
 import { localeLink } from "~/utils/localeLink";
 import { FiArrowRight, FiClock, FiSearch } from "react-icons/fi";
@@ -22,8 +20,9 @@ import { createLinkHreflang, createMetaDescriptor } from "~/components/head";
 import type { Route } from "./+types/calendar";
 import type { AppHandle } from "~/types/link";
 import type { loader as rootLorder } from "~/root";
+import { cdn } from "~/utils/cdn";
 
-const PIXELS_PER_HOUR = 1.5
+const PIXELS_PER_HOUR = 1.4
 const PREDICTION_STRIPE_CLASS = "bg-[repeating-linear-gradient(45deg,rgba(255,255,255,0.1),rgba(255,255,255,0.1)_10px,transparent_10px,transparent_20px)]";
 
 
@@ -51,17 +50,17 @@ const armorTypeColor = typecolor
 const armorTypeTranslation = type_translation
 
 // (CSV parsing helper is the same)
-function parseCsvString<T extends object>(csvString: string): T[] {
-  try {
-    const parsed = Papa.parse<T>(csvString, {
-      header: true, skipEmptyLines: true, dynamicTyping: true,
-    });
-    return parsed.data.filter(row => Object.values(row).some(val => val !== null && val !== ''));
-  } catch (error) {
-    console.error(`[Schedule Loader] Failed to parse CSV string:`, error);
-    return [];
-  }
-}
+// function parseCsvString<T extends object>(csvString: string): T[] {
+//   try {
+//     const parsed = Papa.parse<T>(csvString, {
+//       header: true, skipEmptyLines: true, dynamicTyping: true,
+//     });
+//     return parsed.data.filter(row => Object.values(row).some(val => val !== null && val !== ''));
+//   } catch (error) {
+//     console.error(`[Schedule Loader] Failed to parse CSV string:`, error);
+//     return [];
+//   }
+// }
 
 const MS_PER_HOUR = 1000 * 60 * 60;
 
@@ -100,13 +99,13 @@ export const handle: AppHandle = {
 
       {
         rel: 'preload',
-        href: `/schaledb.com/${data?.locale}.students.min.json`,
+        href: cdn(`/schaledb.com/${getLocaleShortName(data?.locale)}.students.min.json`),
         as: 'fetch',
         crossOrigin: 'anonymous',
       },
       {
         rel: 'preload',
-        href: `/w/students_portrait.json`,
+        href: cdn(`/w/students_portrait.json`),
         as: 'fetch',
         crossOrigin: 'anonymous',
       },
@@ -331,8 +330,8 @@ export default function SchedulePageGantt() {
   const isScrolling = useRef<boolean>(false);
 
   useEffect(() => {
-    fetch(`/schaledb.com/${locale}.students.min.json`).then(res => res.json()).then(setStudentData).catch(e => console.error(e));
-    fetch(`/w/students_portrait.json`).then(res => res.json()).then(setStudentPortraits).catch(e => console.error(e));
+    fetch(cdn(`/schaledb.com/${getLocaleShortName(locale)}.students.min.json`)).then(res => res.json()).then(setStudentData).catch(e => console.error(e));
+    fetch(cdn(`/w/students_portrait.json`)).then(res => res.json()).then(setStudentPortraits).catch(e => console.error(e));
   }, [locale]);
 
   const calculateLeftPx = useCallback((startTime: string) => {
@@ -374,7 +373,7 @@ export default function SchedulePageGantt() {
     while (currentMonth <= endDate) {
       const left = calculateLeftPx(currentMonth.toISOString());
       const month = currentMonth.getMonth() + 1;
-      const year = currentMonth.getFullYear();
+      // const year = currentMonth.getFullYear();
       newMonthlyMarkers.push({ date: currentMonth.toISOString(), label: currentMonth.toLocaleDateString(locale, { year: 'numeric', month: '2-digit' }), isYearMarker: month === 1, left });
       currentMonth.setMonth(currentMonth.getMonth() + 1);
     }
@@ -592,12 +591,12 @@ export interface GanttBaseBarProps {
   lane: number;
   laneHeight: number;
 }
-// Add export (for widget import)
+
 export interface GanttBarProps extends GanttBaseBarProps {
   colorMap?: Record<string, string>;
   colorKey?: string;
 }
-// Add export (for widget import)
+
 export interface GanttTrackProps {
   title: string;
   items: ScheduleItem[];
@@ -798,7 +797,7 @@ export function GanttBar({
                 </span>
               )}
               {item.type === 'event' && studentName && width > 300 && (
-                <span className="font-normal opacity-90 ml-2 truncate shrink-0">
+                <span className="hidden sm:block font-normal opacity-90 ml-2 truncate shrink-0">
                   {t_cal("distribute", { name: studentName })}
                 </span>
               )}
@@ -811,7 +810,7 @@ export function GanttBar({
 
         <div className="grow"></div>
         {item.link && (
-          <Link to={localeLink(locale, item.link)} className=" p-1.5 rounded-md text-xs font-semibold bg-white/20 hover:bg-white/40 dark:bg-black/20 dark:hover:bg-black/40 shrink-0 z-0 sticky right-2 mr-2">
+          <Link to={localeLink(locale, item.link)} className="flex sticky p-1.5 rounded-md text-xs font-semibold bg-white/10 backdrop-blur-lg hover:bg-white/40 dark:bg-black/20 dark:hover:bg-black/40 shrink-0 z-10 right-2 mr-2">
             <FiSearch className="w-3 h-3" />
           </Link>
         )}
@@ -830,8 +829,7 @@ function GanttPickupBar({
   lane,
   laneHeight,
 }: GanttBaseBarProps) {
-  // Add i18n hook
-  const { t: t_cal } = useTranslation("calendar");
+  // const { t: t_cal } = useTranslation("calendar");
   const { t: t_c, i18n } = useTranslation("common");
   const locale = i18n.language as Locale
 
@@ -858,10 +856,10 @@ function GanttPickupBar({
 
   // Changed prediction class: 'bg-prediction-stripe' -> PREDICTION_STRIPE_CLASS
   const stickyLabelStyle: React.CSSProperties = {};
-  const barBgColor = trackColorClass.pickup;
-  const stickyLabelClass = barBgColor
-    ? `${barBgColor} border-black/20 shadow-md rounded-md ${isPrediction ? PREDICTION_STRIPE_CLASS : ''}`
-    : `bg-pink-400 border-black/20 shadow-md rounded-md ${isPrediction ? PREDICTION_STRIPE_CLASS : ''}`;
+  // const barBgColor = trackColorClass.pickup;
+  // const stickyLabelClass = barBgColor
+  //   ? `${barBgColor} border-black/20 shadow-md rounded-md ${isPrediction ? PREDICTION_STRIPE_CLASS : ''}`
+  //   : `bg-pink-400 border-black/20 shadow-md rounded-md ${isPrediction ? PREDICTION_STRIPE_CLASS : ''}`;
 
   // R1/R4: Max width of the scroll area, excluding the date area (approx. 75px)
   // Use the JS-calculated `width` prop (e.g., 150px)
@@ -875,7 +873,7 @@ function GanttPickupBar({
       <div
         style={barStyle}
         className={`${barClass} absolute top-0 left-0
-                    flex items-center justify-between min-w-[50px] whitespace-nowrap h-full bg-[#0000]`}
+                    flex items-center justify-between min-w-[50px] h-full bg-[#0000]`}
       >
         {/* (Wrapper/Scroller/Content structure is same as before) */}
         <div
@@ -961,7 +959,7 @@ export function GanttMarker({
   lane: number;
   laneHeight: number;
 }) {
-  const { t: t_p } = useTranslation("planner");
+  // const { t: t_p } = useTranslation("planner");
   const { t: t_cal } = useTranslation("calendar");
 
   const left = calculateLeftPx(item.startTime);

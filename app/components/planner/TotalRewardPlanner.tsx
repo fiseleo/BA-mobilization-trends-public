@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { ItemIcon } from './common/Icon';
 import type { EventData, IconData } from '~/types/plannerData';
 import { usePlanForEvent } from '~/store/planner/useEventPlanStore';
@@ -139,11 +139,11 @@ export const TotalRewardPlanner = ({
               </div>
             </div>
           </div>
-          <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
+          <div className="space-y-2 max-h-[70vh] overflow-y-auto pr-2">
             {totalRewardData.map(reward => {
               const isClaimed = claimedRewardIds.has(reward.Id);
               return (
-                <div key={reward.Id} className={`p-2 rounded-lg flex items-center justify-between transition-opacity ${isClaimed ? 'bg-green-100 dark:bg-green-900/50' : 'opacity-40'
+                <div key={reward.Id} className={`p-2 rounded-lg flex items-center justify-between transition-opacity ${isClaimed ? 'bg-green-100 dark:bg-green-900/50' : 'opacity-80'
                   }`}>
                   <div className="text-sm font-semibold text-gray-800 dark:text-neutral-200 flex items-center gap-2">
                     <div className={`w-5 h-5 rounded flex items-center justify-center ${isClaimed ? 'bg-green-500 text-white' : 'border-2 bg-white dark:bg-neutral-700 border-gray-300 dark:border-neutral-600'}`}>

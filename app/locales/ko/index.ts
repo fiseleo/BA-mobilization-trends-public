@@ -1,3 +1,4 @@
+// app/locales/ko/index.ts
 import type { ResourceLanguage } from "i18next";
 import {
     currentLocale,
@@ -10,11 +11,14 @@ import {
     dashboard,
     dashboardIndex,
     liveDashboard,
-    planner,
     emblemCounter,
     language_banner,
     calendar
 } from "../ko.json"; // import your namespaced locales
+import {ko as club} from "../club.json"
+import {ko as stat} from "../stat.json"
+import planner from "./planner.json"
+import jukebox from "./jukebox.json"
 
 export default {
     // translation: {},
@@ -31,5 +35,8 @@ export default {
     planner,
     emblemCounter,
     language_banner,
-    calendar
+    calendar,
+    club,
+    stat,
+    jukebox
 } satisfies ResourceLanguage;

@@ -86,6 +86,8 @@ export const SkillsTab = ({ plan, studentInfo, handlePlanChange }: SkillsTabProp
                                 currentUW={plan.current.uw}
                                 targetUW={plan.target.uw}
                                 skillData={s}
+                                currentRank={plan.current.affection}
+                                targetRank={plan.target.affection}
                             />
                         )) : <SkillDisplay
                             studentInfo={studentInfo}
@@ -96,6 +98,8 @@ export const SkillsTab = ({ plan, studentInfo, handlePlanChange }: SkillsTabProp
                             currentUW={plan.current.uw}
                             targetUW={plan.target.uw}
                             skillData={studentInfo.Skills.Ex}
+                            currentRank={plan.current.affection}
+                            targetRank={plan.target.affection}
                         />}
                         <SkillDisplay
                             studentInfo={studentInfo}
@@ -106,6 +110,8 @@ export const SkillsTab = ({ plan, studentInfo, handlePlanChange }: SkillsTabProp
                             currentUW={plan.current.uw}
                             targetUW={plan.target.uw}
                             skillData={studentInfo.Skills.Public}
+                            currentRank={plan.current.affection}
+                            targetRank={plan.target.affection}
                         />
                         <SkillDisplay
                             studentInfo={studentInfo}
@@ -116,6 +122,8 @@ export const SkillsTab = ({ plan, studentInfo, handlePlanChange }: SkillsTabProp
                             currentUW={plan.current.uw}
                             targetUW={plan.target.uw}
                             skillData={studentInfo.Skills.Passive}
+                            currentRank={plan.current.affection}
+                            targetRank={plan.target.affection}
                         />
                         <SkillDisplay
                             studentInfo={studentInfo}
@@ -126,6 +134,8 @@ export const SkillsTab = ({ plan, studentInfo, handlePlanChange }: SkillsTabProp
                             currentUW={plan.current.uw}
                             targetUW={plan.target.uw}
                             skillData={studentInfo.Skills.ExtraPassive}
+                            currentRank={plan.current.affection}
+                            targetRank={plan.target.affection}
                         />
                     </div>
                 </div>

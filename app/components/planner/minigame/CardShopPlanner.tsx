@@ -1,6 +1,6 @@
 // src/components/CardShopPlanner.tsx
 
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { ItemIcon } from '../common/Icon';
 import type { CardShopItem, EventData, IconData } from '~/types/plannerData';
 import { usePlanForEvent } from '~/store/planner/useEventPlanStore';
@@ -12,13 +12,13 @@ type CardShopStrategy = 'sr-reset' | 'all-open' | 'one-open';
 export type SimulationResult = {
   costs: Record<string, number>;
   rewards: Record<string, number>;
-  totalFlips: number; // Add total flip count
+  totalFlips: number;
 };
 
 export type CardShopRates = {
   avgCosts: Record<string, number>;
   avgRewards: Record<string, number>;
-  avgFlips: number; // Add average flip count per round
+  avgFlips: number;
 };
 
 export interface CardShopConfig {

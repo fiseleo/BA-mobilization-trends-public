@@ -5,6 +5,7 @@ import type { BinnedDataRow, ChartData, GameServer, RaidInfo, RaidInfoFiltered, 
 import { tsvParseRows } from "d3-dsv";
 import type { fetchCacheProcessor } from "./cache";
 import type { Locale } from "./i18n/config";
+import { cdn } from "./cdn";
 
 
 export interface ProcessChartDataParams {
@@ -71,10 +72,10 @@ function getAllCountOfHistogramclass(raindInfo: RaidInfoFiltered, difficulty: Di
 
 
 export const getRawTsvData = async (server: GameServer, selectedStudentId: number | null, fetchAndProcessWithCache: fetchCacheProcessor<string>) => {
-    const mainDataUrl = `/w/map/${server}/${selectedStudentId}.bin`;
+    const mainDataUrl = cdn(`/w/map/${server}/${selectedStudentId}.bin`);
 
     const mainDataText = await fetchAndProcessWithCache(mainDataUrl, res => res.text());
-    console.log('mainDataText',{mainDataText})
+    // console.log('mainDataText',{mainDataText})
     const rawTsvData: RawDataRow[] = tsvParseRows(mainDataText, (row): RawDataRow => ({
         x: +row[0], y: +row[1], z: +row[2], w: +row[3], difficulty: difficultyInfo[+row[4]].name
     }));

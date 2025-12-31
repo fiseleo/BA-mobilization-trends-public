@@ -49,75 +49,10 @@ export const eventConvertor = {
     47: 849, // We Are the Occult Research Club! ~School Mysteries and Ancient Spells~
     48: 850, // For Whom is This Art? ~The Whereabouts of Forgery and Aesthetics~
     49: 851, // Magical Girl
+    50: 852,
+    51: 853
 }
 
-
-// --- TEXT CONSTANTS ---
-export const TEXTS = {
-    title: { ko: "BGM 플레이어", jp: "BGMプレーヤー", en: "BGM Player" },
-    description: { ko: "\"블루 아카이브\"의 번호가 붙어있는 BGM 조회", jp: "「ブルーアーカイブ」の番号が付いているBGM照会", en: "Search for numbered BGM of \"Blue Archive\"" },
-    filter_title: { ko: "스포일러 필터", jp: "ネタバレフィルター", en: "Spoiler Filter" },
-    select_main_story: { ko: "메인 스토리 선택", jp: "メインストーリー選択", en: "Select Main Stories" },
-    select_event_story: { ko: "이벤트 스토리 선택", jp: "イベントストーリー選択", en: "Select Event Stories" },
-    select_favor_story: { ko: "인연 스토리 선택", jp: "絆ストーリー選択", en: "Choose relationship Stories" },
-    select_memorial: { ko: "메모리얼 로비 선택", jp: "メモリアルロビー選択", en: "Select Memorial Lobby" },
-    view_details: { ko: "상세정보 보기", jp: "詳細表示", en: "View Details" },
-    hide_details: { ko: "상세정보 닫기", jp: "詳細非表示", en: "Hide Details" },
-    show_story_names: { ko: "스토리 제목 표시", jp: "ストーリータイトル表示", en: "Show Story Titles" },
-    hide_story_names: { ko: "스토리 제목 숨김", jp: "ストーリータイトル非表示", en: "Hide Story Titles" },
-    view_all_details: { ko: "모든 상세정보 펼치기", jp: "すべての詳細を開く", en: "Expand All Details" },
-    hide_all_details: { ko: "모든 상세정보 닫기", jp: "すべての詳細を閉じる", en: "Collapse All Details" },
-
-    search_placeholder: { ko: "제목, 작곡가로 검색...", jp: "タイトル、作曲者で検索...", en: "Search by title, composer..." },
-    no_results: { ko: "결과가 없습니다. 스포일러 방지를 위해 필터를 설정해야 결과가 표시됩니다.", jp: "結果はありません。 結果を表示する前に、ネタバレを防止するためのフィルタを設定する必要があります。", en: "No results. Filters must be set to prevent spoilers before the results are displayed." },
-
-    playbackOptions: { ko: "재생 옵션", en: "Playback Options", jp: "再生オプション" },
-    selectAll: { ko: "전체 선택", en: "Select All", jp: "すべて選択" },
-    deselectAll: { ko: "전체 해제", en: "Deselect All", jp: "すべて選択解除" },
-    deselectAllSearched: { ko: "검색된 학생 전체 해제", en: "Deselect All Searched Students", jp: "検索された学生をすべて選択解除" },
-    selectAllSearched: { ko: "검색된 학생 전체 선택", en: "Select All Searched Students", jp: "検索された学生をすべて選択" },
-    searchStudentName: { ko: "학생 이름 검색...", jp: "生徒名検索...", en: "Search student name..." },
-
-    play_random: { ko: "랜덤 재생", jp: "ランダム再生", en: "Play Random" },
-    autoplay: { ko: "다음 곡 자동 재생", jp: "自動再生", en: "Autoplay" }, // Additional
-    playback_mode_autoplay: { ko: "다음 곡 자동재생", jp: "次の曲を自動再生", en: "Autoplay Next" },
-    playback_mode_repeat: { ko: "현재 곡 반복", jp: "現在の曲をリピート", en: "Repeat Current" },
-    playback_mode_off: { ko: "재생 후 정지", jp: "再生後に停止", en: "Stop After" },
-
-    close: { ko: "닫기", jp: "閉じる", en: "Close" },
-    loading: { ko: "데이터 로딩 중...", jp: "データ読み込み中...", en: "Loading data..." },
-    error: { ko: "오류가 발생했습니다.", jp: "エラーが発生しました。", en: "An error occurred." },
-    rank: { ko: "인연랭크_", jp: "絆", en: "rank_" },
-    episode: { ko: "({x}화)", jp: "（第{x}話）", en: "(Episode {x})" },
-    bgm_list_title: { ja: 'BGMリスト', ko: 'BGM 목록', en: 'BGM List' },
-    sort_ascending: { ja: '昇順', ko: '오름차순', en: 'Ascending' },
-    sort_descending: { ja: '降順', ko: '내림차순', en: 'Descending' },
-    sort_order: { ja: '並び替え', ko: '정렬 순서', en: 'Sort Order' }
-};
-
-export const GENERAL_CATEGORIES = {
-    Work: { ko: "임무", jp: "任務", en: "Missions" },
-    Raid: { ko: "총력전", jp: "総力戦", en: "Raids" },
-    GroupStory: { ko: "그룹 스토리", jp: "グループストーリー", en: "Group Story" },
-    MiniStory: { ko: "미니 스토리", jp: "ミニストーリー", en: "Mini Story" },
-    WorkStory: { ko: "업무 스토리", jp: "業務ストーリー", en: "Work Story" },
-    Other: { ko: "기타 (UI, 로비 등)", jp: "その他（UIなど）", en: "Other (UI, etc.)" }
-};
-
-export const XREF_PREFIXES = {
-    Main_Story: { ko: "[메인]", jp: "[メイン]", en: "[Main]" },
-    Event_Story: { ko: "[이벤트]", jp: "[イベント]", en: "[Event]" },
-    Favor_Story: { ko: "[인연]", jp: "[絆]", en: "[Favor]" },
-    Memorial: { ko: "[메모리얼]", jp: "[メモリアル]", en: "[Memorial]" },
-    Work: { ko: "[임무]", jp: "[任務]", en: "[Mission]" },
-    UI: { ko: "[UI]", jp: "[UI]", en: "[UI]" },
-    raid: { ko: "[총력전]", jp: "[総力戦]", en: "[T. Assault]" },
-    limitraid: { ko: "[제약해제결전]", jp: "[制約解除決戦]", en: "[Final Restriction Release]" },
-    Group_Story: { ko: "[그룹]", jp: "[グループ]", en: "[Group]" },
-    Mini_Story: { ko: "[미니]", jp: "[ミニ]", en: "[Mini]" },
-    Work_Story: { ko: "[업무]", jp: "[業務]", en: "[Work]" },
-
-};
 
 // --- ICON COMPONENTS ---
 export const AutoplayIcon = () => (
@@ -136,38 +71,88 @@ export const StopIcon = () => (
     </svg>
 );
 
+export const GENERAL_CATEGORIES = {
+    Work: "category.work",
+    Raid: "category.raid",
+    GroupStory: "category.group_story",
+    MiniStory: "category.mini_story",
+    WorkStory: "category.work_story",
+    Other: "category.other"
+};
 
-export const mainStoryChapters = {
-    '1부 1장': { ko: 'Vol.1 1장 대책위원회의 기묘한 하루', jp: 'Vol.1 第1章 対策委員会の奇妙な一日', en: 'Vol.1 Ch.1', date:'2021/02/04'},
-    '1부 2장': { ko: 'Vol.1 2장 잃은 것과 놓지 않은 것', jp: 'Vol.1 第2章 失ったもの、手放さなかったもの', en: 'Vol.1 Ch.2', date:'2021/03/11'},
-    '1부 3장': { ko: 'Vol.1 3장 그 꿈이 남기고 간 흔적들', jp: 'Vol.1 第3章 夢が残した足跡', en: 'Vol.1 Ch.3', date:'2024/2/7'},
-    '2부 1장': { ko: 'Vol.2 1장 레트로의 로망', jp: 'Vol.2 第1章 レトロチック・ロマン', en: 'Vol.2 Ch.1', date:'2021/03/25'},
-    '2부 2장': { ko: 'Vol.2 2장 우정과 용기와 빛의 로망', jp: 'Vol.2 第2章 友情と勇気と光のロマン', en: 'Vol.2 Ch.2', date:'2022/11/23'},
-    '3부 1장': { ko: 'Vol.3 1장 보충수업, 시작합니다!', jp: 'Vol.3 第1章 補習授業、スタート！', en: 'Vol.3 Ch.1', date:'2021/05/27'},
-    '3부 2장': { ko: 'Vol.3 2장 증명 불가능한 문제', jp: 'Vol.3 第2章 不可能な証明', en: 'Vol.3 Ch.2', date:'2021/10/27'},
-    '3부 3장': { ko: 'Vol.3 3장 우리들의 이야기를', jp: 'Vol.3 第3章 私たちの物語', en: 'Vol.3 Ch.3', date:'2021/12/15'},
-    '3부 4장': { ko: 'Vol.3 4장 잊혀진 신들을 위한 키리에', jp: 'Vol.3 第4章 忘れられた神々のためのキリエ', en: 'Vol.3 Ch.4', date:'2022/5/24'},
-    '4부 1장': { ko: 'Vol.4 1장 RABBIT 소대, 작전 개시!', jp: 'Vol.4 第1章 RABBIT小隊始動！', en: 'Vol.4 Ch.1', date:'2022/03/23'},
-    '4부 2장': { ko: 'Vol.4 2장 We Were RABBITs!', jp: 'Vol.4 第2章 We Were RABBITs!', en: 'Vol.4 Ch.2', date:'2023/06/07'},
-    '5부 1장': { ko: 'Vol.5 1장 피어나길 바라는 꽃망울처럼', jp: 'Vol.5 第1章 いつかの芽吹きを待ち侘びて', en: 'Vol.5 Ch.1', date:'2023/11/08'},
-    '5부 2장': { ko: 'Vol.5 2장', jp: 'Vol.5 第2章 孤独に花を咲かせんとする君へ', en: 'Vol.5 Ch.2', date:'2025/05/21'},
-    '6부 1장': { ko: 'Vol.6 1장', jp: 'Vol.6 第1章 見えない私たちの境界線 ', en: 'Vol.6 Ch.1', date:'2025/09/17'},
-    '6부 2장': { ko: 'Vol.6 2장', jp: 'Vol.6 第2章 あの刻に告げし決別', en: 'Vol.6 Ch.2', date:'2025/10/08'},
-    'Ex. 데카그라마톤 편 0장': { ko: 'Ex. 데카그라마톤 편 0장 지혜의 뱀', jp: 'Ex. デカグラマトン編 第1章 知恵の蛇', en: 'Ex. Decagrammaton Ch.0', date:'2021/11/09'},
-    'Ex. 데카그라마톤 편 1장': { ko: 'Ex. 데카그라마톤 편 1장 불타는 검', jp: 'Ex. デカグラマトン編 第2章 炎の剣', en: 'Ex. Decagrammaton Ch.1', date:'2024/11/6'},
-    'Final. 그리고 모든 기적이 시작되는 곳 편 1장': { ko: 'Final. 1장 샬레 탈환 작전', jp: 'Final. 第1章 シャーレ奪還作戦', en: 'Final Vol. Ch.1', date:'2023/01/22'},
-    'Final. 그리고 모든 기적이 시작되는 곳 편 2장': { ko: 'Final. 2장 거짓된 성소 공략전', jp: 'Final. 第2章 虚妄のサンクトゥム攻略戦', en: 'Final Vol. Ch.2', date:'2023/01/24'},
-    'Final. 그리고 모든 기적이 시작되는 곳 편 3장': { ko: 'Final. 3장 아트라하시스의 방주 점령전', jp: 'Final. 第3章 アトラ・ハシースの箱舟占領戦', en: 'Final Vol. Ch.3' , date:'2023/02/22'},
-    'Final. 그리고 모든 기적이 시작되는 곳 편 4장': { ko: 'Final. 4장 프레나파테스 결전', jp: 'Final. 第4章 プレナパテス決戦', en: 'Final Vol. Ch.4', date:'2023/03/08'},
+export const XREF_PREFIXES: Record<string, string> = {
+    Main_Story: "prefix.main_story",
+    Event_Story: "prefix.event_story",
+    Favor_Story: "prefix.favor_story",
+    Memorial: "prefix.memorial",
+    Work: "prefix.work",
+    UI: "prefix.ui",
+    raid: "prefix.raid",
+    limitraid: "prefix.limitraid",
+    Group_Story: "prefix.group_story",
+    Mini_Story: "prefix.mini_story",
+    Work_Story: "prefix.work_story",
+};
+
+// https://bluearchive.wikiru.jp/?%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AA%E3%83%BC
+export const mainStoryChapters: Record<string, { key: string, date: string }> = {
+    '1부 1장': { key: 'vol1_ch1', date: '2021/02/04' },
+    '1부 2장': { key: 'vol1_ch2', date: '2021/03/11' },
+    '1부 3장': { key: 'vol1_ch3', date: '2024/2/7' },
+    '2부 1장': { key: 'vol2_ch1', date: '2021/03/25' },
+    '2부 2장': { key: 'vol2_ch2', date: '2022/11/23' },
+    '3부 1장': { key: 'vol3_ch1', date: '2021/05/27' },
+    '3부 2장': { key: 'vol3_ch2', date: '2021/10/27' },
+    '3부 3장': { key: 'vol3_ch3', date: '2021/12/15' },
+    '3부 4장': { key: 'vol3_ch4', date: '2022/5/24' },
+    '4부 1장': { key: 'vol4_ch1', date: '2022/03/23' },
+    '4부 2장': { key: 'vol4_ch2', date: '2023/06/07' },
+    '5부 1장': { key: 'vol5_ch1', date: '2023/11/08' },
+    '5부 2장': { key: 'vol5_ch2', date: '2025/05/21' },
+    '6부 1장': { key: 'vol6_ch1', date: '2025/09/17' },
+    '6부 2장': { key: 'vol6_ch2', date: '2025/10/08' },
+    '6부 3장': { key: 'vol6_ch3', date: '2025/11/12' },
+    'Ex. 데카그라마톤 편 0장': { key: 'ex_deca_ch0', date: '2021/11/09' },
+    'Ex. 데카그라마톤 편 1장': { key: 'ex_deca_ch1', date: '2024/11/6' },
+    'Final. 그리고 모든 기적이 시작되는 곳 편 1장': { key: 'final_ch1', date: '2023/01/22' },
+    'Final. 그리고 모든 기적이 시작되는 곳 편 2장': { key: 'final_ch2', date: '2023/01/24' },
+    'Final. 그리고 모든 기적이 시작되는 곳 편 3장': { key: 'final_ch3', date: '2023/02/22' },
+    'Final. 그리고 모든 기적이 시작되는 곳 편 4장': { key: 'final_ch4', date: '2023/03/08' },
 };
 
 export const otherStoryTitles = {
     Group_Story: {
-        '1': { ko: '게임개발부', jp: 'ゲーム開発部', en: 'Game Development Department' },
+        '11': 'GourmetClub',
+        '12': 'CleanNClearing',
+        '13': 'RedwinterSecretary',
+        '14': 'Engineer',
+        '15': 'Veritas',
+        '16': 'FoodService',
+        '17': 'KnightsHospitaller',
+        '18': 'Justice',
+        '19': 'Fuuki',
+        '20': 'HoukagoDessert',
+        '21': 'Countermeasure',
+        '22': 'Kohshinjo68',
+        '23': 'MatsuriOffice',
+        '24': 'Shugyobu',
+        '25': 'GameDev',
+        '26': 'BlackTortoisePromenade',
+        '27': 'Valkyrie',
+        '28': 'Class227',
+        '29': 'NinpoKenkyubu',
+        '30': 'RabbitPlatoon',
+        '31': 'TheSeminar',
+        '32': 'Onmyobu',
+        '33': 'TrainingClub',
+        '34': 'Genryumon',
+        '35': 'HotSpringsDepartment',
+        '36': 'TeaParty',
+
         // ... other group story titles
     },
     Mini_Story: {
-        '1': { ko: '미니 스토리 예시', jp: 'ミニストーリーの例', en: 'Mini Story Example' },
+        '-1': { ko: '미니 스토리 예시', jp: 'ミニストーリーの例', en: 'Mini Story Example' },
         // ... other mini story titles
     },
 };

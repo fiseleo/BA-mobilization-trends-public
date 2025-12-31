@@ -6,7 +6,7 @@ import RaidClearStatusGraph from "./overview/RaidClearStatusGraph";
 import { RecordLookup } from "./overview/RecordLookup";
 import { Card } from "./card";
 import { useTranslation } from "react-i18next";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 
 interface OverviewDashboardUIProp {
@@ -19,7 +19,7 @@ interface OverviewDashboardUIProp {
 }
 
 // overviewLoading: topOverviewLoading, setOverviewLoading: SetTopOverviewLoading
-const OverviewDashboardUI = ({ activeTab, raidInfos, fullData, server, overviewLoading: topOverviewLoading, setOverviewLoading: SetTopOverviewLoading }: OverviewDashboardUIProp) => {
+const OverviewDashboardUI = ({ activeTab, raidInfos, fullData, server }: OverviewDashboardUIProp) => {
 
     const { t } = useTranslation("dashboard");
     const { t: t_c } = useTranslation("common");

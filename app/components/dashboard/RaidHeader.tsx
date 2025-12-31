@@ -8,6 +8,7 @@ import { TerrainIconGameStyle, type Terrain } from '../teran';
 import { getMostDifficultLevel, type_translation, typecolor } from '../raidToString';
 import type { Locale } from '~/utils/i18n/config';
 import { DownloadButton } from './DownloadButton';
+import { YouTubeSearchGenerator } from './YouTubeSearchGenerator';
 
 
 interface RaidHeaderProps {
@@ -35,12 +36,21 @@ export default function RaidHeader({ raidInfo, server, isGrandAssault, allData, 
                     <span className="inline-block px-3 py-1 text-s font-semibold text-neutral-800 dark:text-neutral-200 bg-neutral-200 dark:bg-neutral-700 rounded-full">
                         {getMostDifficultLevel(raidInfo)}
                     </span>
-                    <span className="inline-block px-3 py-1 text-s font-semibold text-neutral-800 dark:text-neutral-200 bg-neutral-200 dark:bg-neutral-700 rounded-full">
+                    {/* <span className="inline-block px-3 py-1 text-s font-semibold text-neutral-800 dark:text-neutral-200 bg-neutral-200 dark:bg-neutral-700 rounded-full">
                         {server.toUpperCase()}
-                    </span>
+                    </span> */}
                     {allData && <span className="hidden sm:inline-block px-3 py-1 text-s font-semibold text-neutral-800 dark:text-neutral-200 bg-neutral-200 dark:bg-neutral-700 rounded-full">
                         <DownloadButton data={allData} filename={`${raidInfo.Id}-${raidInfo.Boss}-${raidInfo.Type || 'Total'}.csv`} />
                     </span>}
+
+
+
+                    <YouTubeSearchGenerator
+                        raidInfo={raidInfo}
+                        showType={showType || false}
+                    />
+
+
                 </div>
 
                 <h1 className="text-4xl font-extrabold text-neutral-900 dark:text-white">
@@ -56,7 +66,7 @@ export default function RaidHeader({ raidInfo, server, isGrandAssault, allData, 
                 )}
 
                 <p className="text-sm mt-4 font-medium text-neutral-500 dark:text-neutral-400">
-                    S{raidInfo.Id.slice(1)} / {raidInfo.Date}
+                    {server.toUpperCase()} / S{raidInfo.Id.slice(1)} / <time dateTime={raidInfo.Date}>{raidInfo.Date}</time>
                 </p>
             </div>
 

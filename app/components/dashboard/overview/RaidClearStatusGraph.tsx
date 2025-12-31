@@ -1,6 +1,6 @@
 // app/components/dashboard/RaidClearStatusGraph.tsx
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getDifficultyFromScoreAndBoss, difficultyInfo } from '~/components/Difficulty';
 import { calculateTimeFromScore } from '~/utils/calculateTimeFromScore';
 import type { GameServer } from '~/types/data';

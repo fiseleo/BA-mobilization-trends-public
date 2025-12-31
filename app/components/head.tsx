@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import type { MetaDescriptor } from 'react-router';
 import type { Locale } from '~/utils/i18n/config';
+import { domain } from '~/data/livedataServer.json'
 
 export const createMetaDescriptor = (title: string, description: string, iamge: string = "/example.webp") => {
   return [
@@ -27,7 +28,7 @@ interface LinkHreflang {
 
 }
 export const createLinkHreflang: (path: string) => LinkHreflang[] = (path: string) => {
-  const domain_name = 'https://yuzutrends.vercel.app'
+  const domain_name = `https://${domain}`
   return [
     {
       "rel": "alternate",
@@ -59,7 +60,7 @@ export const Title = () => {
 
   return <>
     <meta property="og:site_name" content={t('title')} />
-    <meta property="og:url" content="https://yuzutrends.vercel.app" />
+    <meta property="og:url" content={`https://${domain}`} />
   </>
 }
 

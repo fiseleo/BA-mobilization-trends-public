@@ -5,7 +5,7 @@ import { GAMESERVER_LIST, type GameServer, type RaidInfo } from "~/types/data";
 import { useTranslation } from "react-i18next";
 import { getMostDifficultLevel, type_translation, typecolor } from "~/components/raidToString";
 import { type Locale } from "~/utils/i18n/config";
-import { loadRaidInfos } from "~/utils/loadRainInfo";
+import { loadRaidInfos } from "~/utils/loadRaidInfo";
 import { TerrainIconGameStyle, type Terrain } from "~/components/teran";
 import { createLinkHreflang, createMetaDescriptor } from "~/components/head";
 import { getLiveRaidInfo } from "~/data/liveRaid";
@@ -56,8 +56,8 @@ export async function loader({ context, params, request }: LoaderFunctionArgs) {
 
 
       if (Array.isArray(raidGroup)) {
-        if (raidGroup[0].Id == 'E23') pinnedGrandAssault = raidGroup;
-      } else if (raidGroup.Id == 'R79') pinnedTotalAssault = raidGroup
+        if (raidGroup[0].Id == 'E25') pinnedGrandAssault = raidGroup;
+      } else if (raidGroup.Id == 'R81') pinnedTotalAssault = raidGroup
 
       // Stop scanning if you find both types
       if (pinnedTotalAssault && pinnedGrandAssault) break;
@@ -66,6 +66,7 @@ export async function loader({ context, params, request }: LoaderFunctionArgs) {
 
   return data({
     title: i18n.t("dashboardIndex:title"), description: i18n.t("dashboardIndex:description"),
+    siteTitle: i18n.t("home:title"),
     groupedRaidInfos,
     server,
     locale,
@@ -97,7 +98,7 @@ export async function loader({ context, params, request }: LoaderFunctionArgs) {
 
 export function meta({ loaderData }: Route.MetaArgs) {
   return createMetaDescriptor(
-    loaderData.title,
+    loaderData.title + ' | ' + loaderData.siteTitle,
     loaderData.description,
     "/img/3.webp"
   )
@@ -131,7 +132,7 @@ function TotalAssaultCard({ region, raidInfo, locale }: { region: string, raidIn
           <span className="text-xs font-light text-gray-400 mr-1 relative -top-1">S{id.substring(1)}</span>
           {Boss}
         </h3>
-        <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">{date}</p>
+        <time className="text-xs text-neutral-500 dark:text-neutral-400 mt-2" dateTime={date}>{date}</time>
       </div>
     </Link>
   );
@@ -169,7 +170,7 @@ function GrandAssaultCard({ region, raidInfos, locale }: { region: string, raidI
             </div>
           ))}
         </div>
-        <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">{date}</p>
+        <time className="text-xs text-neutral-500 dark:text-neutral-400 mt-2" dateTime={date}>{date}</time>
       </div>
     </Link>
   );
@@ -183,6 +184,8 @@ function LiveShortcutCard({ raidInfos, locale }: { raidInfos: RaidInfo[], locale
   // Use the first data entry as the representative info
   const primaryRaid = raidInfos[0];
   const { Id: id, Boss, Date: date, Location: location } = primaryRaid;
+  const liveExpired = (Number(new Date(date + 'T02:00:00Z')) /* GMT+9 11:00 */ + 3600_000 * 24 * 7 /* add 7 day */ - 3600_000 * 7) < Date.now()
+
 
   const israid = isTotalAssault(primaryRaid)
 
@@ -198,10 +201,10 @@ function LiveShortcutCard({ raidInfos, locale }: { raidInfos: RaidInfo[], locale
         <div className="flex justify-between items-center text-sm font-semibold">
           {/* Left: Live status display */}
           <div className="text-sky-500 dark:text-sky-400 flex items-center gap-1.5">
-            <span className="relative flex h-3 w-3">
+            {!liveExpired && <span className="relative flex h-3 w-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-            </span>
+            </span>}
             <span>LIVE (BETA)</span>
           </div>
           {/* Right: JFD type and terrain */}
@@ -239,7 +242,7 @@ function LiveShortcutCard({ raidInfos, locale }: { raidInfos: RaidInfo[], locale
         </div>}
 
         {/* Date info */}
-        <p className={"text-xs text-neutral-500 dark:text-neutral-400 mt-2"}>{date}</p>
+        <time className={"text-xs text-neutral-500 dark:text-neutral-400 mt-2"} dateTime={date}>{date}</time>
       </div>
     </Link>
   );
@@ -273,19 +276,25 @@ export default function DashboardIndex() {
 
 
 
-        {(pinnedTotalAssault || pinnedGrandAssault) && (
+        {(pinnedTotalAssault && pinnedGrandAssault) && (
           <section className="mb-12 p-5 rounded-xl bg-gray-100 dark:bg-neutral-800/60 border border-gray-200 dark:border-neutral-700/80">
             <h2 className="text-xl font-bold text-neutral-800 dark:text-neutral-200 mb-4 flex items-center gap-2 px-1">
               <span className="text-sky-500">📌</span>
               <span>{t_index('pinnedGlobalTitle')}</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {/* {pinnedTotalAssault && (
+                <TotalAssaultCard region={server} raidInfo={pinnedTotalAssault} locale={locale} />
+              )} */}
+              {new Date(pinnedTotalAssault?.Date || 0) < new Date(pinnedGrandAssault[0]?.Date) &&
+                <TotalAssaultCard region={server} raidInfo={pinnedTotalAssault} locale={locale} />
+              }
               {pinnedGrandAssault && (
                 <GrandAssaultCard region={server} raidInfos={pinnedGrandAssault} locale={locale} />
               )}
-              {pinnedTotalAssault && (
+              {new Date(pinnedTotalAssault?.Date || 0) > new Date(pinnedGrandAssault[0]?.Date) &&
                 <TotalAssaultCard region={server} raidInfo={pinnedTotalAssault} locale={locale} />
-              )}
+              }
             </div>
           </section>
         )}

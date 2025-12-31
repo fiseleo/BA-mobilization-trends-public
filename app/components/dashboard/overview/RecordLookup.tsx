@@ -379,7 +379,7 @@ export const RecordLookup: React.FC<RecordLookupProps> = ({ scores, raidInfo, se
                 </div>
 
                 {isDropdownVisible && (
-                    <div className="absolute w-full mt-1 bg-white dark:bg-neutral-800 rounded-lg shadow-lg border dark:border-neutral-700 z-10 max-h-80 overflow-y-auto">
+                    <div className="absolute w-full mt-1 bg-white dark:bg-neutral-800 rounded-lg shadow-lg border dark:border-neutral-700 z-10 max-h-100 overflow-y-auto">
                         {isSearchQuery ? (
                             searchResults.length > 0 ? (
                                 searchResults.map((res, i) => (

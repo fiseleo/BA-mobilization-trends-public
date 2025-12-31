@@ -1,5 +1,5 @@
 // app/components/planner/FloatingCurrencyStatus.tsx
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ItemIcon } from './common/Icon';
 import type { EventData, IconData, TransactionEntry } from '~/types/plannerData';
 import { getFreeStudentID } from './getFreeStudentId';
@@ -58,7 +58,7 @@ export const FloatingCurrencyStatus = ({
     const [isExpanded, setIsExpanded] = useState(false);
     const modalRef = useRef<HTMLDivElement>(null);
 
-    const { t, i18n } = useTranslation("planner");
+    const { t } = useTranslation("planner");
 
 
     const showItems = getShowItems(eventData, remainingCurrency);

@@ -5,6 +5,7 @@ import { usePlanForEvent } from '~/store/planner/useEventPlanStore';
 import { useTranslation } from 'react-i18next';
 import { ChevronIcon } from '~/components/Icon';
 import type { Locale } from '~/utils/i18n/config';
+import { getLocalizeEtcName } from '../common/locale';
 
 export type CustomGameResult = {
     cost: { key: string; amount: number } | null;
@@ -162,7 +163,7 @@ export const CustomGamePlanner = ({ eventId, eventData, iconData, onCalculate, r
             const data = (eventData?.icons)?.[item.type as keyof IconInfos]?.[item.id];
             const nameData = data && ('LocalizeEtc' in data ? data.LocalizeEtc : undefined);
 
-            const name = (locale === 'ko' ? nameData?.NameKr : (locale == 'en' ? (nameData?.NameEn || nameData?.NameJp) : (nameData?.NameJp))) || '';
+            const name = getLocalizeEtcName(nameData, locale) || ''//(locale === 'ko' ? nameData?.NameKr : (locale == 'en' ? (nameData?.NameEn || nameData?.NameJp) : (nameData?.NameJp))) || '';
             return name.toLowerCase().includes(lowerCaseQuery);
         });
     }, [isSelecting, searchQuery, farmingItemsForCost, prioritizedItems, iconData, locale]);

@@ -1,6 +1,6 @@
 //'use client';
 
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import 'rc-slider/assets/index.css';
 import type { GameServer, GameServerParams, RaidInfo, Student } from '~/types/data';
 import { GAMESERVER_LIST } from '~/types/data';
@@ -11,16 +11,15 @@ import TooltipSlider from '~/components/HandleTooltip';
 import { raidToString, raidToStringTsx } from '~/components/raidToString';
 import { useDataCache } from '~/utils/cache';
 import type { Route } from './+types/ranking';
-import { useLocation, useParams, type LoaderFunctionArgs, type MetaFunction } from 'react-router';
+import { useLocation, useParams, type LoaderFunctionArgs } from 'react-router';
 import type { AppHandle } from '~/types/link';
-import type { Locale } from '~/utils/i18n/config';
-import type { loader as rootLorder } from "~/root";
-import { DEFAULT_LOCALE } from "~/utils/i18n/config";
+import { getLocaleShortName, type Locale } from '~/utils/i18n/config';
 import { createLinkHreflang, createMetaDescriptor } from '~/components/head';
 
 import { RankingChart } from '~/components/ranking/chart';
 import { PlayIcon, StopIcon } from '~/components/Icon';
 import { getInstance } from '~/middleware/i18next';
+import { cdn } from '~/utils/cdn';
 
 
 interface RawRatingData {
@@ -63,7 +62,7 @@ export const links: Route.LinksFunction = () => {
 
     {
       rel: "preload",
-      href: `/w/students_portrait.json`,
+      href: cdn(`/w/students_portrait.json`),
       crossOrigin: "anonymous",
       as: "fetch"
     },
@@ -90,7 +89,7 @@ export const links: Route.LinksFunction = () => {
 export function meta({ loaderData }: Route.MetaArgs) {
 
   return createMetaDescriptor(
-    loaderData.title + ' - ' + loaderData.siteTitle,
+    loaderData.title + ' | ' + loaderData.siteTitle,
     loaderData.description,
     "/img/1.webp"
   )
@@ -108,19 +107,19 @@ export const handle: AppHandle = {
     return [
       {
         rel: "preload",
-        href: `/w/${server}/play_rate_rank.bin`,
+        href: cdn(`/w/${server}/play_rate_rank.bin`),
         crossOrigin: "anonymous",
         as: "fetch"
       },
       {
         rel: 'preload',
-        href: `/w/${data?.locale}.students.bin`,
+        href: cdn(`/w/${getLocaleShortName(data?.locale)}.students.bin`),
         as: 'fetch',
         crossOrigin: 'anonymous',
       },
       {
         rel: 'preload',
-        href: `/w/${server}/${data?.locale}.raid_info.bin`,
+        href: cdn(`/w/${server}/${getLocaleShortName(data?.locale)}.raid_info.bin`),
         as: 'fetch',
         crossOrigin: 'anonymous',
       },
@@ -146,7 +145,7 @@ export default function RankingChartPage() {
   const [selectedRaidIds, setSelectedRaidIds] = useState<number[]>([0, 102]); // Stores [min, max] range
   const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultySelect>("All"); // Stores [min, max] range
   const [isPlaying, setIsPlaying] = useState(false);
-  const currentLocale = useTranslation().i18n.language;
+  const currentLocale = useTranslation().i18n.language as Locale;
   const { t, i18n } = useTranslation("charts", { keyPrefix: 'ranking' });
   const { t: t_raids } = useTranslation("raidInfo");
   const locale = i18n.language as Locale
@@ -188,15 +187,15 @@ export default function RankingChartPage() {
     const fetchDataAndStudents = async () => {
       try {
         const [ratings, students, raids] = await Promise.all([
-          fetchData(`/w/${server}/play_rate_rank.bin`, res => res.json() as Promise<RawRatingData>),
-          fetchStudents(`/w/${currentLocale}.students.bin`, res => res.json() as Promise<Record<string, Student>>),
-          fetchRaids(`/w/${server}/${currentLocale}.raid_info.bin`, res => res.json() as Promise<RaidInfo[]>),
+          fetchData(cdn(`/w/${server}/play_rate_rank.bin`), res => res.json() as Promise<RawRatingData>),
+          fetchStudents(cdn(`/w/${getLocaleShortName(currentLocale)}.students.bin`), res => res.json() as Promise<Record<string, Student>>),
+          fetchRaids(cdn(`/w/${server}/${getLocaleShortName(currentLocale)}.raid_info.bin`), res => res.json() as Promise<RaidInfo[]>),
         ]);
 
         setAllStudents(students);
 
         await (async () => {
-          const students_portrait = await fetch('/w/students_portrait.json').then(res => res.json()) as { [key: number]: string }
+          const students_portrait = await fetch(cdn('/w/students_portrait.json')).then(res => res.json()) as { [key: number]: string }
           Object.entries(students).map(([studentId, student]) => {
             student.Portrait = students_portrait[parseInt(studentId)]
           })
@@ -332,7 +331,7 @@ export default function RankingChartPage() {
   }, [rawRatingData, isRelativeMode, studentMap, svgWidth, allStudents, selectedSquadType, selectedTacticRole, selectedRaidIds, selectedStudentType, displayMode, selectedDifficulty]);
 
   // Create marks for the slider
-  const raidIds = Object.keys(raidInfo).map(Number).filter(id => !isNaN(id));
+  // const raidIds = Object.keys(raidInfo).map(Number).filter(id => !isNaN(id));
 
   const filteredRaidInfoByDifficulty = raidInfo.map((raid, index) => ({ ...raid, index })).filter(raid => {
     if (selectedDifficulty == 'All') return true

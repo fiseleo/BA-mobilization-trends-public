@@ -6,3 +6,18 @@ Allow: /charts/
 Allow: /dashboard/
 Allow: /planner/
 Allow: /utils/
+Allow: /calendar/
+
+Allow: /ko$
+Allow: /ko/charts/
+Allow: /ko/dashboard/
+Allow: /ko/planner/
+Allow: /ko/utils/
+Allow: /ko/calendar/
+
+Allow: /ja$
+Allow: /ja/charts/
+Allow: /ja/dashboard/
+Allow: /ja/planner/
+Allow: /ja/utils/
+Allow: /ja/calendar/

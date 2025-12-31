@@ -1,7 +1,7 @@
 // src/components/TotalBonusDisplay.tsx
 
 import { useTranslation } from "react-i18next";
-import type { EventData, IconData, LocalizeEtc } from "~/types/plannerData";
+import type { EventData, IconData } from "~/types/plannerData";
 import type { Locale } from "~/utils/i18n/config";
 import { getLocalizeEtcName } from "./common/locale";
 import { ItemIcon } from "./common/Icon";
@@ -33,7 +33,7 @@ export const TotalBonusDisplay = ({ eventData, iconData, totalBonus }: TotalBonu
                 {eventData.currency.filter(c => bonusItems.has(c.EventContentItemType)).map(currency => {
                     const bonusValue = totalBonus[currency.ItemUniqueId] || 0;
                     const itemId = currency.ItemUniqueId.toString();
-                    const itemInfo = eventData.icons.Item[itemId as any];
+                    // const itemInfo = eventData.icons.Item[itemId as any];
 
                     return (
                         <div key={currency.ItemUniqueId} className="flex items-center gap-2">

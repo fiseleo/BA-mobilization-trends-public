@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { ItemIcon } from './common/Icon';
 import type { EventData, IconData, Mission, Stage } from '~/types/plannerData';
 import { usePlanForEvent } from '~/store/planner/useEventPlanStore';
@@ -184,7 +184,7 @@ export const MissionPlanner = ({
                                             <span className={`text-xs font-bold px-2 py-0.5 rounded-full shrink-0 whitespace-nowrap ${missionType === 'DailyMission' ? 'bg-green-200 text-green-800 dark:bg-green-900/60 dark:text-green-300' :
                                                 'bg-yellow-200 text-yellow-800 dark:bg-yellow-900/60 dark:text-yellow-300'
                                                 }`}>
-                                                {t(missionType, { defaultValue: missionType })}
+                                                {t(`mission.${missionType}`, { defaultValue: missionType })}
                                             </span>
                                             <p className="text-sm text-gray-800 dark:text-gray-200 truncate">
                                                 {formatMissionDescription(mission, allStages, locale)}

@@ -9,6 +9,7 @@ import { usePlanForEvent } from '~/store/planner/useEventPlanStore';
 import { useTranslation } from 'react-i18next';
 import type { Locale } from '~/utils/i18n/config';
 import { getLocalizeEtcName } from './common/locale';
+import { CustomCheckbox } from '../CustomCheckbox';
 
 
 type ItemType = 'Furniture' | 'Credit' | 'ExpGrowth' | 'Material' | 'Favor' | 'Coin' | 'SecretStone' | 'Gem' | 'Equipment';
@@ -95,7 +96,7 @@ export const ShopPlanner = ({
       for (const stage of stagesThatDropThis) {
         const totalRewardSum = stage.EventContentStageReward.filter(r => r.RewardTagStr == 'Event').map(v => v?.RewardAmount).reduce((a, b) => a + b);
         const rewardInfo = stage.EventContentStageReward.find(r => r.RewardId === currencyId && r.RewardTagStr == 'Event')!;
-        if (!rewardInfo) return null
+        if (!rewardInfo) continue
         const baseDropAmount = rewardInfo.RewardAmount * rewardInfo.RewardProb / 10000;
         const bonusPercent = totalBonus[currencyId] || 0;
         const effectiveDropAmount = baseDropAmount * (1 + bonusPercent / 10000);
@@ -193,8 +194,37 @@ export const ShopPlanner = ({
   };
 
 
+  /*
+    const handleSelectAllByTypeInCategory = (type: ItemType, categoryId: string) => {
+      const newCounts = { ...purchaseCounts };
+      const itemsInCategory = eventData.shop[categoryId];
+  
+      itemsInCategory.forEach(item => {
+        if (!item.Goods?.length) return;
+  
+        const goodsInfo = item.Goods[0];
+        const rewardId = goodsInfo.ParcelId[0];
+        const rewardType = goodsInfo.ParcelTypeStr[0];
+        const itemInfo = (eventData.icons as any)[rewardType]?.[rewardId.toString()];
+  
+        // Simplify logic by calling helper function
+        const currentItemType = getShopItemType(rewardType, rewardId, itemInfo);
+  
+        if (currentItemType === type) {
+          const alreadyPurchased = alreadyPurchasedCounts?.[item.Id] || 0;
+          const remainingLimit = item.PurchaseCountLimit - alreadyPurchased;
+          if (remainingLimit > 0) {
+            newCounts[item.Id] = remainingLimit;
+          }
+        }
+      });
+      setPurchaseCounts(() => newCounts);
+    };*/
 
-  const handleSelectAllByTypeInCategory = (type: ItemType, categoryId: string) => {
+
+  const handleToggleTypeSelection = (type: ItemType, categoryId: string, currentState: 'checked' | 'unchecked' | 'indeterminate') => {
+    const isFullyChecked = currentState === 'checked';
+
     const newCounts = { ...purchaseCounts };
     const itemsInCategory = eventData.shop[categoryId];
 
@@ -205,21 +235,28 @@ export const ShopPlanner = ({
       const rewardId = goodsInfo.ParcelId[0];
       const rewardType = goodsInfo.ParcelTypeStr[0];
       const itemInfo = (eventData.icons as any)[rewardType]?.[rewardId.toString()];
-
-      // Simplify logic by calling helper function
       const currentItemType = getShopItemType(rewardType, rewardId, itemInfo);
 
       if (currentItemType === type) {
         const alreadyPurchased = alreadyPurchasedCounts?.[item.Id] || 0;
-        const remainingLimit = item.PurchaseCountLimit - alreadyPurchased;
-        if (remainingLimit > 0) {
-          newCounts[item.Id] = remainingLimit;
+        const isInfinite = item.PurchaseCountLimit === 0;
+        // Target only non-infinite purchase items
+        if (!isInfinite) {
+          const remainingLimit = item.PurchaseCountLimit - alreadyPurchased;
+          if (remainingLimit > 0) {
+            if (isFullyChecked) {
+              // Clicked while already fully selected -> Deselect all (set to 0)
+              newCounts[item.Id] = 0;
+            } else {
+              // Clicked while unselected or partially selected -> Select all (set to remaining stock)
+              newCounts[item.Id] = remainingLimit;
+            }
+          }
         }
       }
     });
     setPurchaseCounts(() => newCounts);
   };
-
 
   const itemTypeButtons = [
     { label: t('item.reports'), type: 'ExpGrowth' as const },
@@ -232,6 +269,48 @@ export const ShopPlanner = ({
     { label: t('common.pyroxene'), type: 'Gem' as const },
     { label: t('item.equipment'), type: 'Equipment' as const },
   ];
+
+  const categorySelectionStates = useMemo(() => {
+    if (!activeTab) return {};
+
+    const itemsInCategory = eventData.shop[activeTab] || [];
+    // { ExpGrowth: { totalEligible: 5, totalSelected: 2 }, ... }
+    const states: Record<string, { totalEligible: number; totalSelected: number }> = {};
+
+    // 1. Initialize state object for all button types
+    itemTypeButtons.forEach(btn => {
+      states[btn.type] = { totalEligible: 0, totalSelected: 0 };
+    });
+
+    // 2. Iterate through current category items and calculate state
+    for (const item of itemsInCategory) {
+      if (!item.Goods?.length) continue;
+
+      const goodsInfo = item.Goods[0];
+      const rewardId = goodsInfo.ParcelId[0];
+      const rewardType = goodsInfo.ParcelTypeStr[0];
+      const itemInfo = (eventData.icons as any)[rewardType]?.[rewardId.toString()];
+      const itemType = getShopItemType(rewardType, rewardId, itemInfo);
+
+      // Count only purchasable items that are not infinite purchase
+      if (itemType && states[itemType]) {
+        const alreadyPurchased = alreadyPurchasedCounts?.[item.Id] || 0;
+        const isInfinite = item.PurchaseCountLimit === 0;
+        const remainingLimit = isInfinite ? Infinity : item.PurchaseCountLimit - alreadyPurchased;
+
+        // Items subject to 'Select All' (Non-infinite, in stock)
+        if (!isInfinite && remainingLimit > 0) {
+          states[itemType].totalEligible++;
+
+          const currentPurchase = purchaseCounts?.[item.Id] || 0;
+          if (currentPurchase === remainingLimit) {
+            states[itemType].totalSelected++;
+          }
+        }
+      }
+    }
+    return states;
+  }, [activeTab, eventData.shop, purchaseCounts, alreadyPurchasedCounts, itemTypeButtons]);
 
   const shopCategories = useMemo(() => Object.entries(eventData.shop), [eventData.shop]);
 
@@ -367,9 +446,9 @@ export const ShopPlanner = ({
           if (activeTab !== categoryId) return null; // Render only the active tab
 
           // Find shop name using shop_info
-          const shopInfo = eventData.shop_info?.find(info => info.CategoryType.toString() === categoryId);
-          const currencyId = shopInfo?.CostParcelId[0];
-          const currencyName = currencyId ? eventData.icons.Item[currencyId]?.LocalizeEtc?.NameKr : `Shop ${categoryId}`;
+          // const shopInfo = eventData.shop_info?.find(info => info.CategoryType.toString() === categoryId);
+          // const currencyId = shopInfo?.CostParcelId[0];
+          // const currencyName = currencyId ? eventData.icons.Item[currencyId]?.LocalizeEtc?.NameKr : `Shop ${categoryId}`;
 
           const availableTypesInCategory = new Set<string>();
           items.forEach(item => {
@@ -392,11 +471,48 @@ export const ShopPlanner = ({
           return (
             <div key={categoryId}>
               <div className="flex justify-between items-center mb-3">
-                <div className="flex flex-wrap gap-1">
-                  {filteredButtons.map(btn => (
-                    <button key={btn.label} onClick={() => handleSelectAllByTypeInCategory(btn.type, categoryId)} className="bg-teal-500 hover:bg-teal-600 dark:bg-teal-600 dark:hover:bg-teal-700 text-white font-semibold text-[10px] py-0.5 px-1.5 rounded-md">{btn.label}</button>
-                  ))}
+                <div className="flex flex-wrap gap-2">
+                  {filteredButtons.filter(btn => categorySelectionStates[btn.type].totalEligible).map(btn => {
+                    const stateInfo = categorySelectionStates[btn.type];
+                    if (!stateInfo) return null;
+
+                    const { totalEligible, totalSelected } = stateInfo;
+                    const isDisabled = totalEligible === 0;
+
+                    let state: 'checked' | 'unchecked' | 'indeterminate' = 'unchecked';
+                    if (!isDisabled) {
+                      if (totalSelected === totalEligible) {
+                        state = 'checked';
+                      } else if (totalSelected > 0) {
+                        state = 'indeterminate';
+                      }
+                    }
+                    return (
+                      <label
+                        key={btn.type}
+                        className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-[10px] font-semibold transition-colors
+                          ${isDisabled
+                            ? 'bg-gray-200 dark:bg-neutral-800 text-gray-400 dark:text-neutral-600 cursor-not-allowed'
+                            : 'bg-teal-500/10 dark:bg-teal-600/20 text-teal-700 dark:text-teal-300 hover:bg-teal-500/20 dark:hover:bg-teal-600/30 cursor-pointer'
+                          }`}
+                      >
+                        <CustomCheckbox
+                          state={state}
+                          disabled={isDisabled}
+                          // OnChange only causes click events.
+                          // Checked status changes are handled by useEffect inside CustomCheckbox seeing 'state' prop.
+                          onChange={() => {
+                            if (!isDisabled) {
+                              handleToggleTypeSelection(btn.type, categoryId, state);
+                            }
+                          }}
+                        />
+                        <span>{btn.label}</span>
+                      </label>
+                    );
+                  })}
                 </div>
+
                 <div className="flex items-center gap-2">
                   <button onClick={() => handleSelectAllInCategory(categoryId)} className="bg-sky-500 hover:bg-sky-600 dark:bg-sky-600 dark:hover:bg-sky-700 text-white font-bold text-xs py-1 px-2 rounded-md"> {t('button.purchaseCurrentTab')}</button>
                   <button onClick={() => handleResetCategory(categoryId)} className="bg-gray-400 hover:bg-gray-500 dark:bg-neutral-600 dark:hover:bg-neutral-700 text-white font-bold text-xs py-1 px-2 rounded-md">{t('button.resetCurrentTab')}</button>
@@ -409,7 +525,7 @@ export const ShopPlanner = ({
                   const goodsInfo = item.Goods[0];
                   const rewardId = goodsInfo.ParcelId[0];
                   const rewardType = goodsInfo.ParcelTypeStr[0] as keyof IconData;
-                  const cost = goodsInfo.ConsumeParcelAmount[0];
+                  // const cost = goodsInfo.ConsumeParcelAmount[0];
                   const alreadyPurchased = alreadyPurchasedCounts?.[item.Id] || 0;
                   const currentPurchase = purchaseCounts?.[item.Id] || 0;
                   const isInfinite = item.PurchaseCountLimit === 0;

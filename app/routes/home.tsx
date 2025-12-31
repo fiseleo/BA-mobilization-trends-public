@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { data, Link, useLoaderData } from "react-router";
 import { createLinkHreflang, createMetaDescriptor } from "~/components/head";
 import type { GameServer } from "~/types/data";
-import { type Locale } from "~/utils/i18n/config";
+import { getLocaleShortName, type Locale } from "~/utils/i18n/config";
 import { Trans } from 'react-i18next';
 
 import rankingImage from '/img/1.webp';
@@ -27,6 +27,7 @@ import type { Route } from "./+types/home";
 import { localeLink } from "~/utils/localeLink";
 import { CalendarWidget, loadCalendarWidgetData } from "~/components/CalendarWidget";
 import type { AppHandle } from "~/types/link";
+import { cdn } from "~/utils/cdn";
 
 export async function loader(args: Route.LoaderArgs) {
   const { request, context, params } = args
@@ -38,7 +39,40 @@ export async function loader(args: Route.LoaderArgs) {
 
   return data({
     title: i18n.t("home:site-title"), description: i18n.t("home:description"), calendarDataJp,
-    calendarDataKr
+    calendarDataKr,
+    trans:
+    {
+      dashboard: {
+        title: i18n.t("home:dashboard-btn"),
+        description: i18n.t("dashboard:description1"),
+        go: i18n.t("home:dashboard-btn-go"),
+      },
+      planner: {
+        title: i18n.t("planner:page.planner"),
+        description: i18n.t("planner:page.plannerescription"),
+        go: i18n.t("planner:page.planner-go"),
+      },
+      jukebox: {
+        title: i18n.t("planner:page.jukebox"),
+        description: i18n.t("planner:page.jukeboxdescription"),
+        go: i18n.t("planner:page.jukebox-go"),
+      },
+      ranking: {
+        title: i18n.t("home:btn2"),
+        description: i18n.t("charts:ranking.description1"),
+        go: i18n.t("home:btn2-go"),
+      },
+      heatmap: {
+        title: i18n.t("home:btn1"),
+        description: i18n.t("charts:heatmap.description1"),
+        go: i18n.t("home:btn1-go"),
+      },
+      emblem: {
+        title: i18n.t("emblemCounter:title"),
+        description: i18n.t("emblemCounter:description"),
+        go: i18n.t("emblemCounter:go"),
+      }
+    }
   });
 }
 
@@ -52,7 +86,7 @@ export function meta({ loaderData }: Route.MetaArgs) {
 
 export function links() {
   return [
-    ...createLinkHreflang('/')
+    ...createLinkHreflang('')
   ]
 }
 
@@ -62,13 +96,13 @@ export const handle: AppHandle = {
 
       {
         rel: 'preload',
-        href: `/schaledb.com/${data?.locale}.students.min.json`,
+        href: cdn(`/schaledb.com/${getLocaleShortName(data?.locale)}.students.min.json`),
         as: 'fetch',
         crossOrigin: 'anonymous',
       },
       {
         rel: 'preload',
-        href: `/w/students_portrait.json`,
+        href: cdn(`/w/students_portrait.json`),
         as: 'fetch',
         crossOrigin: 'anonymous',
       },
@@ -81,24 +115,24 @@ export default function Home() {
   const locale = useTranslation().i18n.language as Locale
   const { t } = useTranslation("home")
   const { t: t_c } = useTranslation("common");
-  const { t: t_d } = useTranslation("dashboard");
-  const { t: t_p } = useTranslation("planner");
-  const { t: t_e } = useTranslation("emblemCounter");
-  const { t: t_chart } = useTranslation("charts");
+  // const { t: t_d } = useTranslation("dashboard");
+  // const { t: t_p } = useTranslation("planner");
+  // const { t: t_e } = useTranslation("emblemCounter");
+  // const { t: t_chart } = useTranslation("charts");
   const { isDark } = useIsDarkState();
-  const { calendarDataJp, calendarDataKr } = useLoaderData<typeof loader>();
+  const { calendarDataJp, calendarDataKr, trans } = useLoaderData<typeof loader>();
 
 
   const [selectedServer, setSelectedServer] = useState<GameServer>('jp');
-  const getServerButtonStyle = (server: GameServer) => {
-    const baseStyle = "w-full sm:w-auto px-6 py-3 text-lg font-semibold rounded-lg shadow-md transition-colors duration-300";
-    if (selectedServer === server) {
-      // Selected
-      return `${baseStyle} bg-blue-600 text-white cursor-default`;
-    }
-    // Unselected
-    return `${baseStyle} bg-neutral-200 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-300 hover:bg-neutral-300 dark:hover:bg-neutral-600`;
-  };
+  // const getServerButtonStyle = (server: GameServer) => {
+  //   const baseStyle = "w-full sm:w-auto px-6 py-3 text-lg font-semibold rounded-lg shadow-md transition-colors duration-300";
+  //   if (selectedServer === server) {
+  //     // Selected
+  //     return `${baseStyle} bg-blue-600 text-white cursor-default`;
+  //   }
+  //   // Unselected
+  //   return `${baseStyle} bg-neutral-200 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-300 hover:bg-neutral-300 dark:hover:bg-neutral-600`;
+  // };
 
   const calendarData = selectedServer === 'jp' ? calendarDataJp : calendarDataKr;
 
@@ -145,14 +179,18 @@ export default function Home() {
           </div>
           <div className="p-6 flex flex-col grow" style={{ wordBreak: 'keep-all' }}>
             <h3 className="text-2xl font-bold text-neutral-800 dark:text-white mb-2">
-              <Trans i18nKey="home:dashboard-btn" components={[<wbr />]} />
+              {/* <Trans i18nKey="home:dashboard-btn" components={[<wbr />]} /> */}
+              <Trans components={[<wbr />]}>{trans.dashboard.title}</Trans>
             </h3>
             <p className="text-neutral-500 dark:text-neutral-400 mb-4 grow">
 
-              <Trans i18nKey="dashboard:description1" components={[<wbr />]} />
+              {/* <Trans i18nKey="dashboard:description1" components={[<wbr />]} /> */}
+              <Trans components={[<wbr />]}>{trans.dashboard.description}</Trans>
             </p>
             <span className="font-semibold text-blue-600 dark:text-blue-400 group-hover:underline mt-2">
-              <Trans i18nKey="home:dashboard-btn-go" components={[<wbr />]} /> ({selectedServer.toUpperCase()}) &rarr;
+              {/* <Trans i18nKey="home:dashboard-btn-go" components={[<wbr />]} /> */}
+              <Trans components={[<wbr />]}>{trans.dashboard.go}</Trans>
+               ({selectedServer.toUpperCase()}) &rarr;
             </span>
           </div>
         </Link>
@@ -167,15 +205,19 @@ export default function Home() {
           </div>
           <div className="p-6 flex flex-col grow">
             <h3 className="text-2xl font-bold text-neutral-800 dark:text-white mb-2">
-              <Trans i18nKey="planner:page.planner" components={[<wbr />]} />
+              {/* <Trans i18nKey="planner:page.planner" components={[<wbr />]} /> */}
+              <Trans components={[<wbr />]}>{trans.planner.title}</Trans>
               {/* <b>(Experimental)</b> */}
             </h3>
             <p className="text-neutral-500 dark:text-neutral-400 mb-4 grow">
 
-              <Trans i18nKey="planner:page.plannerescription" components={[<wbr />]} />
+              {/* <Trans i18nKey="planner:page.plannerescription" components={[<wbr />]} /> */}
+              <Trans components={[<wbr />]}>{trans.planner.description}</Trans>
             </p>
             <span className="font-semibold text-blue-600 dark:text-blue-400 group-hover:underline mt-2">
-              <Trans i18nKey="planner:page.planner-go" components={[<wbr />]} /> &rarr;
+              {/* <Trans i18nKey="planner:page.planner-go" components={[<wbr />]} /> */}
+              <Trans components={[<wbr />]}>{trans.planner.go}</Trans>
+               &rarr;
             </span>
           </div>
         </Link>
@@ -191,14 +233,17 @@ export default function Home() {
           </div>
           <div className="p-6 flex flex-col grow">
             <h3 className="text-2xl font-bold text-neutral-800 dark:text-white mb-2">
-              <Trans i18nKey="planner:page.jukebox" components={[<wbr />]} />
+              {/* <Trans i18nKey="planner:page.jukebox" components={[<wbr />]} /> */}
+              <Trans components={[<wbr />]}>{trans.jukebox.title}</Trans>
             </h3>
             <p className="text-neutral-500 dark:text-neutral-400 mb-4 grow">
 
-              <Trans i18nKey="planner:page.jukeboxdescription" components={[<wbr />]} />
+              {/* <Trans i18nKey="planner:page.jukeboxdescription" components={[<wbr />]} /> */}
+              <Trans components={[<wbr />]}>{trans.jukebox.description}</Trans>
             </p>
             <span className="font-semibold text-blue-600 dark:text-blue-400 group-hover:underline mt-2">
-              <Trans i18nKey="planner:page.jukebox-go" components={[<wbr />]} /> &rarr;
+              {/* <Trans i18nKey="planner:page.jukebox-go" components={[<wbr />]} /> */}
+              <Trans components={[<wbr />]}>{trans.jukebox.go}</Trans> &rarr;
             </span>
           </div>
         </Link>
@@ -214,13 +259,18 @@ export default function Home() {
           </div>
           <div className="p-6 flex flex-col grow">
             <h3 className="text-2xl font-bold text-neutral-800 dark:text-white mb-2">
-              <Trans i18nKey="home:btn2" components={[<wbr />]} />
+              {/* <Trans i18nKey="home:btn2" components={[<wbr />]} /> */}
+              <Trans components={[<wbr />]}>{trans.ranking.title}</Trans>
             </h3>
             <p className="text-neutral-500 dark:text-neutral-400 mb-4 grow">
-              <Trans i18nKey="charts:ranking.description1" components={[<wbr />]} />
+              {/* <Trans i18nKey="charts:ranking.description1" components={[<wbr />]} /> */}
+              <Trans components={[<wbr />]}>{trans.ranking.description}</Trans>
             </p>
             <span className="font-semibold text-blue-600 dark:text-blue-400 group-hover:underline mt-2">
-              <Trans i18nKey="home:btn2-go" components={[<wbr />]} /> ({selectedServer.toUpperCase()}) &rarr;
+              {/* <Trans i18nKey="home:btn2-go" components={[<wbr />]} />  */}
+              <Trans components={[<wbr />]}>{trans.ranking.go}</Trans>
+              ({selectedServer.toUpperCase()})
+              &rarr;
             </span>
           </div>
         </Link>
@@ -236,14 +286,19 @@ export default function Home() {
           </div>
           <div className="p-6 flex flex-col grow">
             <h3 className="text-2xl font-bold text-neutral-800 dark:text-white mb-2">
-              <Trans i18nKey="home:btn1" components={[<wbr />]} />
+              {/* <Trans i18nKey="home:btn1" components={[<wbr />]} /> */}
+              <Trans components={[<wbr />]}>{trans.heatmap.title}</Trans>
             </h3>
             <p className="text-neutral-500 dark:text-neutral-400 mb-4 grow">
 
-              <Trans i18nKey="charts:heatmap.description1" components={[<wbr />]} />
+              {/* <Trans i18nKey="charts:heatmap.description1" components={[<wbr />]} /> */}
+              <Trans components={[<wbr />]}>{trans.heatmap.description}</Trans>
             </p>
             <span className="font-semibold text-blue-600 dark:text-blue-400 group-hover:underline mt-2">
-              <Trans i18nKey="home:btn1-go" components={[<wbr />]} /> ({selectedServer.toUpperCase()}) &rarr;
+              {/* <Trans i18nKey="home:btn1-go" components={[<wbr />]} />  */}
+              <Trans components={[<wbr />]}>{trans.heatmap.go}</Trans>
+              ({selectedServer.toUpperCase()}) 
+              &rarr;
             </span>
           </div>
         </Link>
@@ -258,14 +313,18 @@ export default function Home() {
           </div>
           <div className="p-6 flex flex-col grow">
             <h3 className="text-2xl font-bold text-neutral-800 dark:text-white mb-2">
-              <Trans i18nKey="emblemCounter:title" components={[<wbr />]} />
+              {/* <Trans i18nKey="emblemCounter:title" components={[<wbr />]} /> */}
+              <Trans components={[<wbr />]}>{trans.emblem.title}</Trans>
             </h3>
             <p className="text-neutral-500 dark:text-neutral-400 mb-4 grow">
 
-              <Trans i18nKey="emblemCounter:description" components={[<wbr />]} />
+              {/* <Trans i18nKey="emblemCounter:description" components={[<wbr />]} /> */}
+              <Trans components={[<wbr />]}>{trans.emblem.description}</Trans>
             </p>
             <span className="font-semibold text-blue-600 dark:text-blue-400 group-hover:underline mt-2">
-              <Trans i18nKey="emblemCounter:go" components={[<wbr />]} /> ({selectedServer.toUpperCase()}) &rarr;
+              {/* <Trans i18nKey="emblemCounter:go" components={[<wbr />]} /> */}
+              <Trans components={[<wbr />]}>{trans.emblem.go}</Trans>
+               ({selectedServer.toUpperCase()}) &rarr;
             </span>
           </div>
         </Link>
@@ -280,7 +339,7 @@ export default function Home() {
 
     <div className="text-center py-8 m-auto max-w-5xl px-4">
       <p className="text-sm text-neutral-500 dark:text-neutral-400 py-3">
-        {t('last-update')} 2025-11-01
+        {t('last-update')} 2025-11-20 (JP), 2025-09-09 (KR)
       </p>
       <p className="text-sm text-neutral-500 dark:text-neutral-400 py-3">
         {t_c('dataWarning')}

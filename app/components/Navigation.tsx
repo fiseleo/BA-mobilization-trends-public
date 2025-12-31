@@ -63,6 +63,7 @@ export const Navigation = ({ reqLocale }: { reqLocale: Locale }) => {
     const { hasShownLanguageBanner, setHasShownLanguageBanner } = useLanguageBannerStore()
 
 
+
     // Effect of closing the dropdown when clicking outside a component
 
     const menurRef = useRef<HTMLDivElement>(null);
@@ -123,7 +124,10 @@ export const Navigation = ({ reqLocale }: { reqLocale: Locale }) => {
         }
 
         const browserPrefs = [
-            ...new Set(navigator.languages.map((l) => l.split('-')[0])),
+            ...new Set(navigator.languages.map((l) => {
+                // if (['zh-TW', 'zh-HK', 'zh-MO', 'zh-hant', 'zh'].includes(l)) return 'zh-Hant' // TODO
+                return l.split('-')[0]
+            })),
         ] as Locale[]
 
         const supportedLngs = SUPORTED_LOCALES as readonly Locale[]

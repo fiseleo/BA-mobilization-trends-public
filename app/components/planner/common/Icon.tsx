@@ -21,7 +21,7 @@ const rarityColors: Record<"dark" | "light", Record<number, string>> = {
 };
 
 
-interface ItemIconProps {
+export interface ItemIconProps {
   type: string;
   itemId: string;
   amount: number | string;
@@ -80,12 +80,21 @@ const TooltipContent = React.forwardRef<HTMLDivElement, TooltipContentProps>(
 
     const { isDark } = useIsDarkState();
 
+    const [isClient, setIsClient] = useState(false);
+    useEffect(() => {
+      setIsClient(true);
+    }, []);
+
     // Define rarity colors locally or import them
     const rarityColors: Record<"dark" | "light", Record<number, string>> = {
       'light': { 0: 'rgb(189, 197, 208)', 1: 'rgb(144, 186, 236)', 2: 'rgb(214, 173, 129)', 3: 'rgb(168, 138, 236)' },
       'dark': { 0: '#8c939e', 1: '#658dbf', 2: '#a87d51', 3: '#7a5bbe' }
     };
     const bgColor = isDark === 'dark' ? 'bg-neutral-900/90' : 'bg-gray-800/90';
+
+    if (!isClient) {
+      return null;
+    }
 
     return ReactDOM.createPortal(
       <div
@@ -207,7 +216,7 @@ export const ItemIcon = ({ type, itemId, amount, size, eventData, iconData, labe
 
     const numericAmount = Number(amount) || 0;
     const elements: GachaElement[] = gachaInfo.GachaElement || gachaInfo.GachaElementRecursive || [];
-    const isRecursive = gachaInfo.IsRecursive;
+    // const isRecursive = gachaInfo.IsRecursive;
 
     // Effect for alternating display
     useEffect(() => {
@@ -229,10 +238,10 @@ export const ItemIcon = ({ type, itemId, amount, size, eventData, iconData, labe
 
     // --- Data for the currently displayed item ---
     const currentElement = elements[currentGachaIndex]; // Get the item for this "tick"
-    let currentItemIconSrc: string | undefined = undefined;
+    // let currentItemIconSrc: string | undefined = undefined;
     let currentItemRarity = 0;
     let currentItemIsCurrencyOrSpecial = false;
-    let currentItemAltName = "GachaGroup"; // Fallback alt name
+    // let currentItemAltName = "GachaGroup"; // Fallback alt name
 
     if (currentElement) {
       let itemToDisplayType = currentElement.ParcelTypeStr;
@@ -260,16 +269,16 @@ export const ItemIcon = ({ type, itemId, amount, size, eventData, iconData, labe
       // Now, get the icon and info based on the final itemToDisplay
       if (itemToDisplayType === 'GachaGroup') {
         // Still a GachaGroup (e.g., empty nested group), show fallback
-        currentItemIconSrc = undefined;
+        // currentItemIconSrc = undefined;
         currentItemRarity = 0;
         currentItemIsCurrencyOrSpecial = false;
-        currentItemAltName = getLocalizeEtcName(itemToDisplayInfo.LocalizeEtc, locale) || `Group ${itemToDisplayId}`;
+        // currentItemAltName = getLocalizeEtcName(itemToDisplayInfo.LocalizeEtc, locale) || `Group ${itemToDisplayId}`;
       } else {
         // This is a final item
         const finalItemInfo = itemToDisplayInfo; // Cast
-        currentItemIconSrc = (iconData as any)[itemToDisplayType]?.[itemToDisplayId];
+        // currentItemIconSrc = (iconData as any)[itemToDisplayType]?.[itemToDisplayId];
         currentItemRarity = finalItemInfo?.Rarity ?? 0;
-        currentItemAltName = getLocalizeEtcName(finalItemInfo?.LocalizeEtc, locale) || `${itemToDisplayType} ${itemToDisplayId}`;
+        // currentItemAltName = getLocalizeEtcName(finalItemInfo?.LocalizeEtc, locale) || `${itemToDisplayType} ${itemToDisplayId}`;
 
         if (itemToDisplayType === 'Currency' || finalItemInfo?.ItemCategory === 2 || [`Item-23`].includes(`${itemToDisplayType}-${itemToDisplayId}`)) {
           currentItemIsCurrencyOrSpecial = true;
@@ -368,10 +377,10 @@ export const ItemIcon = ({ type, itemId, amount, size, eventData, iconData, labe
                 return (
                   <div key={index} className="relative w-full h-full rounded-sm overflow-hidden" style={{ backgroundColor: elBG }}>
                     <img
-                      src={`data:image/webp;base64,${elIconSrc}`}
+                      src={elIconSrc.startsWith('blob:')? elIconSrc : `data:image/webp;base64,${elIconSrc}`}
                       alt="" // Alt text not crucial for small grid items
                       className="w-full h-full object-cover"
-                      loading="lazy" // Add lazy loading
+                      loading="lazy" // Lazy loading
                     />
                   </div>
                 );
@@ -429,6 +438,7 @@ export const ItemIcon = ({ type, itemId, amount, size, eventData, iconData, labe
 
   const nonRarityColors = isDark == 'light' ? '#eee' : '#00000000'
   if (type == 'Currency') backgroundColor = nonRarityColors;
+  // if (type == 'Equipment') backgroundColor = nonRarityColors;
   else if (itemInfo?.ItemCategory == 2) backgroundColor = nonRarityColors;
   else if (['Item-23'].includes(key)) backgroundColor = nonRarityColors; // Eligma
   else if (itemInfo.ExpiryChangeParcelTypeStr == "Currency") backgroundColor = nonRarityColors;
@@ -451,7 +461,7 @@ export const ItemIcon = ({ type, itemId, amount, size, eventData, iconData, labe
 
         <div className="absolute inset-0 flex items-center justify-center">
           <img
-            src={`data:image/webp;base64,${iconSrc}`}
+            src={iconSrc.startsWith('blob:')? iconSrc : `data:image/webp;base64,${iconSrc}`}
             alt={itemInfo.LocalizeEtc?.['NameKr']}
             className="max-w-full max-h-full object-cover"
           />

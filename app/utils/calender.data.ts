@@ -1,10 +1,10 @@
 import Papa from "papaparse";
-import { type_translation, typecolor, } from "~/components/raidToString";
+import { type_translation } from "~/components/raidToString";
 import jpEventList from '~/data/jp/eventList.json';
 import krEventList from '~/data/jp/eventList.json';
 import bossData from '~/data/bossdata.json'
 import { getInstance } from "~/middleware/i18next";
-import type { Locale } from "~/utils/i18n/config";
+import { getLocaleShortName, type Locale } from "~/utils/i18n/config";
 
 // --- JP ?raw import ---
 import jpEventCsvRaw from '~/data/jp/schedule/event.csv?raw';
@@ -31,12 +31,15 @@ import krMainstoryCsvRaw from '~/data/kr/schedule/mainstory.csv?raw';
 import krMinistoryCsvRaw from '~/data/kr/schedule/miniStory.csv?raw';
 import krPatchCsvRaw from '~/data/kr/schedule/patch.csv?raw';
 import type { GameServer } from "~/types/data";
-import { loadRaidInfosById } from "./loadRainInfo";
+import { loadRaidInfosById } from "./loadRaidInfo";
 
 
 const armorTypeTranslation = type_translation
 
 const MS_PER_HOUR = 1000 * 60 * 60;
+const JP_RAID_SEASON_EXIST_START = 47
+const KR_RAID_SEASON_EXIST_START = 15
+
 
 function convTitleLnag(locale: Locale) {
   if (locale == 'en') return 'titleEn'
@@ -53,7 +56,7 @@ export interface ScheduleItem {
 export type ScheduleTrack = 'raid' | 'event' | 'multifloor' | 'campaign' | 'pickup' | 'maintenance' | 'story' | 'patch' | 'misc';
 
 // CSV parsing helper (internal to file)
-function parseCsvString<T extends object>(csvString: string): T[] {
+export function parseCsvString<T extends object>(csvString: string): T[] {
   try {
     const parsed = Papa.parse<T>(csvString, {
       header: true, skipEmptyLines: true, dynamicTyping: true,
@@ -150,7 +153,7 @@ export async function loadScheduleData({ server, locale, i18n, tracksToLoad }: L
   if (tracksToLoadArray.includes('event')) {
     parseCsvString<any>(sources.event).forEach(item => {
       const eventInfo = (eventList as any)[(item.id % 10000)?.toString()];
-      const title = eventInfo?.[{ en: 'En', ja: 'Jp', ko: 'Kr' }[locale]] || item.name || `Event (ID: ${item.id})`;
+      const title = eventInfo?.[{ en: 'En', ja: 'Jp', ko: 'Kr', 'zh-Hant': 'Tw' }[locale]] || eventInfo?.[{ en: 'En', ja: 'Jp', ko: 'Kr' }['ja']] || item.name || `Event (ID: ${item.id})`;
       addItem('event', { id: `event-${item.id}`, type: 'event', startTime: item.openTime, endTime: item.closeTime, title: title, link: `/planner/event/${item.id}`, details: { rerun: item.rerun, studentId: item.studentId, prediction: !!item.prediction } });
     });
   }
@@ -163,10 +166,10 @@ export async function loadScheduleData({ server, locale, i18n, tracksToLoad }: L
         let title = `${item.boss}`;
         let details: any = { maxDifficulty: item.maxDifficulty, prediction: !!item.prediction };
         if (bossInfo) {
-          title = `${bossInfo.name[locale]}`;
+          title = `${bossInfo.name[getLocaleShortName(locale)]}`;
           details.terrain = bossInfo.teran;
           details.armorType = bossInfo.armorType;
-          details.armorName = (armorTypeTranslation as any)[bossInfo.armorType][locale] || bossInfo.armorType;
+          details.armorName = (armorTypeTranslation as any)[bossInfo.armorType][getLocaleShortName(locale)] || bossInfo.armorType;
         }
 
         // Time comparison for link logic is also performed using KST-parsed time (ms)
@@ -174,7 +177,13 @@ export async function loadScheduleData({ server, locale, i18n, tracksToLoad }: L
         const endMs = new Date(parseKST(item.endTime)).getTime();
 
         let link: string | undefined = undefined;
-        if (nowMs >= startMs && nowMs <= endMs && server == 'jp') {
+        if (server=='jp' && item.season < JP_RAID_SEASON_EXIST_START){
+          // nothing
+        }
+        else if (server=='kr' && item.season < KR_RAID_SEASON_EXIST_START){
+          // nothing
+        }
+        else if (nowMs >= startMs && nowMs <= endMs && server == 'jp') {
           link = '/live';
         } else if (nowMs > endMs) {
           link = `/dashboard/${server}/R${item.season}`;
@@ -191,7 +200,7 @@ export async function loadScheduleData({ server, locale, i18n, tracksToLoad }: L
     parseCsvString<any>(sources.eraid).forEach(item => {
       if (item.boss1) {
         const bossInfo = (bossData as any)[item.boss1.split('_')[0]];
-        const title = `${bossInfo.name[locale]}`;
+        const title = `${bossInfo.name[getLocaleShortName(locale)]}`;
         const terrain = item.boss1.split('_')[1];
         const bosses: any[] = [];
         const parseBossDetails = (bossString: string, difficulty: string) => {
@@ -201,7 +210,7 @@ export async function loadScheduleData({ server, locale, i18n, tracksToLoad }: L
           const armorType = parts[2];
           return {
             armorType: armorType,
-            armorName: (armorTypeTranslation as any)[armorType]?.[locale] || armorType,
+            armorName: (armorTypeTranslation as any)[armorType]?.[getLocaleShortName(locale)] || armorType,
             difficulty: difficulty
           };
         };
@@ -248,9 +257,9 @@ export async function loadScheduleData({ server, locale, i18n, tracksToLoad }: L
       const bossInfo = (bossData as any)[item.boss];
       let title = `${item.boss}`;
       if (bossInfo) {
-        title = bossInfo.name?.[locale]
+        title = bossInfo.name?.[getLocaleShortName(locale)]
       }
-      const armorKo = (armorTypeTranslation as any)[item.armorType]?.[locale] || item.armorType;
+      const armorKo = (armorTypeTranslation as any)[item.armorType]?.[getLocaleShortName(locale)] || item.armorType;
       addItem('multifloor', { id: `multifloor-${item.season}`, type: 'multifloor', startTime: item.startTime, endTime: item.endTime, title: `${title}`, details: { armorType: item.armorType, armorName: armorKo, prediction: !!item.prediction } });
     });
   }
@@ -363,7 +372,7 @@ export async function loadScheduleData({ server, locale, i18n, tracksToLoad }: L
         title: 'misc.shop-reset',
         details: { isPointEvent: true, prediction: false }
       });
-      // Add UTC timestamp to allStartTimes as well
+      // UTC timestamp to allStartTimes as well
       allStartTimes.push(resetTime.getTime());
       allEndTimes.push(resetTime.getTime() + MS_PER_HOUR);
 

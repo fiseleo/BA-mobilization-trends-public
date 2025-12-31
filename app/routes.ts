@@ -1,4 +1,4 @@
-import { type RouteConfig, index, route } from "@react-router/dev/routes";
+import { type RouteConfig, route } from "@react-router/dev/routes";
 
 export default [
     // index("routes/home.tsx"),
@@ -14,11 +14,14 @@ export default [
 
     route(":locale?/planner/event", "routes/planner/EventMainPage.tsx"),
     route(":locale?/planner/event/:eventId", "routes/planner/EventPage.tsx"),
-    route(":locale?/planner/students", "routes/planner/StudentPlannerPage.tsx"),
+    route(":locale?/planner/students", "routes/planner/Student.tsx"),
+    route(":locale?/planner/equipment", "routes/planner/Equipment.tsx"),
+    route(":locale?/planner/gacha", "routes/planner/Gacha.tsx"),
     route(":locale?/utils/jukebox", "routes/utils/jukebox.tsx"),
 
     route(":locale?/live", "routes/live/index.tsx"),
-    route("/api/locales/:lng/:ns", "routes/locales.ts"),
+    route("/api/locales/:lng/:ns", "routes/api/locales.ts"),
+    route("/api/contract", "routes/api/email.ts"),
     route(":locale?/calendar/:server?", "routes/calendar.tsx"),
 
     route("*", "routes/404.tsx"),

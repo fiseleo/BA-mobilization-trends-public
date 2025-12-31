@@ -1,5 +1,5 @@
 // app/components/planner/minigame/dreamMaker/DreamMakerInteractiveSimulator.tsx
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { EventData, IconData, MinigameDreamData, MinigameDreamParameter, MinigameDreamScheduleResult } from '~/types/plannerData';
 import type { DreamMakerSimConfig, DreamMakerSimResult } from './type';
 import { useTranslation } from 'react-i18next';

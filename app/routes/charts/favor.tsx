@@ -1,13 +1,13 @@
 
-import { data, useLoaderData, type LoaderFunctionArgs, type MetaFunction } from 'react-router';
-import { EmblemCounter } from '~/components/EmblemCounter'; // Fix path
+import { data, type LoaderFunctionArgs } from 'react-router';
+import { EmblemCounter } from '~/components/emblem/EmblemCounter'; // Fix path
 import { createLinkHreflang, createMetaDescriptor } from '~/components/head';
 
-import type { loader as rootLorder } from "~/root";
-import { DEFAULT_LOCALE, type Locale } from '~/utils/i18n/config';
+import { getLocaleShortName, type Locale } from '~/utils/i18n/config';
 import type { Route } from './+types/favor';
 import { getInstance } from '~/middleware/i18next';
 import type { AppHandle } from '~/types/link';
+import { cdn } from '~/utils/cdn';
 
 
 export async function loader({ context, params, request }: LoaderFunctionArgs) {
@@ -35,7 +35,7 @@ export async function loader({ context, params, request }: LoaderFunctionArgs) {
 
 export function meta({ loaderData }: Route.MetaArgs) {
   return createMetaDescriptor(
-    loaderData.title + ' - ' + loaderData.siteTitle,
+    loaderData.title + ' | ' + loaderData.siteTitle,
     loaderData.description,
     "/img/f.webp"
   )
@@ -43,17 +43,17 @@ export function meta({ loaderData }: Route.MetaArgs) {
 
 export const handle: AppHandle = {
   preload: (data) => {
-    const { eventId } = useLoaderData<typeof rootLorder>().params
+    // const { eventId } = useLoaderData<typeof rootLorder>().params
     return [
       {
         rel: 'preload',
-        href: `/schaledb.com/${data?.locale}.students.min.json`,
+        href: cdn(`/schaledb.com/${getLocaleShortName(data?.locale)}.students.min.json`),
         as: 'fetch',
         crossOrigin: 'anonymous',
       },
       {
         rel: 'preload',
-        href: `/w/students_portrait.json`,
+        href: cdn(`/w/students_portrait.json`),
         as: 'fetch',
         crossOrigin: 'anonymous',
       },

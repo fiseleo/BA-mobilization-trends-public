@@ -1,6 +1,7 @@
+import React from "react";
 import type { Student } from "~/types/data";
 import { StarRating } from "../StarRatingProps"
-import React, { useState } from "react";
+import { useState } from "react";
 import { useIsDarkState } from "~/store/isDarkState";
 import { useTranslation } from "react-i18next";
 
@@ -80,7 +81,7 @@ export const RankingChart = ({ svgWidth, containerRef, processedData, displayMod
         y: number;
     }>({ visible: false, content: '', x: 0, y: 0 });
     const { isDark } = useIsDarkState();
-    const { t, i18n } = useTranslation("charts", { keyPrefix: 'ranking' });
+    const { t } = useTranslation("charts", { keyPrefix: 'ranking' });
 
 
 

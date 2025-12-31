@@ -26,7 +26,7 @@ export const StudentIcon: React.FC<{ character?: Character, student?: Student, p
     return (
         <div
             ref={ref}
-            className="relative w-full flex flex-col items-center grow-0 shrink basis-14 min-w-10 cursor-pointer shadow-xl/10 rounded-sm"
+            className="relative w-full flex flex-col items-center grow-0 shrink basis-14 min-w-10 shadow-xl/10 rounded-sm"
             // onClick={() => setShowTooltip(!showTooltip)}
             onMouseEnter={() => setShowTooltip(true)}
             onFocus={() => setShowTooltip(true)}

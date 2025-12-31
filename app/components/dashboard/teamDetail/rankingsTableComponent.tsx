@@ -16,7 +16,6 @@ export const RankCard: React.FC<{
     server: GameServer
 }> = ({ entry, studentData, portraitData, raid, server }) => {
     return (
-        // Add lg:flex to make the card a flex container on large screens
         <div className="bg-white dark:bg-neutral-800 rounded-lg p-2 sm:p-0.75 shadow-md border border-neutral-200 dark:border-neutral-700 hover:border-teal-500 transition-colors sm:flex sm:items-center">
 
             {/* RANK & SCORE Section */}
@@ -52,7 +51,7 @@ export const RankCard: React.FC<{
             {/* Character Icons Section */}
             {/* This section becomes the main content area on the right */}
             <div className="space-y-1 flex flex-col items-center w-full sm:w-auto sm:flex-1 gap-y-3  sm:py-4" >
-                {entry.t.map((team, i) => (
+                {entry?.t?.map((team, i) => (
                     <div key={i} className="flex flex-row items-center justify-center w-full gap-x-2">
                         {team.m.map((c, j) => <StudentIcon key={`${i}-m-${c?.id}-${j}`} character={c} student={studentData[c?.id]} portraitData={portraitData} />)}
                         <div className="shrink-0 text-2xl mx-0 sm:mx-1 text-neutral-400 dark:text-neutral-500">|</div>
@@ -77,6 +76,7 @@ export const RankingsTableComponent: React.FC<{
     handleScrollToTop: () => void,
 }> = ({ detailedFilteredData, currentPage, itemsPerPage, studentData, portraitData, paginatedData, showRank, activeRange, raidInfo, server, handlePageChange, handleItemsPerPageChange, handleLoadMore, handleScrollToTop }) => (
     <>
+        <Pagination currentPage={currentPage} totalItems={detailedFilteredData.length} itemsPerPage={itemsPerPage} showmoreBtn={false} onPageChange={handlePageChange} onItemsPerPageChange={handleItemsPerPageChange} onLoadMore={handleLoadMore} onScrollToTop={handleScrollToTop} />
         <div className="grid grid-cols-1 gap-4">
             {paginatedData.length > 0 ? (
                 paginatedData.map((entry, i) => (
@@ -94,6 +94,6 @@ export const RankingsTableComponent: React.FC<{
                 <p className="text-center text-gray-500 pt-10">No data</p>
             )}
         </div>
-        <Pagination currentPage={currentPage} totalItems={detailedFilteredData.length} itemsPerPage={itemsPerPage} onPageChange={handlePageChange} onItemsPerPageChange={handleItemsPerPageChange} onLoadMore={handleLoadMore} onScrollToTop={handleScrollToTop} />
+        <Pagination currentPage={currentPage} totalItems={detailedFilteredData.length} itemsPerPage={itemsPerPage} showmoreBtn={true} onPageChange={handlePageChange} onItemsPerPageChange={handleItemsPerPageChange} onLoadMore={handleLoadMore} onScrollToTop={handleScrollToTop} />
     </>
 );

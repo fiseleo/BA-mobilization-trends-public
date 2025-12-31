@@ -1,5 +1,5 @@
 // app/components/planner/minigame/DiceRacePlanner.tsx
-import React, { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { ItemIcon } from '../common/Icon';
 import type { EventData, IconData } from '~/types/plannerData';
 import { useEventSettings } from '~/store/planner/useSettingsStore';
@@ -170,7 +170,7 @@ const runSimulation = (
 
 export const DiceRacePlanner = ({ eventId, eventData, iconData, onCalculate, remainingCurrency }: DiceRacePlannerProps) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const { plan,
+    const {
         setDiceRaceSimConfig: setSimConfig,
         diceRaceSimConfig: simConfig,
     } = usePlanForEvent(eventId);

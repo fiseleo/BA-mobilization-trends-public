@@ -1,5 +1,5 @@
 // src/components/FarmingPlanner.tsx
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { useMemo, useCallback, useEffect } from 'react';
 import { ItemIcon } from './common/Icon';
 import type { EventData, IconData, Mission, Stage } from '~/types/plannerData';
 import { usePlanForEvent } from '~/store/planner/useEventPlanStore';
@@ -309,7 +309,7 @@ export const FarmingPlanner = ({
     }
 
     // --- 2. Create a matrix to pass to the solver ---
-    const stageMap = new Map(optimizableStages.map((s, i) => [s.Id, i]));
+    // const stageMap = new Map(optimizableStages.map((s, i) => [s.Id, i]));
     const itemMap = new Map(neededItemIds.map((id, i) => [id, i]));
 
     const numStages = optimizableStages.length;
@@ -523,12 +523,12 @@ export const FarmingPlanner = ({
 
             <div className="divide-y dark:divide-neutral-600">
               {farmingStages.map(s => {
-                const totalEventItems = s.EventContentStageReward.filter(r => (['Event', 'Default', 'Rare'].includes(r.RewardTagStr)) && eventData.currency.some(c => c.ItemUniqueId === r.RewardId)).reduce((sum, r) => sum + r.RewardAmount * r.RewardProb / 10000, 0);
-                const efficiency = s.StageEnterCostAmount > 0 ? totalEventItems / s.StageEnterCostAmount : 0;
+                // const totalEventItems = s.EventContentStageReward.filter(r => (['Event', 'Default', 'Rare'].includes(r.RewardTagStr)) && eventData.currency.some(c => c.ItemUniqueId === r.RewardId)).reduce((sum, r) => sum + r.RewardAmount * r.RewardProb / 10000, 0);
+                // const efficiency = s.StageEnterCostAmount > 0 ? totalEventItems / s.StageEnterCostAmount : 0;
                 const currentPrio = stagePrio[s.Id] || 'include';
                 const btnInfo = prioButtonInfo[currentPrio];
 
-                const firstClearRewards = s.EventContentStageReward.filter(r => !['Event', 'Default', 'Rare'].includes(r.RewardTagStr));
+                // const firstClearRewards = s.EventContentStageReward.filter(r => !['Event', 'Default', 'Rare'].includes(r.RewardTagStr));
                 const repeatableRewards = s.EventContentStageReward.filter(r => ['Event', 'Default', 'Rare'].includes(r.RewardTagStr)
                   // && r.RewardParcelTypeStr !== 'GachaGroup'
                 );

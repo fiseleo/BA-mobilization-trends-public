@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { ChevronIcon } from "../Icon";
 
 export const Card: React.FC<{

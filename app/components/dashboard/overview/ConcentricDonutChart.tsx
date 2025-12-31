@@ -1,8 +1,8 @@
 // app/components/dashboard/ConcentricDonutChart.tsx
 
-import React, { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
+import { ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { getDifficultyFromScoreAndBoss } from '~/components/Difficulty';
 import { calculateTimeFromScore, getTimeoutFromBoss } from '~/utils/calculateTimeFromScore';
 import type { GameServer } from '~/types/data';
@@ -186,9 +186,9 @@ export function ConcentricDonutChartItem({ boss, server, id, scores, tierCounter
     };
 
     const handleMouseEnter = (data: ChartData, event: React.MouseEvent, fill: string) => {
-        const name = data.timeBinName || data.name;
-        const value = data.value;
-        const percent = data.percent;
+        // const name = data.timeBinName || data.name;
+        // const value = data.value;
+        // const percent = data.percent;
 
 
 

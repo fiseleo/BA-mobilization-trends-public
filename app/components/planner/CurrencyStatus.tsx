@@ -1,6 +1,6 @@
 // src/components/CurrencyStatus.tsx
 
-import React, { useState, type RefObject } from 'react';
+import { useState } from 'react';
 import { ItemIcon } from './common/Icon';
 import type { EventData, IconData } from '~/types/plannerData';
 import { getLocalizeEtcName } from './common/locale';

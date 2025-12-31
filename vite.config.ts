@@ -40,6 +40,7 @@ export default defineConfig(({ isSsrBuild }) => ({
   ],
   // include: ['react-helmet-async'],
   ssr: {
+    noExternal: ['posthog-js', '@posthog/react']
   },
   build: {
     sourcemap: false,

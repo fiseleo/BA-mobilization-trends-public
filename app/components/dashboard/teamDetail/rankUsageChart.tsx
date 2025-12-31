@@ -1,8 +1,8 @@
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useIsDarkState } from "~/store/isDarkState";
-import { getBackgroundRatingColor, getCharacterStarValue, type Character, type PortraitData, type ReportEntry, type StudentData } from "../common";
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, Label, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { getBackgroundRatingColor, getCharacterStarValue, type Character, type PortraitData, type ReportEntryRank, type StudentData } from "../common";
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { StarRating } from "~/components/StarRatingProps";
 import { StudentIcon } from "../studentIcon";
 
@@ -17,13 +17,15 @@ const getColorForString = (str: string, is_etc: boolean) => {
 };
 
 
-export const RankUsageChart: React.FC<{ data: ReportEntry[], studentData: StudentData, portraitData: PortraitData }> = ({ data, studentData, portraitData }) => {
+export const RankUsageChart: React.FC<{ data: ReportEntryRank[], studentData: StudentData, portraitData: PortraitData }> = ({ data, studentData, portraitData }) => {
     const [selectedCharId, setSelectedCharId] = useState<number | null>(null);
     const [activeIndex, setActiveIndex] = useState<number | null | string>(null);
     const { isDark } = useIsDarkState();
-    const startRank = data[0].r
+    const startRank = data[0].typeRanking
     const { t } = useTranslation("dashboard");
     const { t: t_c } = useTranslation("common");
+
+    console.log('[RankUsageChart] data', data)
 
 
     // --- Data Processing ---
@@ -36,7 +38,7 @@ export const RankUsageChart: React.FC<{ data: ReportEntry[], studentData: Studen
         const buckets = new Map<number, { total: number, students: Map<string, number> }>();
 
         data.forEach(entry => {
-            const bucketStart = Math.floor((entry.r - 1) / bucketSize) * bucketSize + 1;
+            const bucketStart = Math.floor((entry.typeRanking - 1) / bucketSize) * bucketSize + 1;
             if (!buckets.has(bucketStart)) buckets.set(bucketStart, { total: 0, students: new Map() });
 
             const bucket = buckets.get(bucketStart)!;
@@ -83,11 +85,11 @@ export const RankUsageChart: React.FC<{ data: ReportEntry[], studentData: Studen
     const singleCharChartData = useMemo(() => {
         // This calculation runs only when a character IS selected
         if (selectedCharId === null || data.length === 0) return [];
-        const maxRank = data[data.length - 1]?.r || 0;
+        const maxRank = data[data.length - 1]?.typeRanking || 0;
         const bucketSize = Math.max(50, Math.ceil(maxRank / 1000) * 10 || 1);
         const buckets = new Map<number, { total: number, stars: Map<number, number> }>();
         data.forEach(entry => {
-            const bucketStart = Math.floor((entry.r - 1) / bucketSize) * bucketSize + 1;
+            const bucketStart = Math.floor((entry.typeRanking - 1) / bucketSize) * bucketSize + 1;
             if (!buckets.has(bucketStart)) buckets.set(bucketStart, { total: 0, stars: new Map() });
             const bucket = buckets.get(bucketStart)!;
             bucket.total++;
@@ -126,7 +128,7 @@ export const RankUsageChart: React.FC<{ data: ReportEntry[], studentData: Studen
     const cardTitle = (
         <div className="flex justify-between items-center w-full">
             <span>
-                {selectedCharId ? `IN ${data[0].r} - ${data[data.length - 1].r} - ${studentData[selectedCharId]?.Name}` : `IN ${data[0].r} - ${data[data.length - 1].r}`}
+                {selectedCharId ? `IN ${data[0].typeRanking} - ${data[data.length - 1].typeRanking} - ${studentData[selectedCharId]?.Name}` : `IN ${data[0].typeRanking} - ${data[data.length - 1].typeRanking}`}
             </span>
             {selectedCharId && (
                 <button onClick={() => setSelectedCharId(null)} className="text-sm bg-neutral-600 px-3 py-1 rounded hover:bg-neutral-500 text-neutral-100">

@@ -1,4 +1,4 @@
-studentId,name,startTime,endTime,rerun,limited,fast
+studentId,name,startTime,endTime,rerun,limited,fast,prediction
 23006,Shizuko,2021-02-25 14:30,2021-03-11 12:00,false,false,false
 10014,Izuna,2021-02-25 14:30,2021-03-11 12:00,false,false,false
 10002,Haruna,2021-03-11 12:30,2021-03-18 12:00,false,false,false
@@ -182,7 +182,8 @@ studentId,name,startTime,endTime,rerun,limited,fast
 20029,Mimori (Swimsuit),2023-08-16 11:00,2023-08-23 10:59,false,false,false
 10046,Izuna (Swimsuit),2023-08-16 11:00,2023-08-23 10:59,true,true,false
 10047,Chise (Swimsuit),2023-08-16 11:00,2023-08-23 10:59,true,true,false
-10075,MeruMomiji,2023-08-23 11:00,2023-09-06 10:59,false,false,false
+13013,Momiji,2023-08-23 11:00,2023-09-06 10:59,false,false,false
+10075,Meru,2023-08-23 11:00,2023-09-06 10:59,false,false,false
 10017,Cherino,2023-08-23 11:00,2023-09-06 10:59,true,false,false
 10037,Marina,2023-08-23 11:00,2023-09-06 10:59,true,false,false
 10076,Kotori (Cheerleader),2023-09-06 11:00,2023-09-15 10:59,false,false,false
@@ -314,7 +315,7 @@ studentId,name,startTime,endTime,rerun,limited,fast
 10081,Yukari,2024-10-16 11:00,2024-10-23 10:59,true,false,false
 10082,Renge,2024-10-16 11:00,2024-10-23 10:59,true,false,false
 10083,Kikyou,2024-10-16 11:00,2024-10-23 10:59,true,false,false
-23008,Mari (Idol),2024-10-23 11:00,2024-11-06 10:59,false,true,false
+10105,Mari (Idol),2024-10-23 11:00,2024-11-06 10:59,false,true,false
 10106,Sakurako (Idol),2024-10-23 11:00,2024-11-06 10:59,false,true,false
 10036,Hinata,2024-11-06 11:00,2024-11-13 10:59,true,false,false
 10048,Saori,2024-11-06 11:00,2024-11-13 10:59,true,false,false
@@ -431,3 +432,24 @@ studentId,name,startTime,endTime,rerun,limited,fast
 10038,,2025-11-05 11:00,2025-11-12 10:59,true,false,false
 20014,,2025-11-05 11:00,2025-11-12 10:59,true,false,false
 20018,,2025-11-05 11:00,2025-11-12 10:59,true,false,false
+10130,,2025-11-12 11:00,2025-11-19 10:59,false,false,false
+10073,,2025-11-12 11:00,2025-11-19 10:59,true,true,false
+20028,,2025-11-12 11:00,2025-11-19 10:59,true,true,false
+10068,,2025-11-12 11:00,2025-11-19 10:59,true,false,false
+10058,,2025-11-12 11:00,2025-11-19 10:59,true,false,false
+10131,,2025-11-19 11:00,2025-12-03 10:59,false,false,false
+20052,,2025-11-19 11:00,2025-12-03 10:59,false,false,false
+10105,Mari (Idol),2025-12-03 11:00,2025-12-17 10:59,true,true,false
+10106,Sakurako (Idol),2025-12-03 11:00,2025-12-17 10:59,true,true,false
+10049,Kazusa,2025-12-03 11:00,2025-12-17 10:59,true,false,false
+10065,Kaho,2025-12-03 11:00,2025-12-17 10:59,true,false,false
+13013,Momiji,2025-12-17 11:00,2025-12-24 10:59,true,false,false
+10075,Meru,2025-12-17 11:00,2025-12-24 10:59,true,false,false
+20026,Minori,2025-12-17 11:00,2025-12-24 10:59,true,false,false
+20031,Shigure (Hot Spring),2025-12-17 11:00,2025-12-24 10:59,true,false,false
+20036,Serika (Swimsuit),2025-12-17 11:00,2025-12-24 10:59,true,false,false
+10132,Tsukuyo (Dress),2025-12-24 11:00,2026-01-07 10:59,false,false,false
+20053,Machiru (Dress),2025-12-24 11:00,2026-01-07 10:59,false,false,false
+10033,Wakamo,2025-12-31 11:00,2026-01-07 10:59,true,true,false
+10045,Hoshino (Swimsuit),2025-12-31 11:00,2026-01-07 10:59,true,true,false
+10059,Mika,2025-12-31 11:00,2026-01-07 10:59,true,true,false

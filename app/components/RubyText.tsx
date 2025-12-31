@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 
 // Define the shape of the props for type safety
 interface RubyTextProps {

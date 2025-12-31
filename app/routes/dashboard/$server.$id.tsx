@@ -1,10 +1,10 @@
 // app/routes/dashboard.$server.$id.tsx
 
-import { useLoaderData, type LoaderFunctionArgs, data, type MetaFunction, useLocation, useSearchParams } from "react-router";
+import { useLoaderData, type LoaderFunctionArgs, data, useLocation, useSearchParams } from "react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { GAMESERVER_LIST, type FullData, type GameServer, type RaidInfo, type Student } from "~/types/data";
-import { loadRaidInfosById } from "~/utils/loadRainInfo";
+import { GAMESERVER_LIST, type FullData, type GameServer, type Student } from "~/types/data";
+import { loadRaidInfosById } from "~/utils/loadRaidInfo";
 import { isTotalAssault, type PortraitData, type ReportEntry, type ReportEntryRank, type StudentData } from "~/components/dashboard/common";
 import type { loader as rootLorder } from "~/root";
 import { HiOutlineChartPie, HiOutlineUsers } from "react-icons/hi2"; // Icon example
@@ -13,7 +13,7 @@ import { HiOutlineChartPie, HiOutlineUsers } from "react-icons/hi2"; // Icon exa
 import RaidHeader from "~/components/dashboard/RaidHeader";
 import { getMostDifficultLevel, type_translation, typecolor } from "~/components/raidToString";
 import DashboardUI from "~/components/dashboard/dashboardUI";
-import { type Locale } from "~/utils/i18n/config";
+import { getLocaleShortName, type Locale } from "~/utils/i18n/config";
 import { createLinkHreflang, createMetaDescriptor } from "~/components/head";
 import type { AppHandle } from "~/types/link";
 import { useDataCacheJson } from "~/utils/useDataCacheJson";
@@ -21,16 +21,18 @@ import OverviewDashboardUI from "~/components/dashboard/OverviewDashboardUI";
 import TierSummary from "~/components/dashboard/TierSummary";
 import { getInstance } from "~/middleware/i18next";
 import type { Route } from "./+types/$server.$id";
+import { cdn } from "~/utils/cdn";
 
 export function meta({ loaderData }: Route.MetaArgs) {
 
     const raidInfo = loaderData.raidInfos[0]//loadRaidInfo(server, locale, params.id || '', params.type || '')
     if (raidInfo) {
         const raid = raidInfo
-        const bosaType = raid.Type ? type_translation[raid.Type][loaderData.locale] : undefined
+        // const bosaType = raid.Type ? type_translation[raid.Type][loaderData.locale] : undefined
         const raidType = loaderData.raidType
         return createMetaDescriptor(
-            `[${raid.Id.replace(/\w/, 'S')}] ${raidType} ${raid.Boss} ${raid.Location}${bosaType ? ' ' + bosaType : ''}` + ' - ' + loaderData.title,
+            // `${raid.Id.replace(/\w/, 'S')} ${raidType} ${raid.Boss} ${raid.Location}${/*bosaType ? ' ' + bosaType :*/ ''} ${loaderData.title}` + ' - ' + loaderData.siteTitle,
+            `${raid.Id.replace(/\w/, 'S')} ${raid.Boss} ${raid.Location} - ${raidType} ${loaderData.title}` + ' | ' + loaderData.siteTitle,
             loaderData.description,
             "/img/3.webp"
         )
@@ -60,7 +62,7 @@ export const handle: AppHandle = {
         if (!raidInfos || !id || !raidInfos.length) return []
         const isRaid = isTotalAssault(raidInfos[0])
 
-        const raidDataUrl = isRaid ? `/w/${server}/raid/${id.replace(/\w/, '')}.bin` : `/w/${server}/eraid/${id.replace(/\w/, '')}-${raidInfos[0].Type}.bin`
+        const raidDataUrl = isRaid ? cdn(`/w/${server}/raid/${id.replace(/\w/, '')}.bin`) : cdn(`/w/${server}/eraid/${id.replace(/\w/, '')}-${raidInfos[0].Type}.bin`)
         return [
             {
                 rel: "preload",
@@ -70,13 +72,13 @@ export const handle: AppHandle = {
             },
             {
                 rel: 'preload',
-                href: `/w/${data?.locale}.students.bin`,
+                href: cdn(`/w/${getLocaleShortName(data?.locale)}.students.bin`),
                 as: 'fetch',
                 crossOrigin: 'anonymous',
             },
             {
                 rel: 'preload',
-                href: `/fulldata/${server}/${id}.bin`,
+                href: cdn(`/fulldata/${server}/${id}.bin`),
                 as: 'fetch',
                 crossOrigin: 'anonymous',
             },
@@ -120,8 +122,9 @@ export async function loader({ context, params, request }: LoaderFunctionArgs) {
 
     return data({
         locale,
-        title: i18n.t("dashboardIndex:title"),
+        title: i18n.t("dashboard:shorttitle"),
         description: i18n.t("dashboard:description1"),
+        siteTitle: i18n.t("home:title"),
         raidType: isRaid ? i18n.t('common:raid') : i18n.t('common:eraid'),
         raidInfos,
         server: server as GameServer,
@@ -164,10 +167,10 @@ export default function RaidDetailsPage() {
     const { t } = useTranslation('dashboard');
     const locale = i18n.language as Locale;
 
-    const filteredRaidInfo = raidInfos.filter(v => v.Cnt.Torment)
-    const initType = filteredRaidInfo.length ? filteredRaidInfo[0].Type : raidInfos[0].Type
+    // const filteredRaidInfo = raidInfos.filter(v => v.Cnt.Torment)
+    // const initType = filteredRaidInfo.length ? filteredRaidInfo[0].Type : raidInfos[0].Type
     // JFD tab state
-    const [activeType, setActiveType] = useState<string>(initType || '');
+    // const [activeType, setActiveType] = useState<string>(initType || '');
     // Data caching and state
     const [cachedData, setCachedData] = useState<Record<string, ReportEntryRank[]>>({});
     const [studentData, setStudentData] = useState<StudentData>({});
@@ -186,10 +189,8 @@ export default function RaidDetailsPage() {
     useEffect(() => {
         setLoading(true)
         Promise.all([
-            // fetchStudents(`/w/${locale}.students.bin`, res => res.json()),
-            // fetch('/w/students_portrait.json').then(res => res.json()),
-            fetchStudents(`/w/${locale}.students.bin`),
-            fetch('/w/students_portrait.json').then(res => res.json()),
+            fetchStudents(cdn(`/w/${getLocaleShortName(locale)}.students.bin`)),
+            fetch(cdn('/w/students_portrait.json')).then(res => res.json()),
         ]).then(([studentJson, portraitJson]) => {
             setStudentData(studentJson);
             setPortraitData(portraitJson);
@@ -203,7 +204,7 @@ export default function RaidDetailsPage() {
         Promise.all([
             // fetch(`/fulldata/${server}/${id}.json`).then(res => res.json())
             // fetchFullData(`/fulldata/${server}/${id}.bin`, res => res.json()),
-            fetchFullData(`/fulldata/${server}/${id}.bin`),
+            fetchFullData(cdn(`/fulldata/${server}/${id}.bin`)),
         ]).then(([data]) => {
             const newdata = { rank: new Int32Array(), tier_counter: {} } as FullData
 
@@ -245,8 +246,8 @@ export default function RaidDetailsPage() {
         if (!raidInfo) return;
 
         const raidDataUrl = isGrandAssault
-            ? `/w/${server}/eraid/${raidInfo.Id.replace(/\w/, '')}-${raidInfo.Type}.bin`
-            : `/w/${server}/raid/${raidInfo.Id.replace(/\w/, '')}.bin`;
+            ? cdn(`/w/${server}/eraid/${raidInfo.Id.replace(/\w/, '')}-${raidInfo.Type}.bin`)
+            : cdn(`/w/${server}/raid/${raidInfo.Id.replace(/\w/, '')}.bin`);
 
         setDashboardLoading(true);
         fetchRaidData(raidDataUrl)
@@ -282,7 +283,6 @@ export default function RaidDetailsPage() {
     };
 
     const setActiveTab = (tab: string) => {
-        console.log('setActiveTab', tab)
         // Prevent changing to a disabled tab (&#39;All&#39; in detail view). (Already handled in JSX, but as a double defense)
         if (mainView === 'detail' && tab === 'All') {
             return;
@@ -320,7 +320,7 @@ export default function RaidDetailsPage() {
         }
         // JFD (if not allType)
         if (activeTab !== 'All' && type_translation[activeTab as keyof typeof type_translation]) {
-            return type_translation[activeTab as keyof typeof type_translation][locale];
+            return type_translation[activeTab as keyof typeof type_translation][getLocaleShortName(locale)];
         }
         // Others (All, etc.)
         return '';
@@ -376,7 +376,7 @@ export default function RaidDetailsPage() {
 
             {/* --- Step 2: Boss Attribute Tabs (JFD only) --- */}
             {isGrandAssault && (
-                <div className="flex justify-center flex-wrap gap-3 px-4 pt-2 pb-5">
+                <div className="flex justify-center flex-wrap gap-3 px-4 pt-2 sm:pb-5 pb-3">
                     {grandAssaultTabs.map((tab) => {
                         const raidInfoForTab = raidInfos.find(r => r.Type === tab);
                         const isTotalTab = tab === 'All';
@@ -387,7 +387,7 @@ export default function RaidDetailsPage() {
                                 key={tab}
                                 onClick={() => !isDisabled && setActiveTab(tab)}
                                 disabled={isDisabled}
-                                className={`px-5 py-2.5 text-sm font-semibold rounded-lg transition-all ${activeTab === tab
+                                className={`sm:px-5 px-3.5 sm:py-2.5 py-1.5 text-sm font-semibold rounded-lg transition-all ${activeTab === tab
                                     ? 'text-white shadow-lg'
                                     : 'text-gray-600 dark:text-neutral-300 bg-gray-200 dark:bg-neutral-800'
                                     } ${isDisabled
@@ -402,7 +402,7 @@ export default function RaidDetailsPage() {
                                 ) : (
                                     <div className="flex flex-col items-center justify-center text-center leading-tight">
                                         <span className="font-semibold">
-                                            {type_translation[tab as keyof typeof type_translation][locale]}
+                                            {type_translation[tab as keyof typeof type_translation][getLocaleShortName(locale)]}
                                         </span>
                                         {raidInfoForTab && (
                                             <span className={`mt-1 text-xs  dark:text-neutral-400 ${activeTab === tab ? 'text-neutral-200' : 'text-neutral-500'}`}>

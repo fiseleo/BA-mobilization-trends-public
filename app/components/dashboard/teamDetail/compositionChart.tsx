@@ -89,16 +89,21 @@ export const CompositionChart: React.FC<{
         if (analysisUnit === 'report') {
             totalEntries = data.length;
             data.forEach(entry => {
-                const charSet = new Set<number>();
-                entry.t.forEach(team => [...team.m, ...team.s].filter(c => c).forEach(char => charSet.add(char.id)));
+                // const charSet = new Set<number>();
+                // entry.t.forEach(team => [...team.m, ...team.s].filter(c => c).forEach(char => charSet.add(char.id)));
 
-                const sortedIds = Array.from(charSet).sort((a, b) => a - b);
+                // const sortedIds = Array.from(charSet).sort((a, b) => a - b);
+                const sortedIds:number[] = []
+                for (const team of entry.t){
+                    const sortedPartyIds = Array.from([...team.m, ...team.s].filter(c => c).map(c=>c.id)).sort((a, b) => a - b);
+                    for (const item of sortedPartyIds) sortedIds.push(item)
+                }
                 if (sortedIds.length === 0) return;
 
                 const key = JSON.stringify(sortedIds);
                 const current = comps.get(key) || { ids: sortedIds, count: 0, ranks: [] };
                 current.count++;
-                current.ranks.push(entry.r);
+                current.ranks.push(entry.typeRanking||entry.r);
                 comps.set(key, current);
             });
         } else {
@@ -120,7 +125,7 @@ export const CompositionChart: React.FC<{
             });
         }
 
-        const validTotal = totalEntries > 0 ? totalEntries : 1;
+        // const validTotal = totalEntries > 0 ? totalEntries : 1;
         return Array.from(comps.entries())
             .sort((a, b) => b[1].count - a[1].count)
             // .filter(([, v]) => v.count > 10)
@@ -216,9 +221,9 @@ export const CompositionChart: React.FC<{
                     >
 
                         <div className="grid grid-cols-6 gap-1">
-                            {comp.ids.map(id => (
+                            {comp.ids.map((id, index) => (
                                 <StudentIcon
-                                    key={id}
+                                    key={id*1e5 + index}
                                     character={{ id } as Character}
                                     student={studentData[id]}
                                     portraitData={portraitData}

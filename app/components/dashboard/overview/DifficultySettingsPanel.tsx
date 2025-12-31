@@ -1,6 +1,6 @@
 // app/components/dashboard/DifficultySettingsPanel.tsx
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { difficultyInfo, type DifficultyName } from '~/components/Difficulty';
 

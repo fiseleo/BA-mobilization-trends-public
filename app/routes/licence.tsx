@@ -1,6 +1,9 @@
-import { data, type LoaderFunctionArgs, type MetaFunction } from "react-router";
+import { data, type LoaderFunctionArgs } from "react-router";
 import { getInstance } from "~/middleware/i18next";
 import type { Route } from "./+types/licence";
+import ContactButton from "~/components/ContactButton";
+import { issuesURL } from '~/data/livedataServer.json'
+
 
 export async function loader({ context }: LoaderFunctionArgs) {
     let i18n = getInstance(context);
@@ -66,25 +69,26 @@ const LicencePage = () => {
                         <li><b>S77-S80:</b> <a href="https://www.plana-stats.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Plana Stats</a></li>
                         <li><b>S81:</b> Provided by an anonymous data contributor</li>
                         <li><b>S82:</b> <a href="https://www.plana-stats.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Plana Stats</a></li>
+                        <li><b>S83:</b> Provided by an anonymous data contributor</li>
 
                     </ul>
                     <h3 className="text-lg font-semibold text-neutral-700 dark:text-neutral-200 mt-6 mb-2">Japan Server Total Assault Teams</h3>
                     <ul className="list-disc list-inside space-y-2 text-neutral-600 dark:text-neutral-400 pl-2">
-                        <li><b>S47-S80:</b> <a href="https://arona.ai/raidreport" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Arona.AI Total Assault Report</a></li>
-                        <li><b>S81-S82:</b> <a href="https://www.plana-stats.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Plana Stats</a></li>
+                        <li><b>S47-S79:</b> <a href="https://arona.ai/raidreport" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Arona.AI Total Assault Report</a></li>
+                        <li><b>S80-S84:</b> <a href="https://www.plana-stats.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Plana Stats</a></li>
                     </ul>
                     <h3 className="text-lg font-semibold text-neutral-700 dark:text-neutral-200 mt-6 mb-2">Japan Server Grand Assault Overall</h3>
                     <ul className="list-disc list-inside space-y-2 text-neutral-600 dark:text-neutral-400 pl-2">
 
                         <li><b>S1-S21:</b> <a href="https://storage.googleapis.com/info.herdatasam.me" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Someone's Google Storage API</a></li>
                         <li><b>S22-S25:</b> <a href="https://www.plana-stats.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Plana Stats</a></li>
-                        <li><b>S26-S27:</b> Provided by an anonymous data contributor</li>
+                        <li><b>S26-S28:</b> Provided by an anonymous data contributor</li>
                     </ul>
                     <h3 className="text-lg font-semibold text-neutral-700 dark:text-neutral-200 mt-6 mb-2">Japan Server Grand Assault Teams</h3>
                     <ul className="list-disc list-inside space-y-2 text-neutral-600 dark:text-neutral-400 pl-2">
-                        <li><b>S1-S24:</b> <a href="https://arona.ai/eraidreport" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Arona.AI Grand Assault Report</a></li>
+                        <li><b>S1-S23:</b> <a href="https://arona.ai/eraidreport" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Arona.AI Grand Assault Report</a></li>
 
-                        <li><b>S25-S27:</b> <a href="https://www.plana-stats.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Plana Stats</a></li>
+                        <li><b>S24-S28:</b> <a href="https://www.plana-stats.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Plana Stats</a></li>
                     </ul>
 
                     <h3 className="text-lg font-semibold text-neutral-700 dark:text-neutral-200 mt-6 mb-2">Japan Server Assault Live Data</h3>
@@ -125,7 +129,7 @@ const LicencePage = () => {
                         </li>
                         <li>
                             Title & Composer:<br />
-                            <a href="https://bluearchive.wiki/wiki/Music/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Blue Archive Wiki</a>
+                            <a href="https://bluearchive.wiki/wiki/Music" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Blue Archive Wiki</a>
                         </li>
                         <li>
                             Music Video:<br />
@@ -148,6 +152,7 @@ const LicencePage = () => {
                         <li><a href="https://bluearchive-torment.netlify.app/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">BA Torment</a></li>
                         <li><a href="https://hina.loves.midokuni.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Hina Loves Midokuni</a></li>
                         <li><a href="https://www.souriki-border.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">そうりきボーダー</a></li>
+                        <li><a href="https://mollulog.net/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">몰루로그</a></li>
                         <li>and various source codes found on GitHub.</li>
                     </ul>
                 </section>
@@ -165,10 +170,22 @@ const LicencePage = () => {
                     </ul>
                 </section>
 
+                {/* Section: Data Collection Tools */}
+                <section className="mt-10 mb-10">
+                    <h2 className="text-2xl font-bold text-neutral-800 dark:text-white mb-4">3rd Party Data Collection</h2>
+                    <ul className="list-disc list-inside space-y-2 text-neutral-600 dark:text-neutral-400 mt-4 pl-2">
+                        <li><a href="https://vercel.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Vercel</a>: Server Hosting</li>
+                        <li><a href="https://github.com/vercel/analytics" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Vercel Analytics</a>: Tracks site performance.</li>
+                        <li><a href="https://www.cloudflare.com/developer-platform/products/r2/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Cloudflare R2</a>: Used for asset storage.</li>
+                        <li><a href="https://posthog.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">PostHog</a>: Provides user analytics and tracking. Cookies are disabled.</li>
+                    </ul>
+                </section>
+
                 <section className="mt-10 mb-10">
                     <h2 className="text-2xl font-bold text-neutral-800 dark:text-white mb-4">Bug Reports & Contact</h2>
                     <ul className="list-disc list-inside space-y-1 text-neutral-600 dark:text-neutral-400 pl-2">
-                        <li>Please report to <a href="https://github.com/bluekiseki/BA-mobilization-trends-public/issues" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Github issues</a>.</li>
+                        <li>Please report to <a href={issuesURL} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Github issues</a></li>
+                        <li>or <a className='text-blue-500 hover:underline'><ContactButton>Email</ContactButton></a></li>
                     </ul>
                 </section>
             </div>

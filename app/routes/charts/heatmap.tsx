@@ -3,20 +3,20 @@ import { useTranslation } from 'react-i18next';
 import ClientHeatmapLoader from '~/components/heatmap/ClientHeatmapLoader';
 
 import type { Route } from './+types/heatmap';
-import { useLocation, useParams, type LoaderFunctionArgs, type MetaFunction } from 'react-router'; // useRouteLoaderData, type LoaderFunctionArgs,
+import { useLocation, useParams, type LoaderFunctionArgs } from 'react-router'; // useRouteLoaderData, type LoaderFunctionArgs,
 import type { AppHandle } from '~/types/link';
-import type { loader as rootLorder } from "~/root";
-import { DEFAULT_LOCALE } from "~/utils/i18n/config";
 import { createLinkHreflang, createMetaDescriptor } from '~/components/head';
 
 import { GAMESERVER_LIST, type GameServer, type GameServerParams } from '~/types/data';
 import { getInstance } from '~/middleware/i18next';
+import { cdn } from '~/utils/cdn';
+import { getLocaleShortName } from '~/utils/i18n/config';
 
 export const links: Route.LinksFunction = () => {
   return [
     {
       rel: "preload",
-      href: `/w/students_portrait.json`,
+      href: cdn(`/w/students_portrait.json`),
       crossOrigin: "anonymous",
       as: "fetch"
     },
@@ -57,7 +57,7 @@ export async function loader({ context, params, request }: LoaderFunctionArgs) {
 //   const t_heatmap = i18n.getFixedT(locale, undefined, 'charts.heatmap');
 export function meta({ loaderData }: Route.MetaArgs) {
   return createMetaDescriptor(
-    loaderData.title + ' - ' + loaderData.siteTitle,
+    loaderData.title + ' | ' + loaderData.siteTitle,
     loaderData.description,
     "/img/2.webp"
   )
@@ -76,13 +76,13 @@ export const handle: AppHandle = {
     return [
       {
         rel: 'preload',
-        href: `/w/${data?.locale}.students.bin`,
+        href: cdn(`/w/${getLocaleShortName(data?.locale)}.students.bin`),
         as: 'fetch',
         crossOrigin: 'anonymous',
       },
       {
         rel: 'preload',
-        href: `/w/${server}/${data?.locale}.raid_info.bin`,
+        href: cdn(`/w/${server}/${getLocaleShortName(data?.locale)}.raid_info.bin`),
         as: 'fetch',
         crossOrigin: 'anonymous',
       },

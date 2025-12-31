@@ -1,5 +1,5 @@
 // TreasurePlanner.tsx
-import React, { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { InteractiveSimulator } from './treasure/InteractiveSimulator';
 import { ItemIcon } from '../common/Icon';
 import type { EventData, IconData, TreasureReward, TreasureRound } from '~/types/plannerData';

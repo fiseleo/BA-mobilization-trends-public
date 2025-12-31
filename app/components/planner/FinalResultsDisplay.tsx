@@ -39,6 +39,10 @@ const getTransactionSourceName = (source: string, t: TFunction<"planner", undefi
     'dreamMaker_cost': 'source.dreamMakerCost',
     'dreamMaker_reward': 'source.dreamMakerReward',
     'studentGrowth_cost': 'source.studentGrowthCost',
+    'cardMatch_reward': 'source.cardMatchReward',
+    'cardMatch_cost': 'source.cardMatchCost',
+    'minigame_ccg_cost': 'source.minigameCCGCost',
+    'minigame_ccg_reward': 'source.minigameCCGReward',
   };
   return t(keyMap[source] || source as any);
 };

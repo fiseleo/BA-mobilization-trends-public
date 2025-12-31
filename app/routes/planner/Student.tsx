@@ -1,3 +1,4 @@
+// app/routes/planner/Student.tsx
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ItemIcon } from '~/components/planner/common/Icon';
@@ -8,25 +9,14 @@ import type { EventData, IconData, StudentData, StudentPortraitData } from '~/ty
 import { calculatedGrowthNeeds } from '~/utils/calculatedGrowthNeeds';
 import iconDataInfoModule from "~/data/event/icon_info.json"
 import iconDataAllModule from "~/data/event/icon_img.json"
-import { DEFAULT_LOCALE, type Locale } from '~/utils/i18n/config';
-import type { loader as rootLorder } from "~/root";
-import { data, type LoaderFunctionArgs, type MetaFunction } from 'react-router';
+import { getLocaleShortName, type Locale } from '~/utils/i18n/config';
+import { data, Link, type LoaderFunctionArgs } from 'react-router';
 import { createLinkHreflang, createMetaDescriptor } from '~/components/head';
-import type { Route } from './+types/StudentPlannerPage';
+import type { Route } from './+types/Student';
 import { getInstance } from '~/middleware/i18next';
-
-
-// export const meta: MetaFunction<typeof rootLorder, {
-//   "root": typeof rootLorder,
-// }> = ({ matches, params }) => {
-//   matches.find(m => m.id)
-//   const rootMatch = matches.find(m => m.id === "root");
-//   const locale_data = rootMatch ? rootMatch.loaderData : null;
-//   const locale = locale_data ? locale_data.locale : DEFAULT_LOCALE;
-
-//   const t = i18n.getFixedT(locale, undefined, 'home');
-//   const t_ranking = i18n.getFixedT(locale, undefined, 'planner');
-//   const t_c = i18n.getFixedT(locale, undefined, 'common');
+import { FaCompressArrowsAlt, FaExpandArrowsAlt, FaExternalLinkAlt } from 'react-icons/fa';
+import { localeLink } from '~/utils/localeLink';
+import { cdn } from '~/utils/cdn';
 
 export async function loader({ context, params, request }: LoaderFunctionArgs) {
   let i18n = getInstance(context);
@@ -41,7 +31,7 @@ export async function loader({ context, params, request }: LoaderFunctionArgs) {
 export function meta({ loaderData }: Route.MetaArgs) {
 
   return createMetaDescriptor(
-    loaderData.title + ' - ' + loaderData.siteTitle,
+    loaderData.title + ' | ' + loaderData.siteTitle,
     loaderData.description,
     "/img/p.webp"
   )
@@ -61,6 +51,7 @@ export const StudentPlannerPage = () => {
   const iconInfoData = iconDataInfoModule as any as EventData["icons"]
   const iconData = iconDataAllModule as IconData
   const [loading, setLoading] = useState(true);
+  const [isSummaryExpanded, setIsSummaryExpanded] = useState(false);
 
   // State to store the uuid of the currently selected (detail view) card
   const [selectedPlanUuid, setSelectedPlanUuid] = useState<string | null>(null);
@@ -73,8 +64,8 @@ export const StudentPlannerPage = () => {
     const fetchData = async () => {
       try {
         const [studentsRes, portraitsRes] = await Promise.all([
-          fetch(`/schaledb.com/${locale}.students.min.json`),
-          fetch('/w/students_portrait.json'),
+          fetch(cdn(`/schaledb.com/${getLocaleShortName(locale)}.students.min.json`)),
+          fetch(cdn('/w/students_portrait.json')),
         ]);
         setAllStudents(await studentsRes.json());
         setStudentPortraits(await portraitsRes.json());
@@ -112,9 +103,9 @@ export const StudentPlannerPage = () => {
 
 
   return (
-    <div className="bg-gray-100 dark:bg-neutral-900 min-h-screen p-4 sm:p-8">
+    <div className="bg-gray-100 dark:bg-neutral-900 min-h-screen p-3 sm:p-7">
       <div className="max-w-7xl mx-auto space-y-6">
-        <header className="flex justify-between items-center">
+        <header className="p-1 flex justify-between items-center">
           <h1 className="text-3xl font-bold dark:text-gray-100">{t('page.studentGrowthPlanner')}</h1>
           <button onClick={() => addPlan(null)} className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 transition-colors">
             {t("ui.addNewPlan")}
@@ -148,8 +139,37 @@ export const StudentPlannerPage = () => {
             {/* Total required materials */}
             {Object.keys(totalNeeds).length > 0 && iconData && (
               <div className="p-4 bg-white dark:bg-neutral-800 rounded-xl shadow-md sticky top-4">
-                <h2 className="text-xl font-bold dark:text-gray-100">Total Requirements</h2>
-                <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t dark:border-neutral-700 max-h-48 overflow-y-auto">
+
+                {/* 1. Header: Title and Expand Button */}
+                <div className="flex justify-between items-center mb-2">
+                  <h2 className="text-xl font-bold dark:text-gray-100">
+                    {t('ui.totalNeededTitle', 'Total Requirements')}
+                  </h2>
+                  <button
+                    onClick={() => setIsSummaryExpanded(prev => !prev)}
+                    className="text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white"
+                    title={isSummaryExpanded ? t_c('close') : t_c('open')}
+                  >
+                    {isSummaryExpanded ? <FaCompressArrowsAlt size={14} /> : <FaExpandArrowsAlt size={14} />}
+                  </button>
+                </div>
+
+                {/* 2. Link Area (Considering extensibility) */}
+                <div className="flex items-center gap-4 mb-3 pb-3 border-b dark:border-neutral-700">
+                  <Link
+                    to={localeLink(locale, "/planner/equipment")}
+                    className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+                  >
+                    <FaExternalLinkAlt size={10} />
+                    {/* Add text label */}
+                    <span>{t('equipment.goToPlanner', 'Go to Equipment Planner')}</span>
+                  </Link>
+                  {/* Other links can be added here later */}
+                </div>
+
+                {/* 3. Content Area */}
+                <div className={`flex flex-wrap gap-2 transition-all duration-300 ease-in-out ${isSummaryExpanded ? 'max-h-[50vh] overflow-y-auto' : 'max-h-48 overflow-y-auto'
+                  } scrollbar-thin`}>
                   {Object.entries(totalNeeds).map(([key, amount]) => {
                     if (amount <= 0) return null;
                     const [type, id] = key.split('_');
@@ -158,6 +178,7 @@ export const StudentPlannerPage = () => {
                 </div>
               </div>
             )}
+
           </div>
 
           {/* --- Right: Detail view (fullscreen on mobile, shown on right on desktop) --- */}

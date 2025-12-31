@@ -1,5 +1,5 @@
 import type { RaidInfo } from "~/types/data";
-import type { Locale } from "~/utils/i18n/config";
+import { getLocaleShortName, type Locale } from "~/utils/i18n/config";
 import { difficultyInfo } from "./Difficulty";
 
 export const typecolor = {
@@ -10,16 +10,16 @@ export const typecolor = {
 }
 
 export const type_translation = {
-    LightArmor: { ko: '경장갑', en: 'LightArmor', ja: '軽装備' },
-    HeavyArmor: { ko: '중장갑', en: 'HeavyArmor', ja: '重装甲' },
-    Unarmed: { ko: '특수장갑', en: 'Unarmed', ja: '特殊装甲' },
-    ElasticArmor: { ko: '탄력장갑', en: 'ElasticArmor', ja: '弾力装甲' },
+    LightArmor: { ko: '경장갑', en: 'LightArmor', ja: '軽装備', zh_Hant: '輕型護甲' },
+    HeavyArmor: { ko: '중장갑', en: 'HeavyArmor', ja: '重装甲', zh_Hant: '重型裝甲' },
+    Unarmed: { ko: '특수장갑', en: 'Unarmed', ja: '特殊装甲', zh_Hant: '特殊裝甲' },
+    ElasticArmor: { ko: '탄력장갑', en: 'ElasticArmor', ja: '弾力装甲', zh_Hant: '彈性裝甲' },
 }
 const type_translation_sorted = {
-    LightArmor: { ko: '경장', en: 'Light', ja: '爆発' },
-    HeavyArmor: { ko: '중장', en: 'Heavy', ja: '貫通' },
-    Unarmed: { ko: '특장', en: 'Unarmed', ja: '神秘' },
-    ElasticArmor: { ko: '탄력', en: 'Elastic', ja: '振動' },
+    LightArmor: { ko: '경장', en: 'Light', ja: '爆発', zh_Hant: '輕型' },
+    HeavyArmor: { ko: '중장', en: 'Heavy', ja: '貫通', zh_Hant: '重型' },
+    Unarmed: { ko: '특장', en: 'Unarmed', ja: '神秘', zh_Hant: '特殊' },
+    ElasticArmor: { ko: '탄력', en: 'Elastic', ja: '振動', zh_Hant: '彈性' },
 }
 
 export function getMostDifficultLevel(raid: RaidInfo) {
@@ -32,7 +32,7 @@ export function raidToString(raid: RaidInfo, locale: Locale, showDate: boolean =
     if (!raid) return 'unknown'
     const { Id, Boss, Type, Date: date, Alias } = raid;
     if (onlyId) {
-        if (Type) return Id + ' ' + type_translation_sorted[Type][locale]
+        if (Type) return Id + ' ' + type_translation_sorted[Type][getLocaleShortName(locale)]
         else return Id
     }
     const arr = []
@@ -41,7 +41,7 @@ export function raidToString(raid: RaidInfo, locale: Locale, showDate: boolean =
     else {
         arr.push(Boss)
     }
-    if (!color && Type) arr.push(type_translation_sorted[Type][locale])
+    if (!color && Type) arr.push(type_translation_sorted[Type][getLocaleShortName(locale)])
     let txt = arr.join('-')
     if (showDate && date) txt += ` (${(new Date(date)).toLocaleDateString()})`
 
@@ -61,7 +61,7 @@ export function raidToStringTsx(raid: RaidInfo, locale: Locale, showDate: boolea
     else {
         arr.push(Boss)
     }
-    if (Type) arr.push(type_translation_sorted[Type][locale])
+    if (Type) arr.push(type_translation_sorted[Type][getLocaleShortName(locale)])
     let txt = arr.join('-')
     if (showDate && date) txt += ` (${(new Date(date)).toLocaleDateString()})`
 

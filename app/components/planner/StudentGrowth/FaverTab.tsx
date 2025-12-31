@@ -1,5 +1,5 @@
 // AffectionTab.tsx
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { affectionExpToNextLevel } from '~/data/growthData';
 import { useGlobalStore, type GrowthPlan } from '~/store/planner/useGlobalStore';
 import type { EventData, IconData, IconInfos } from '~/types/plannerData';
@@ -167,7 +167,7 @@ export const AffectionTab = ({ plan, giftAffectionList, eventData, iconData, han
                 setTargetResult(resultJSX);
             }
         } else {
-// Call rendering function based on the full required experience (expNeedForTarget) if the gift is not considered for holding
+            // Call rendering function based on the full required experience (expNeedForTarget) if the gift is not considered for holding
             if (expNeededForTarget <= 0) {
                 setTargetResult(t('affectionTab.results.targetMet'));
             } else {
@@ -232,25 +232,44 @@ export const AffectionTab = ({ plan, giftAffectionList, eventData, iconData, han
                         </label>
                     </div>
                 </div>
-                <div className="max-h-60 overflow-y-auto flex flex-wrap justify-center gap-2">
-                    {displayedGifts.map(gift => (
-                        <div key={gift.id} className="w-18 p-1.5 bg-white dark:bg-neutral-800 rounded-md shadow-sm flex flex-col items-center gap-1 border dark:border-neutral-700">
-                            <ItemIcon type={gift.type} itemId={gift.id} amount={0} size={12} eventData={eventData} iconData={iconData} />
-                            <div className='flex flex-row items-center gap-x-1'>
-                                <img
-                                    src={getPreferenceIcon(gift.preferenceLevel, gift.rarity)}
-                                    alt={t('common.preferenceLevelAlt', { level: gift.preferenceLevel })}
-                                    className="object-contain h-4 w-4"
-                                />
-                                <span className="text-xs font-bold text-yellow-600 dark:text-yellow-500">
-                                    +{gift.affectionPoints}
-                                </span>
+                <div className="max-h-60 overflow-y-auto rounded-lg border border-gray-200 dark:border-neutral-700">
+
+                    <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-7 lg:grid-cols-7 gap-px bg-gray-200 dark:bg-neutral-700">
+                        {displayedGifts.map(gift => (
+                            <div
+                                key={gift.id}
+                                className="bg-white dark:bg-neutral-800 p-2 flex flex-col items-center justify-between gap-1.5"
+                            >
+                                <div className="flex flex-col items-center gap-1 w-full">
+                                    <div className="relative">
+                                        <ItemIcon type={gift.type} itemId={gift.id} amount={0} size={10} eventData={eventData} iconData={iconData} />
+
+                                    </div>
+
+                                    <div className='flex items-center gap-0.5 justify-center w-full'>
+                                        <img
+                                            src={getPreferenceIcon(gift.preferenceLevel, gift.rarity)}
+                                            alt={t('common.preferenceLevelAlt', { level: gift.preferenceLevel })}
+                                            className="object-contain h-3 w-3 opacity-80"
+                                        />
+                                        <span className="text-[10px] sm:text-xs font-bold text-yellow-600 dark:text-yellow-500 leading-none">
+                                            +{gift.affectionPoints}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div className="w-full">
+                                    <NumberInput
+                                        value={ownedGifts[gift.id] || 0}
+                                        onChange={val => updateOwnedGifts(gift.id, val)}
+                                        min={0}
+                                        max={99999}
+                                        narrowButtonType='plus'
+                                    />
+                                </div>
                             </div>
-                            <div className="w-full">
-                                <NumberInput value={ownedGifts[gift.id] || 0} onChange={val => updateOwnedGifts(gift.id, val)} min={0} max={99999} />
-                            </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
             </div>
 

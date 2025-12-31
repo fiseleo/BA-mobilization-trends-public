@@ -44,3 +44,5 @@ season,startTime,endTime,type,teran,armorType,3nd,4nd
 43,2025-09-03 11:00:00,2025-09-10 03:59:59,shooting,Street,ElasticArmor,"마지막 박스캣 받는 대미지 감소","SR 무기 공격력 증가"
 44,2025-10-08 11:00:00,2025-10-15 03:59:59,defense,Indoor,LightArmor,"이동속도 증가, 피격 시 넉백","사망 시, 주변에 대미지"
 45,2025-11-05 11:00:00,2025-11-12 03:59:59,escort,Outdoor,ElasticArmor,"적을 쓰러뜨렸을 때 defense력 감소, 받는 대미지량 증가","적의 HP가 감소할 때, 다른 적의 HP 회복"
+46,2025-12-03 11:00:00,2025-12-10 03:59:59,breakthrough,Outdoor,LightArmor,,
+47,2026-01-07 11:00:00,2026-01-14 03:59:59,escort,Street,HeavyArmor,,

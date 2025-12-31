@@ -1,8 +1,12 @@
-import React from 'react';
+// app/components/planner/StudentGrowth/EquipmentTab.tsx
 import { TIER_OPTIONS, TIER_TO_LEVEL } from './StudentGrowthPlanCard';
 import type { GrowthPlan } from '~/store/planner/useGlobalStore';
 import type { Student } from '~/types/plannerData';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router';
+import { localeLink } from '~/utils/localeLink';
+import { FaExternalLinkAlt } from 'react-icons/fa';
+import type { Locale } from '~/utils/i18n/config';
 
 export const EquipmentTab = ({ plan, studentInfo, handleEquipmentChange }: {
     plan: GrowthPlan;
@@ -11,11 +15,25 @@ export const EquipmentTab = ({ plan, studentInfo, handleEquipmentChange }: {
 
 }) => {
     const { t, i18n } = useTranslation("planner");
+    // Get locale for localeLink
+    const locale = i18n.language as Locale;
 
     if (!studentInfo) return <div className="text-center p-4">Please choose the student first.</div>;
 
     return (
-        <div className="space-y-2 text-sm">
+        // Changed space-y-2 -> space-y-4
+        <div className="space-y-4 text-sm">
+
+            {/* Link to Equipment Farming Planner */}
+            <div className="flex justify-end">
+                <Link
+                    to={localeLink(locale, "/planner/equipment")}
+                    className="flex items-center gap-1.5 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                    {t('equipment.goToPlanner')}
+                    <FaExternalLinkAlt size={12} />
+                </Link>
+            </div>
 
             <div className="space-y-4 text-sm">
                 {studentInfo.Equipment.map((equipmentName, i) => {
@@ -30,7 +48,7 @@ export const EquipmentTab = ({ plan, studentInfo, handleEquipmentChange }: {
                             <div className="flex justify-center items-center gap-2 sm:gap-4">
 
                                 <div className="w-20 font-bold text-sm mr-2 text-gray-800 dark:text-neutral-200">
-                                    {t(`common.${equipmentName}`)}:
+                                    {t(`common.${equipmentName}` as any)}:
                                 </div>
 
                                 <div className={`flex-1 space-y-1 ${!isEnabledCurrent ? 'opacity-50' : ''}`}>

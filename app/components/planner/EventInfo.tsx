@@ -27,6 +27,20 @@ interface SortedEvent {
   id: number;
   name: string;
   openTime: string;
+  Planable?: boolean
+}
+
+export function eventTagTranslation(tag: string, t: any) {
+  if (tag == 'Stage') return t('common.stage')
+  else if (tag == 'Shop') return t('common.shop')
+  else if (tag == 'Mission') return t('common.mission')
+  else if (tag == 'BoxGacha') return `${t('ui.minigame')} - ${t('minigame.roulette')}`
+  else if (tag == 'FortuneGachaShop') return `${t('ui.minigame')} - ${t('minigame.omikuji')}`
+  else if (tag == 'DiceRace') return `${t('ui.minigame')} - ${t('minigame.diceRace')}`
+  else if (tag == 'Concentration') return `${t('ui.minigame')} - ${t('minigame.card_match')}`
+  else if (tag == 'Treasure') return `${t('ui.minigame')} - ${t('minigame.treasureHunt')}`
+  else if (tag == 'CardShop') return `${t('ui.minigame')} - ${t('placeholder.cardGacha')}`
+  return tag
 }
 
 export const EventInfo = ({ name, eventId, startTime, endTime, eventContentTypeStr }: EventInfoProps) => {
@@ -42,6 +56,9 @@ export const EventInfo = ({ name, eventId, startTime, endTime, eventContentTypeS
 
   const sortedEvents: SortedEvent[] = useMemo(() => {
     return Object.entries(eventList)
+      .filter(([, details]) => {
+        return (details as any).Planable != false
+      })
       .map(([id, details]) => ({
         id: Number(id),
         name: (details as any)[locale_key] || (details as any).Jp || `Event ${id}`,
@@ -107,7 +124,7 @@ export const EventInfo = ({ name, eventId, startTime, endTime, eventContentTypeS
         <div className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
           <HiOutlineCalendarDays className="h-5 w-5 shrink-0" />
           <span>
-            {formatInTimeZone(startTime).toLocaleString()} ~ {formatInTimeZone(endTime).toLocaleString()}
+            <time dateTime={startTime}>{formatInTimeZone(startTime).toLocaleString()}</time> {locale == 'en' ? '-' : '~'} <time dateTime={endTime}>{formatInTimeZone(endTime).toLocaleString()}</time>
           </span>
         </div>
 
@@ -116,7 +133,8 @@ export const EventInfo = ({ name, eventId, startTime, endTime, eventContentTypeS
           <HiOutlineTag className="h-5 w-5 shrink-0 text-neutral-600 dark:text-neutral-400" />
           {eventContentTypeStr.map((v, i) => (
             <span key={i} className="rounded-full bg-neutral-200 dark:bg-neutral-700 px-3 py-0.5 text-xs font-medium text-neutral-700 dark:text-neutral-200">
-              {v}
+              {/* {v} */}
+              {eventTagTranslation(v, t)}
             </span>
           ))}
         </div>

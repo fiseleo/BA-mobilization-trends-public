@@ -68,7 +68,7 @@ const BossTeamDetails: FC<{
                         {team.m.map((c, j) => (
                             <StudentIcon
                                 key={`${i}-m-${c?.id}-${j}`}
-                                character={c} // [KEY FIX] Pass the full character object
+                                character={c} // Pass the full character object
                                 student={studentData[c?.id]}
                                 portraitData={portraitData}
                             />
@@ -77,7 +77,7 @@ const BossTeamDetails: FC<{
                         {team.s.map((c, j) => (
                             <StudentIcon
                                 key={`${i}-s-${c?.id}-${j}`}
-                                character={c} // [KEY FIX] Pass the full character object
+                                character={c} // Pass the full character object
                                 student={studentData[c?.id]}
                                 portraitData={portraitData}
                             />

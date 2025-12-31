@@ -2,6 +2,7 @@ import { Link } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import type { Locale } from '~/utils/i18n/config'
 import LocaleSwitcher from './LocaleSwitcher' // Language switcher
+import { issuesURL as GITHUB_TRANSLATE_URL } from '~/data/livedataServer.json'
 
 // Define data types for component props
 type BannerData = {
@@ -34,14 +35,12 @@ export function LanguageBanner({ bannerData, onDismiss }: Props) {
   // but in the preferred language detected by the server (displayLocale)
 
   const t = i18n.getFixedT(bannerData.displayLocale, "language_banner",) // Assuming 'common' namespace
-  console.log('bannerData.displayLocale', bannerData.displayLocale, t("message"))
+  // console.log('bannerData.displayLocale', bannerData.displayLocale, t("message"))
 
   const languageName = bannerData.suggestedLocale
     ? getNativeLanguageName(bannerData.suggestedLocale)
     : ''
 
-  // (Improvement 3) GitHub link (change to actual URL)
-  const GITHUB_TRANSLATE_URL = 'https://github.com/bluekiseki/BA-mobilization-trends-public/issues'
 
   return (
     <div

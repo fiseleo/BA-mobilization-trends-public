@@ -1,3 +1,4 @@
+// app/routes/locales.ts
 import { data } from "react-router";
 import { cacheHeader } from "pretty-cache-header";
 import { z } from "zod";
@@ -34,6 +35,8 @@ export async function loader({ params }: Route.LoaderArgs) {
   const ns = z
     .enum(Object.keys(namespaces) as Array<keyof typeof namespaces>)
     .safeParse(params.ns);
+
+    // console.log('Object.keys(namespaces)',resources)
 
   if (ns.error) return data({ error: ns.error }, { status: 400 });
 

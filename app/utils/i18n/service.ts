@@ -1,6 +1,6 @@
-import { createInstance } from "i18next";
+// import { createInstance } from "i18next";
 import { DEFAULT_LOCALE, SUPORTED_LOCALES, type Locale } from "./config";
-import { initReactI18next } from "react-i18next";
+// import { initReactI18next } from "react-i18next";
 // import { i18nConfig } from "~/i18n";
 
 export function getLocaleFromHeaders(request: Request): Locale {
