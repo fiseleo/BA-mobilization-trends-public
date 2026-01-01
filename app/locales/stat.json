@@ -475,5 +475,8 @@
         "Special_CH0309_Public": "「薬莢クリップ」",
         "Special_CH0229_Ex": "「穏やかな評」",
         "Special_CH0228_Ex": "「売上」"
+    },
+    "zh-Hant-TW": {
+        // Translations go here
     }
 }
